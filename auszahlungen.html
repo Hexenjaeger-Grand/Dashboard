@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auszahlungen - Hexenjäger</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .summary-icon {
+            font-size: 2.5em;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+
+        .summary-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-purple-light);
+            margin: var(--space-sm) 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .payout-actions {
+            display: flex;
+            gap: var(--space-sm);
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: var(--space-sm);
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--accent-purple);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .details-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .details-content {
+            background: var(--bg-card);
+            margin: 5% auto;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid var(--border-color);
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .event-details-list {
+            margin-top: var(--space-lg);
+        }
+
+        .event-detail-item {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-info {
+            flex: 1;
+        }
+
+        .event-date {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-bottom: var(--space-xs);
+        }
+
+        .event-description {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .event-amount {
+            color: var(--accent-purple-light);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .member-details {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: var(--space-xs);
+        }
+
+        .member-id {
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .total-amount {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--bg-darker);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-lg);
+        }
+
+        .total-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .total-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-purple-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 3em;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
+        }
+
+        .payout-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--bg-darker);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hexenjaeger-symbol"></div>
+            <h1>Auszahlungen</h1>
+            <p>Verwalte offene Auszahlungen</p>
+            <a href="index.html" class="back-btn">← Zurück zur Übersicht</a>
+        </header>
+
+        <!-- Übersichtskarten -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-number" id="totalPayouts">0</div>
+                <div class="summary-label">Offene Auszahlungen</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">💵</div>
+                <div class="summary-number" id="totalAmount">$0</div>
+                <div class="summary-label">Gesamtbetrag</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">👥</div>
+                <div class="summary-number" id="totalMembers">0</div>
+                <div class="summary-label">Betroffene Mitglieder</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">📊</div>
+                <div class="summary-number" id="avgPayout">$0</div>
+                <div class="summary-label">Durchschnitt pro Mitglied</div>
+            </div>
+        </div>
+
+        <!-- Schnellaktionen -->
+        <div class="payout-summary">
+            <div>
+                <h3 style="margin: 0; color: var(--text-light);">Offene Auszahlungen</h3>
+                <p style="margin: var(--space-xs) 0 0 0; color: var(--text-muted); font-size: 0.9em;">
+                    <span id="summaryText">Keine offenen Auszahlungen</span>
+                </p>
+            </div>
+            <div class="summary-actions">
+                <button onclick="window.location.href='eingabe.html'" class="btn btn-primary">
+                    📝 Neues Event
+                </button>
+            </div>
+        </div>
+
+        <!-- Auszahlungs-Tabelle -->
+        <div class="card">
+            <h2>Offene Auszahlungen</h2>
+            
+            <div id="payoutTable" class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mitglied</th>
+                            <th>ID</th>
+                            <th>Gesamtbetrag</th>
+                            <th>Events</th>
+                            <th>Letzte Aktivität</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payoutBody">
+                        <!-- Wird via JavaScript gefüllt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="noPayouts" class="empty-state" style="display: none;">
+                <div class="empty-icon">💤</div>
+                <h3 style="color: var(--text-muted); margin-bottom: var(--space-sm);">Keine offenen Auszahlungen</h3>
+                <p style="color: var(--text-muted); margin-bottom: var(--space-lg);">
+                    Es sind aktuell keine Auszahlungen offen.
+                </p>
+                <button onclick="window.location.href='eingabe.html'" class="btn btn-primary">
+                    📝 Erstes Event erfassen
+                </button>
+            </div>
+        </div>
+
+        <!-- Details Modal -->
+        <div id="detailsModal" class="details-modal">
+            <div class="details-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+                    <h3 style="color: var(--accent-purple-light); margin: 0;" id="detailsTitle">Event Details</h3>
+                    <button onclick="closeDetails()" class="btn-icon">
+                        <span style="font-size: 18px;">✕</span>
+                    </button>
+                </div>
+                
+                <div class="member-header" id="memberHeader">
+                    <!-- Wird via JavaScript gefüllt -->
+                </div>
+                
+                <div class="event-details-list" id="eventDetailsList">
+                    <!-- Event Details werden hier geladen -->
+                </div>
+                
+                <div class="total-amount">
+                    <div class="total-label">Gesamtauszahlung</div>
+                    <div class="total-value" id="modalTotalAmount">$0</div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-sm); justify-content: center; margin-top: var(--space-xl);">
+                    <button onclick="completePayout(currentMemberDetails)" class="btn btn-primary">
+                        ✅ Auszahlung bestätigen
+                    </button>
+                    <button onclick="closeDetails()" class="btn btn-secondary">
+                        ❌ Abbrechen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentMemberDetails = null;
+
+        function loadPayouts() {
+            const events = db.getEvents();
+            const members = db.getMembers();
+            const tbody = document.getElementById('payoutBody');
+            const noPayouts = document.getElementById('noPayouts');
+            const summaryText = document.getElementById('summaryText');
+
+            // Berechne Auszahlungen aus Events
+            const memberPayouts = calculatePayoutsFromEvents(events, members);
+
+            // Update Summary Cards
+            document.getElementById('totalPayouts').textContent = events.length;
+            document.getElementById('totalMembers').textContent = memberPayouts.length;
+            
+            const totalAmount = memberPayouts.reduce((sum, payout) => sum + payout.total, 0);
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+            
+            const avgPayout = memberPayouts.length > 0 ? Math.round(totalAmount / memberPayouts.length) : 0;
+            document.getElementById('avgPayout').textContent = formatCurrency(avgPayout);
+
+            // Update Summary Text
+            if (memberPayouts.length === 0) {
+                summaryText.textContent = 'Keine offenen Auszahlungen';
+            } else {
+                summaryText.textContent = `${memberPayouts.length} Mitglieder warten auf Auszahlung`;
+            }
+
+            if (memberPayouts.length === 0) {
+                tbody.innerHTML = '';
+                noPayouts.style.display = 'block';
+                return;
+            }
+
+            noPayouts.style.display = 'none';
+
+            // Sortiere nach Betrag (absteigend)
+            memberPayouts.sort((a, b) => b.total - a.total);
+
+            tbody.innerHTML = memberPayouts.map(payout => {
+                const eventCount = payout.eventCount;
+                const lastEvent = payout.events.length > 0 ? 
+                    new Date(payout.events[payout.events.length - 1].date) : 
+                    new Date();
+                
+                const timeAgo = getTimeAgo(lastEvent);
+
+                return `
+                    <tr>
+                        <td>
+                            <strong>${payout.memberName}</strong>
+                        </td>
+                        <td>
+                            <code>${payout.memberId}</code>
+                        </td>
+                        <td>
+                            <strong style="color: var(--accent-purple); font-size: 1.1em;">
+                                ${formatCurrency(payout.total)}
+                            </strong>
+                        </td>
+                        <td>
+                            <span style="color: var(--text-muted);">${eventCount}</span>
+                        </td>
+                        <td>
+                            <small style="color: var(--text-muted);">${timeAgo}</small>
+                        </td>
+                        <td>
+                            <div class="payout-actions">
+                                <button onclick="showDetails('${payout.memberId}')" class="btn btn-secondary btn-small" title="Details anzeigen">
+                                    👁️ Details
+                                </button>
+                                <button onclick="completePayout('${payout.memberId}')" class="btn btn-primary btn-small" title="Auszahlung bestätigen">
+                                    ✅ Auszahlen
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function calculatePayoutsFromEvents(events, members) {
+            const memberPayouts = {};
+            
+            events.forEach(event => {
+                const eventType = event.eventType;
+                const amount = event.amount || 1;
+                const totalAmount = event.totalAmount || 0;
+                
+                // Berechne den Betrag für dieses Event
+                let calculatedAmount = 0;
+                
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(eventType)) {
+                    // Shared Events - Betrag wird aufgeteilt
+                    calculatedAmount = totalAmount > 0 ? Math.round(totalAmount / event.memberIds.length) : 0;
+                } else {
+                    // Individuelle Events - verwende den Event-Preis
+                    calculatedAmount = db.getEventPrice(eventType, amount);
+                }
+                
+                // Verteile auf Mitglieder
+                event.memberIds.forEach(memberId => {
+                    const member = members.find(m => m.id === memberId);
+                    if (member) {
+                        if (!memberPayouts[memberId]) {
+                            memberPayouts[memberId] = {
+                                memberId: memberId,
+                                memberName: member.name,
+                                total: 0,
+                                eventCount: 0,
+                                events: []
+                            };
+                        }
+                        
+                        memberPayouts[memberId].total += calculatedAmount;
+                        memberPayouts[memberId].eventCount += 1;
+                        memberPayouts[memberId].events.push({
+                            eventType: eventType,
+                            amount: amount,
+                            totalAmount: calculatedAmount,
+                            date: event.date,
+                            sharedEvent: ['cayo', 'rp_fabrik', 'ekz'].includes(eventType)
+                        });
+                    }
+                });
+            });
+            
+            return Object.values(memberPayouts);
+        }
+
+        function showDetails(memberId) {
+            const events = db.getEvents();
+            const members = db.getMembers();
+            const detailsList = document.getElementById('eventDetailsList');
+            const detailsTitle = document.getElementById('detailsTitle');
+            const memberHeader = document.getElementById('memberHeader');
+            const modalTotalAmount = document.getElementById('modalTotalAmount');
+            
+            currentMemberDetails = memberId;
+            
+            // Finde Mitglied
+            const member = members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            // Setze Titel und Header
+            detailsTitle.textContent = `Event Details`;
+            memberHeader.innerHTML = `
+                <div class="member-avatar">${member.name.charAt(0)}</div>
+                <div class="member-details">
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-id">${member.id}</div>
+                </div>
+            `;
+            
+            // Filtere Events für dieses Mitglied
+            const memberEvents = events.filter(event => 
+                event.memberIds.includes(memberId)
+            );
+            
+            if (memberEvents.length === 0) {
+                detailsList.innerHTML = '<div class="empty-state">Keine Event-Daten gefunden</div>';
+                modalTotalAmount.textContent = formatCurrency(0);
+                return;
+            }
+
+            let totalAmount = 0;
+            detailsList.innerHTML = memberEvents.map(event => {
+                const eventType = event.eventType;
+                const amount = event.amount || 1;
+                const totalAmountEvent = event.totalAmount || 0;
+                
+                // Berechne Betrag für dieses Event
+                let calculatedAmount = 0;
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(eventType)) {
+                    calculatedAmount = totalAmountEvent > 0 ? Math.round(totalAmountEvent / event.memberIds.length) : 0;
+                } else {
+                    calculatedAmount = db.getEventPrice(eventType, amount);
+                }
+                
+                totalAmount += calculatedAmount;
+                
+                const eventNames = {
+                    'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
+                    '40er_win': '40er Win', '40er_lose': '40er Lose',
+                    'giesserei': 'Gießerei', 'waffenfabrik': 'Waffenfabrik',
+                    'hafen': 'Hafen', 'cayo': 'Cayo Perico', 
+                    'rp_fabrik': 'RP Fabrik', 'ekz': 'EKZ'
+                };
+                
+                const eventName = eventNames[eventType] || eventType;
+                const unit = eventType.includes('hafen') ? 'Drops' : 
+                            eventType === 'ekz' ? 'Wins' : 'Kills';
+                
+                const eventDate = new Date(event.date).toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const isShared = ['cayo', 'rp_fabrik', 'ekz'].includes(eventType);
+                const sharedInfo = isShared ? ` (geteilt mit ${event.memberIds.length} Mitgliedern)` : '';
+                
+                return `
+                    <div class="event-detail-item">
+                        <div class="event-info">
+                            <div class="event-date">${eventDate}</div>
+                            <div class="event-description">
+                                ${eventName} - ${amount} ${unit}${sharedInfo}
+                            </div>
+                        </div>
+                        <div class="event-amount">${formatCurrency(calculatedAmount)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            modalTotalAmount.textContent = formatCurrency(totalAmount);
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        function closeDetails() {
+            document.getElementById('detailsModal').style.display = 'none';
+            currentMemberDetails = null;
+        }
+
+        function completePayout(memberId) {
+            const member = db.getMembers().find(m => m.id === memberId);
+            if (!member) return;
+            
+            if (confirm(`Auszahlung für ${member.name} bestätigen?\n\nDiese Aktion markiert alle Events dieses Mitglieds als ausgezahlt.`)) {
+                const result = db.completePayout(memberId);
+                if (result.success) {
+                    showNotification(`✅ Auszahlung für ${member.name} über ${formatCurrency(result.amount)} erfolgreich abgeschlossen!`, 'success');
+                    closeDetails();
+                    loadPayouts(); // Neu laden um die Änderung zu sehen
+                } else {
+                    showNotification('❌ Fehler: ' + result.error, 'error');
+                }
+            }
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Gerade eben';
+            if (diffMins < 60) return `Vor ${diffMins} min`;
+            if (diffHours < 24) return `Vor ${diffHours} h`;
+            if (diffDays === 1) return 'Gestern';
+            if (diffDays < 7) return `Vor ${diffDays} Tagen`;
+            if (diffDays < 30) return `Vor ${Math.floor(diffDays / 7)} Wochen`;
+            return `Vor ${Math.floor(diffDays / 30)} Monaten`;
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPayouts();
+            
+            // Auto-Refresh alle 30 Sekunden
+            setInterval(loadPayouts, 30000);
+        });
+    </script>
+</body>
+</html>
