@@ -186,34 +186,40 @@ class HexenjaegerDB {
     }
 }
 
-// Passwort-Validierung mit Bot-API
-async function validatePasswordWithBot(password) {
+// In app.js - Passwort-Validierung ersetzen:
+async function validatePasswordWithBot(password, userId) {
     try {
-        const response = await fetch('http://localhost:3000/api/validate-password?password=' + encodeURIComponent(password));
-        if (!response.ok) {
-            throw new Error('API nicht erreichbar');
-        }
+        const response = await fetch(`http://localhost:3000/api/validate-password?password=${encodeURIComponent(password)}&userId=${encodeURIComponent(userId)}`);
+        if (!response.ok) throw new Error('API nicht erreichbar');
         const data = await response.json();
-        return data.valid;
+        return data;
     } catch (error) {
         console.error('Bot API nicht erreichbar:', error);
-        // Fallback: Lokale Validierung (für Entwicklung)
-        return validatePasswordLocally(password);
+        return { valid: false, accessLevel: 'member' };
     }
 }
 
-// Fallback: Lokale Passwort-Validierung (nur für Entwicklung)
-function validatePasswordLocally(password) {
-    const storedPassword = localStorage.getItem('hj_access');
-    const storedTime = localStorage.getItem('hj_access_time');
+// In der Passwort-Eingabe User ID speichern
+function checkPassword() {
+    const password = document.getElementById('passwordInput').value.trim().toUpperCase();
+    const userId = localStorage.getItem('hj_user_id') || generateTempUserId();
     
-    if (storedPassword && storedTime) {
-        const timePassed = Date.now() - parseInt(storedTime);
-        if (timePassed < 24 * 60 * 60 * 1000 && password === storedPassword) {
-            return true;
+    validatePasswordWithBot(password, userId).then(result => {
+        if (result.valid) {
+            localStorage.setItem('hj_access', password);
+            localStorage.setItem('hj_access_time', Date.now());
+            localStorage.setItem('hj_user_id', userId);
+            localStorage.setItem('hj_access_level', result.accessLevel);
+            document.getElementById('passwordOverlay').style.display = 'none';
+            accessManager.setAccessLevel(result.accessLevel);
+        } else {
+            // Fehler anzeigen
         }
-    }
-    return false;
+    });
+}
+
+function generateTempUserId() {
+    return 'temp_' + Math.random().toString(36).substr(2, 9);
 }
 
 // Zugangslevel Management
