@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hexenjäger Admin</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --text: #eef2ff;
+      --muted: #9aa3b2;
+      --danger: #ef4444;
+      --surface: rgba(14,18,27,.72);
+      --border: #1a2333;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      max-width: 600px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+    }
+    button { background: #3b82f6; color: white; border: none; cursor: pointer; }
+    button:hover { background: #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>🔐 Admin Login</h2>
+    <input type="email" id="email" placeholder="Admin Email">
+    <input type="password" id="password" placeholder="Passwort">
+    <button id="loginBtn">Anmelden</button>
+    <p id="status"></p>
+  </div>
+
+  <div class="card" id="adminPanel" style="display:none">
+    <h2>👥 Mitglieder verwalten</h2>
+    <input type="text" id="memberName" placeholder="Mitglied Name">
+    <input type="text" id="memberId" placeholder="Mitglied ID">
+    <button id="addMemberBtn">Mitglied hinzufügen</button>
+    
+    <h3>Mitglieder Liste</h3>
+    <div id="membersList"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // DEINE FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Login Funktion
+    document.getElementById('loginBtn').onclick = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('status');
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        status.textContent = "Erfolgreich angemeldet!";
+        document.getElementById('adminPanel').style.display = 'block';
+      } catch (error) {
+        status.textContent = "Fehler: " + error.message;
+      }
+    };
+
+    // Mitglied hinzufügen
+    document.getElementById('addMemberBtn').onclick = async () => {
+      const name = document.getElementById('memberName').value;
+      const id = document.getElementById('memberId').value;
+      
+      if (!name) return alert("Name benötigt!");
+      
+      try {
+        await db.collection('members').doc(name).set({
+          name: name,
+          id: id,
+          balance: 0,
+          createdAt: new Date().toISOString()
+        });
+        alert("Mitglied hinzugefügt!");
+        loadMembers();
+      } catch (error) {
+        alert("Fehler: " + error.message);
+      }
+    };
+
+    // Mitglieder laden
+    function loadMembers() {
+      db.collection('members').onSnapshot(snapshot => {
+        const list = document.getElementById('membersList');
+        list.innerHTML = '';
+        
+        snapshot.forEach(doc => {
+          const member = doc.data();
+          const div = document.createElement('div');
+          div.style.padding = '8px';
+          div.style.borderBottom = '1px solid var(--border)';
+          div.textContent = `${member.name} (${member.id}) - $${member.balance || 0}`;
+          list.appendChild(div);
+        });
+      });
+    }
+
+    // Auto-Load wenn angemeldet
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('adminPanel').style.display = 'block';
+        loadMembers();
+      }
+    });
+  </script>
+</body>
+</html>
