@@ -1,1 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hexenjäger Event-Log</title>
+  <style>
+    :root {
+      --bg: #0b0f1a; --text: #f3f4f6; --muted: #cbd5e1;
+      --accent: #7c3aed; --accent2: #06b6d4;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{margin:0;color:var(--text);background:var(--bg);font-family:system-ui;padding:24px 16px;}
+    .wrap{max-width:1200px;margin:0 auto}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    h1{margin:0;font-size:32px}
+    .btn{padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-weight:700;border:none;cursor:pointer}
+    .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px;margin-bottom:16px}
+    input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:var(--text)}
+    .chip-input{display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(0,0,0,.3)}
+    .chip-badge{background:var(--accent);color:white;padding:6px 12px;border-radius:999px;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>📅 Hexenjäger Event-Log</h1>
+      <a class="btn" href="index.html">🏠 Übersicht</a>
+    </div>
 
+    <div class="card">
+      <h2>Neues Event</h2>
+      <select id="eventType">
+        <option value="">Event auswählen</option>
+        <option value="Jagd">🧙‍♂️ Jagd</option>
+        <option value="Ritual">🔮 Ritual</option>
+        <option value="Training">⚔️ Training</option>
+        <option value="Mission">🎯 Mission</option>
+        <option value="Verteidigung">🛡️ Verteidigung</option>
+      </select>
+      
+      <div style="margin:12px 0">
+        <label>Teilnehmer (Name#ID):</label>
+        <div class="chip-input" id="participantsInput">
+          <input type="text" id="participantText" placeholder="Name#ID + Enter">
+        </div>
+      </div>
+
+      <input type="text" id="note" placeholder="Bemerkung (optional)">
+      <button class="btn" id="btnSubmit" style="margin-top:12px">Event speichern</button>
+      <p id="status"></p>
+    </div>
+
+    <div class="card">
+      <h2>Letzte Events</h2>
+      <div id="eventsList"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let participants = [];
+    
+    // Teilnehmer hinzufügen
+    document.getElementById('participantText').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const value = e.target.value.trim();
+        if (value && value.includes('#')) {
+          const [name, id] = value.split('#');
+          participants.push({ name: name.trim(), id: id.trim() });
+          renderParticipants();
+          e.target.value = '';
+        }
+      }
+    });
+
+    function renderParticipants() {
+      const container = document.getElementById('participantsInput');
+      const chips = container.querySelectorAll('.chip-badge');
+      chips.forEach(chip => chip.remove());
+      
+      participants.forEach((p, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip-badge';
+        chip.innerHTML = `${p.name}#${p.id} <span style="cursor:pointer" onclick="removeParticipant(${index})">×</span>`;
+        container.insertBefore(chip, document.getElementById('participantText'));
+      });
+    }
+
+    window.removeParticipant = (index) => {
+      participants.splice(index, 1);
+      renderParticipants();
+    };
+
+    // Event speichern
+    document.getElementById('btnSubmit').onclick = async () => {
+      const type = document.getElementById('eventType').value;
+      const note = document.getElementById('note').value;
+      const status = document.getElementById('status');
+      
+      if (!type) return status.textContent = "Bitte Event-Typ auswählen!";
+      
+      try {
+        await db.collection('eventLogs').add({
+          type,
+          participants: participants,
+          note,
+          ts: new Date().toISOString(),
+          serverTs: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        status.textContent = "Event gespeichert!";
+        participants = [];
+        renderParticipants();
+        document.getElementById('eventType').value = '';
+        document.getElementById('note').value = '';
+        
+        setTimeout(() => status.textContent = '', 2000);
+      } catch (error) {
+        status.textContent = "Fehler: " + error.message;
+      }
+    };
+
+    // Events anzeigen
+    db.collection('eventLogs').orderBy('serverTs', 'desc').limit(20).onSnapshot(snap => {
+      const list = document.getElementById('eventsList');
+      list.innerHTML = '';
+      
+      snap.forEach(doc => {
+        const event = doc.data();
+        const div = document.createElement('div');
+        div.style.padding = '12px';
+        div.style.borderBottom = '1px solid rgba(255,255,255,.1)';
+        div.innerHTML = `
+          <strong>${event.type}</strong> - ${new Date(event.ts).toLocaleString('de-DE')}
+          ${event.note ? `<br><em>${event.note}</em>` : ''}
+          ${event.participants && event.participants.length ? `<br>Teilnehmer: ${event.participants.map(p => p.name + '#' + p.id).join(', ')}` : ''}
+        `;
+        list.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
