@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hexenjäger Auszahlungen</title>
+  <style>
+    :root {
+      --bg: #0f172a; --text: #e5e7eb; --muted: #9ca3af; 
+      --border: #1f2937; --accent: #7c3aed; --accent2: #06b6d4;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui;padding:24px 16px;}
+    .wrap{max-width:1200px;margin:0 auto}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    h1{margin:0;font-size:32px;font-weight:800}
+    .btn{padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-weight:700}
+    .card{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+    .chip{background:#0b1020;border:1px solid var(--border);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:13px}
+    table{width:100%;border-collapse:collapse}
+    thead th{background:#0a0f1f;border-bottom:1px solid var(--border);color:var(--muted);padding:10px;text-align:left}
+    td{padding:10px;border-bottom:1px dashed #1f2a44}
+    .right{text-align:right}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>💰 Hexenjäger Auszahlungen</h1>
+      <a class="btn" href="index.html">🏠 Übersicht</a>
+    </div>
+
+    <div class="card">
+      <div class="chips">
+        <span class="chip">👥 Mitglieder: <b id="statMitglieder">0</b></span>
+        <span class="chip">💶 Gesamtsaldo: <b id="statSaldo">0</b> $</span>
+      </div>
+      <div style="overflow:auto;max-height:38vh;border:1px solid var(--border);border-radius:12px">
+        <table>
+          <thead><tr><th>Mitglied</th><th>ID</th><th class="right">Kontostand ($)</th></tr></thead>
+          <tbody id="tbodyMembers"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
+      <div class="card">
+        <h3>📤 Letzte Auszahlungen</h3>
+        <div style="overflow:auto;max-height:45vh;border:1px solid var(--border);border-radius:12px">
+          <table>
+            <thead><tr><th>Datum</th><th>Mitglied</th><th>Event</th><th class="right">Betrag ($)</th></tr></thead>
+            <tbody id="tbodyPayouts"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📥 Letzte Einzahlungen</h3>
+        <div style="overflow:auto;max-height:45vh;border:1px solid var(--border);border-radius:12px">
+          <table>
+            <thead><tr><th>Datum</th><th>Mitglied</th><th>Event</th><th class="right">Betrag ($)</th></tr></thead>
+            <tbody id="tbodyDeposits"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Mitglieder live anzeigen
+    db.collection('members').orderBy('balance', 'desc').onSnapshot(snap => {
+      const tbody = document.getElementById('tbodyMembers');
+      let total = 0, count = 0;
+      tbody.innerHTML = '';
+      
+      snap.forEach(doc => {
+        const m = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${m.name}</td><td>${m.id || ''}</td><td class="right">${(m.balance || 0).toLocaleString('de-DE')}</td>`;
+        tbody.appendChild(tr);
+        total += (m.balance || 0);
+        count++;
+      });
+      
+      document.getElementById('statMitglieder').textContent = count;
+      document.getElementById('statSaldo').textContent = total.toLocaleString('de-DE');
+    });
+
+    // Transaktionen anzeigen
+    db.collection('transactions').orderBy('ts', 'desc').limit(50).onSnapshot(snap => {
+      const payouts = document.getElementById('tbodyPayouts');
+      const deposits = document.getElementById('tbodyDeposits');
+      payouts.innerHTML = '';
+      deposits.innerHTML = '';
+      
+      snap.forEach(doc => {
+        const t = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${new Date(t.ts).toLocaleDateString('de-DE')}</td>
+                        <td>${t.member}</td>
+                        <td>${t.event}</td>
+                        <td class="right">${(t.amount || 0).toLocaleString('de-DE')}</td>`;
+        
+        if (t.type === 'auszahlung') payouts.appendChild(tr);
+        else if (t.type === 'einzahlung') deposits.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>
