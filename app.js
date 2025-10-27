@@ -186,6 +186,89 @@ class HexenjaegerDB {
     }
 }
 
+// Passwort-Validierung mit Bot-API
+async function validatePasswordWithBot(password) {
+    try {
+        const response = await fetch('http://localhost:3000/api/validate-password?password=' + encodeURIComponent(password));
+        if (!response.ok) {
+            throw new Error('API nicht erreichbar');
+        }
+        const data = await response.json();
+        return data.valid;
+    } catch (error) {
+        console.error('Bot API nicht erreichbar:', error);
+        // Fallback: Lokale Validierung (für Entwicklung)
+        return validatePasswordLocally(password);
+    }
+}
+
+// Fallback: Lokale Passwort-Validierung (nur für Entwicklung)
+function validatePasswordLocally(password) {
+    const storedPassword = localStorage.getItem('hj_access');
+    const storedTime = localStorage.getItem('hj_access_time');
+    
+    if (storedPassword && storedTime) {
+        const timePassed = Date.now() - parseInt(storedTime);
+        if (timePassed < 24 * 60 * 60 * 1000 && password === storedPassword) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Zugangslevel Management
+class AccessManager {
+    constructor() {
+        this.accessLevel = 'member'; // Standard: Nur Lesen
+    }
+
+    setAccessLevel(level) {
+        this.accessLevel = level;
+        localStorage.setItem('hj_access_level', level);
+        this.applyAccessRestrictions();
+    }
+
+    applyAccessRestrictions() {
+        const isAdmin = this.accessLevel === 'admin';
+        
+        // Verstecke/Zeige Elemente basierend auf Zugangslevel
+        const adminElements = document.querySelectorAll('[data-admin-only]');
+        const memberElements = document.querySelectorAll('[data-member-only]');
+        
+        adminElements.forEach(el => {
+            el.style.display = isAdmin ? '' : 'none';
+        });
+        
+        // Event-Buttons für Nicht-Admins deaktivieren
+        const eventButtons = document.querySelectorAll('#submitEvent, [onclick*="Event"], [onclick*="event"]');
+        if (!isAdmin) {
+            eventButtons.forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+    }
+
+    canEdit() {
+        return this.accessLevel === 'admin';
+    }
+
+    canDelete() {
+        return this.accessLevel === 'admin';
+    }
+
+    canCreateEvents() {
+        return this.accessLevel === 'admin';
+    }
+
+    loadAccessLevel() {
+        const savedLevel = localStorage.getItem('hj_access_level');
+        if (savedLevel) {
+            this.accessLevel = savedLevel;
+            this.applyAccessRestrictions();
+        }
+    }
+}
+
 // Hilfsfunktionen
 function formatCurrency(amount) {
     return '$' + parseInt(amount).toLocaleString('de-DE');
@@ -198,13 +281,78 @@ function escapeHtml(text) {
 }
 
 function showNotification(message, type = 'success') {
-    // Wird in den HTML Dateien implementiert
+    // Erstelle eine Notification falls nicht vorhanden
     if (typeof window.showNotification === 'function') {
         window.showNotification(message, type);
     } else {
-        alert(message);
+        // Fallback: Einfache Notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#6366f1'};
+            color: white;
+            border-radius: 6px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 4000);
     }
 }
 
-// Globale DB Instanz
+// Zugangskontrolle für alle Seiten
+function checkAccess() {
+    const password = localStorage.getItem('hj_access');
+    const storedTime = localStorage.getItem('hj_access_time');
+    
+    if (!password || !storedTime) {
+        showPasswordScreen();
+        return false;
+    }
+    
+    // Prüfe ob Passwort älter als 24 Stunden
+    const timePassed = Date.now() - parseInt(storedTime);
+    if (timePassed > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('hj_access');
+        localStorage.removeItem('hj_access_time');
+        localStorage.removeItem('hj_access_level');
+        showPasswordScreen();
+        return false;
+    }
+    
+    return true;
+}
+
+function showPasswordScreen() {
+    // Wird in den HTML Dateien implementiert
+    if (typeof window.showPasswordScreen === 'function') {
+        window.showPasswordScreen();
+    }
+}
+
+// Globale Instanzen
 const db = new HexenjaegerDB();
+const accessManager = new AccessManager();
+
+// Beim Laden der Seite Zugangslevel laden
+document.addEventListener('DOMContentLoaded', function() {
+    if (checkAccess()) {
+        accessManager.loadAccessLevel();
+    }
+});
+
+// API für andere Seiten
+window.HexenjaegerApp = {
+    db: db,
+    accessManager: accessManager,
+    validatePasswordWithBot: validatePasswordWithBot,
+    checkAccess: checkAccess
+};
