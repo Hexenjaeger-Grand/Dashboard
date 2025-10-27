@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistik - Hexenjäger</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 2.5em;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--accent-purple-light);
+            margin: var(--space-sm) 0;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .stat-trend {
+            font-size: 0.8em;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 12px;
+            margin-top: var(--space-xs);
+            display: inline-block;
+        }
+
+        .trend-up {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .trend-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .trend-neutral {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent-purple-light);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: var(--space-xs);
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--bg-darker);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--border-color);
+            font-size: 0.8em;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .sorting-options {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .sort-btn:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .top-list {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+        }
+
+        .top-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        .top-item:hover {
+            background: rgba(99, 102, 241, 0.02);
+        }
+
+        .top-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            flex: 1;
+        }
+
+        .member-rank {
+            font-weight: bold;
+            color: var(--accent-purple-light);
+            min-width: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--accent-purple-light);
+        }
+
+        .member-details {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: var(--space-xs);
+        }
+
+        .member-stats {
+            text-align: right;
+        }
+
+        .member-amount {
+            font-weight: bold;
+            color: var(--text-light);
+            font-size: 1.1em;
+            margin-bottom: var(--space-xs);
+        }
+
+        .member-events {
+            color: var(--text-muted);
+            font-size: 0.85em;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--bg-darker);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: var(--space-xs);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-purple);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .reset-section {
+            text-align: center;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            background: var(--bg-darker);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border-color);
+        }
+
+        .event-type-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .event-type-item {
+            background: var(--bg-darker);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+        }
+
+        .event-type-icon {
+            font-size: 1.5em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .event-type-count {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: var(--space-xs);
+        }
+
+        .event-type-label {
+            color: var(--text-muted);
+            font-size: 0.8em;
+        }
+
+        .time-filter {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: var(--space-xs) var(--space-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8em;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hexenjaeger-symbol"></div>
+            <h1>Statistik</h1>
+            <p>Übersicht und detaillierte Analysen</p>
+            <a href="index.html" class="back-btn">← Zurück zur Übersicht</a>
+        </header>
+
+        <!-- Haupt-Statistiken -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number" id="totalPaid">$0</div>
+                <div class="stat-label">Gesamt ausgezahlt</div>
+                <div class="stat-trend trend-up">
+                    +0%
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Summe aller abgeschlossenen Auszahlungen</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-number" id="openPayouts">0</div>
+                <div class="stat-label">Offene Auszahlungen</div>
+                <div class="stat-trend trend-up">
+                    +0%
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Aktuelle Anzahl offener Auszahlungen</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-number" id="totalEvents">0</div>
+                <div class="stat-label">Gesamt Events</div>
+                <div class="stat-trend trend-up">
+                    +0%
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Gesamtanzahl aller erfassten Events</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-number" id="avgPerMember">$0</div>
+                <div class="stat-label">Durchschnitt pro Person</div>
+                <div class="stat-trend trend-up">
+                    +0%
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Durchschnittlicher Betrag pro Mitglied</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Mitglieder -->
+        <div class="card">
+            <h2>Top 10 Mitglieder</h2>
+            
+            <div class="sorting-options">
+                <button class="sort-btn active" onclick="sortByPayout()">💰 Nach Auszahlungen</button>
+                <button class="sort-btn" onclick="sortByEvents()">🎯 Nach Events</button>
+                <button class="sort-btn" onclick="sortByActivity()">📊 Nach Aktivität</button>
+            </div>
+
+            <div class="top-list" id="topList">
+                <!-- Wird via JavaScript gefüllt -->
+            </div>
+        </div>
+
+        <!-- Event Statistiken -->
+        <div class="card">
+            <h2>Event-Statistiken</h2>
+            
+            <div class="time-filter">
+                <button class="filter-btn active" onclick="filterTime('all')">Alle Zeit</button>
+                <button class="filter-btn" onclick="filterTime('month')">Letzter Monat</button>
+                <button class="filter-btn" onclick="filterTime('week')">Letzte Woche</button>
+                <button class="filter-btn" onclick="filterTime('today')">Heute</button>
+            </div>
+
+            <div class="event-type-stats" id="eventTypeStats">
+                <!-- Wird via JavaScript gefüllt -->
+            </div>
+        </div>
+
+        <!-- Detaillierte Auszahlungsstatistik -->
+        <div class="card">
+            <h2>Detaillierte Auszahlungsstatistik</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mitglied</th>
+                            <th>Bizwar W/L</th>
+                            <th>40er W/L</th>
+                            <th>Gießerei</th>
+                            <th>Waffenfabrik</th>
+                            <th>Hafen</th>
+                            <th>Cayo</th>
+                            <th>RP Fabrik</th>
+                            <th>EKZ</th>
+                            <th>Gesamt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody">
+                        <!-- Wird via JavaScript gefüllt -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="noStatsData" class="empty-state" style="display: none;">
+                <div class="empty-icon">📊</div>
+                <h3>Noch keine Daten</h3>
+                <p>Es sind noch keine Auszahlungsdaten vorhanden.</p>
+            </div>
+        </div>
+
+        <!-- Reset Bereich -->
+        <div class="reset-section">
+            <button onclick="showResetConfirm()" class="btn btn-danger">
+                🗑️ Alle Daten zurücksetzen
+            </button>
+            <p style="color: var(--text-muted); font-size: 0.8em; margin-top: var(--space-sm);">
+                Setzt alle Events und Auszahlungsdaten zurück. Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentSort = 'payout';
+        let currentTimeFilter = 'all';
+
+        function updateStatistics() {
+            const events = db.getEvents();
+            const completedPayouts = db.getCompletedPayouts();
+            const members = db.getMembers();
+            
+            updateSummaryStats(events, completedPayouts, members);
+            updateTopList(events, completedPayouts, members);
+            updateEventTypeStats(events);
+            updateDetailedStats(events, completedPayouts, members);
+        }
+
+        function updateSummaryStats(events, completedPayouts, members) {
+            // Gesamt ausgezahlt
+            const totalPaid = completedPayouts.reduce((sum, payout) => sum + payout.total, 0);
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+            
+            // Offene Auszahlungen
+            document.getElementById('openPayouts').textContent = events.length;
+            
+            // Gesamt Events
+            document.getElementById('totalEvents').textContent = events.length;
+            
+            // Durchschnitt pro Person
+            const totalAmount = totalPaid + calculateOpenPayoutsTotal(events);
+            const avgPerMember = members.length > 0 ? Math.round(totalAmount / members.length) : 0;
+            document.getElementById('avgPerMember').textContent = formatCurrency(avgPerMember);
+        }
+
+        function calculateOpenPayoutsTotal(events) {
+            let total = 0;
+            events.forEach(event => {
+                const eventType = event.eventType;
+                const amount = event.amount || 1;
+                const totalAmount = event.totalAmount || 0;
+                
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(eventType)) {
+                    total += totalAmount;
+                } else {
+                    total += db.getEventPrice(eventType, amount);
+                }
+            });
+            return total;
+        }
+
+        function updateTopList(events, completedPayouts, members) {
+            const topList = document.getElementById('topList');
+            const memberStats = calculateMemberStats(events, completedPayouts, members);
+
+            const sortedMembers = Object.values(memberStats)
+                .filter(member => member.totalPaid > 0 || member.totalEvents > 0)
+                .sort((a, b) => {
+                    if (currentSort === 'payout') {
+                        return b.totalPaid - a.totalPaid;
+                    } else if (currentSort === 'events') {
+                        return b.totalEvents - a.totalEvents;
+                    } else {
+                        return b.activityScore - a.activityScore;
+                    }
+                })
+                .slice(0, 10);
+
+            if (sortedMembers.length === 0) {
+                topList.innerHTML = `
+                    <div class="empty-state" style="padding: var(--space-xl);">
+                        <div class="empty-icon">👥</div>
+                        <h3 style="color: var(--text-muted);">Noch keine Daten</h3>
+                        <p style="color: var(--text-muted);">Es sind noch keine Statistiken verfügbar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Finde den höchsten Wert für Progress-Bars
+            const maxAmount = Math.max(...sortedMembers.map(m => m.totalPaid));
+            const maxEvents = Math.max(...sortedMembers.map(m => m.totalEvents));
+
+            topList.innerHTML = sortedMembers.map((member, index) => {
+                let displayValue, displayLabel, progress;
+                
+                if (currentSort === 'payout') {
+                    displayValue = formatCurrency(member.totalPaid);
+                    displayLabel = `${member.totalEvents} Events`;
+                    progress = maxAmount > 0 ? (member.totalPaid / maxAmount) * 100 : 0;
+                } else if (currentSort === 'events') {
+                    displayValue = member.totalEvents;
+                    displayLabel = formatCurrency(member.totalPaid);
+                    progress = maxEvents > 0 ? (member.totalEvents / maxEvents) * 100 : 0;
+                } else {
+                    displayValue = member.activityScore;
+                    displayLabel = `${member.totalEvents} Events`;
+                    progress = Math.min(member.activityScore, 100);
+                }
+
+                const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
+                
+                return `
+                    <div class="top-item">
+                        <div class="member-info">
+                            <div class="member-rank">${rankIcons[index] || (index + 1)}</div>
+                            <div class="member-avatar">${member.name.charAt(0)}</div>
+                            <div class="member-details">
+                                <div class="member-name">${member.name}</div>
+                                <div class="member-id">${member.id}</div>
+                            </div>
+                        </div>
+                        <div class="member-stats">
+                            <div class="member-amount">${displayValue}</div>
+                            <div class="member-events">${displayLabel}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateMemberStats(events, completedPayouts, members) {
+            const memberStats = {};
+            
+            // Initialisiere alle Mitglieder
+            members.forEach(member => {
+                memberStats[member.id] = {
+                    id: member.id,
+                    name: member.name,
+                    totalPaid: 0,
+                    totalEvents: 0,
+                    activityScore: 0,
+                    eventsByType: {}
+                };
+            });
+
+            // Addiere abgeschlossene Auszahlungen
+            completedPayouts.forEach(payout => {
+                if (memberStats[payout.memberId]) {
+                    memberStats[payout.memberId].totalPaid += payout.total;
+                }
+            });
+
+            // Addiere offene Events
+            events.forEach(event => {
+                const eventType = event.eventType;
+                const amount = event.amount || 1;
+                const totalAmount = event.totalAmount || 0;
+                
+                let calculatedAmount = 0;
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(eventType)) {
+                    calculatedAmount = totalAmount > 0 ? Math.round(totalAmount / event.memberIds.length) : 0;
+                } else {
+                    calculatedAmount = db.getEventPrice(eventType, amount);
+                }
+                
+                event.memberIds.forEach(memberId => {
+                    if (memberStats[memberId]) {
+                        memberStats[memberId].totalPaid += calculatedAmount;
+                        memberStats[memberId].totalEvents += 1;
+                        
+                        // Aktivitäts-Score basierend auf Events und Betrag
+                        memberStats[memberId].activityScore += Math.min(calculatedAmount / 10000, 10) + 1;
+                        
+                        // Events nach Typ zählen
+                        if (!memberStats[memberId].eventsByType[eventType]) {
+                            memberStats[memberId].eventsByType[eventType] = 0;
+                        }
+                        memberStats[memberId].eventsByType[eventType] += amount;
+                    }
+                });
+            });
+
+            return memberStats;
+        }
+
+        function updateEventTypeStats(events) {
+            const container = document.getElementById('eventTypeStats');
+            
+            const eventTypes = {
+                'bizwar_win': { icon: '⚔️', name: 'Bizwar Win' },
+                'bizwar_lose': { icon: '⚔️', name: 'Bizwar Lose' },
+                '40er_win': { icon: '🔫', name: '40er Win' },
+                '40er_lose': { icon: '🔫', name: '40er Lose' },
+                'giesserei': { icon: '🏭', name: 'Gießerei' },
+                'waffenfabrik': { icon: '🔫', name: 'Waffenfabrik' },
+                'hafen': { icon: '⚓', name: 'Hafen' },
+                'cayo': { icon: '🏝️', name: 'Cayo' },
+                'rp_fabrik': { icon: '🏭', name: 'RP Fabrik' },
+                'ekz': { icon: '🎯', name: 'EKZ' }
+            };
+
+            // Zähle Events nach Typ
+            const eventCounts = {};
+            Object.keys(eventTypes).forEach(type => {
+                eventCounts[type] = 0;
+            });
+
+            events.forEach(event => {
+                if (eventCounts[event.eventType] !== undefined) {
+                    eventCounts[event.eventType] += event.amount || 1;
+                }
+            });
+
+            container.innerHTML = Object.entries(eventTypes).map(([type, info]) => {
+                const count = eventCounts[type] || 0;
+                return `
+                    <div class="event-type-item">
+                        <div class="event-type-icon">${info.icon}</div>
+                        <div class="event-type-count">${count}</div>
+                        <div class="event-type-label">${info.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateDetailedStats(events, completedPayouts, members) {
+            const tbody = document.getElementById('statsTableBody');
+            const noStatsData = document.getElementById('noStatsData');
+            
+            const memberStats = calculateMemberStats(events, completedPayouts, members);
+            const membersWithData = Object.values(memberStats).filter(member => member.totalPaid > 0);
+
+            if (membersWithData.length === 0) {
+                tbody.innerHTML = '';
+                noStatsData.style.display = 'block';
+                return;
+            }
+
+            noStatsData.style.display = 'none';
+
+            tbody.innerHTML = membersWithData
+                .sort((a, b) => b.totalPaid - a.totalPaid)
+                .map(member => {
+                    const eventsByType = member.eventsByType;
+                    
+                    return `
+                        <tr>
+                            <td><strong>${member.name}</strong></td>
+                            <td>${eventsByType.bizwar_win || 0} / ${eventsByType.bizwar_lose || 0}</td>
+                            <td>${eventsByType['40er_win'] || 0} / ${eventsByType['40er_lose'] || 0}</td>
+                            <td>${eventsByType.giesserei || 0}</td>
+                            <td>${eventsByType.waffenfabrik || 0}</td>
+                            <td>${eventsByType.hafen || 0}</td>
+                            <td>${eventsByType.cayo || 0}</td>
+                            <td>${eventsByType.rp_fabrik || 0}</td>
+                            <td>${eventsByType.ekz || 0}</td>
+                            <td><strong>${formatCurrency(member.totalPaid)}</strong></td>
+                        </tr>
+                    `;
+                }).join('');
+        }
+
+        function sortByPayout() {
+            currentSort = 'payout';
+            updateSortButtons();
+            updateStatistics();
+        }
+
+        function sortByEvents() {
+            currentSort = 'events';
+            updateSortButtons();
+            updateStatistics();
+        }
+
+        function sortByActivity() {
+            currentSort = 'activity';
+            updateSortButtons();
+            updateStatistics();
+        }
+
+        function filterTime(timeframe) {
+            currentTimeFilter = timeframe;
+            updateFilterButtons();
+            // Hier könnte man die Daten nach Zeit filtern
+            updateStatistics();
+        }
+
+        function updateSortButtons() {
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const buttons = document.querySelectorAll('.sorting-options .sort-btn');
+            if (currentSort === 'payout') buttons[0].classList.add('active');
+            else if (currentSort === 'events') buttons[1].classList.add('active');
+            else buttons[2].classList.add('active');
+        }
+
+        function updateFilterButtons() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const buttons = document.querySelectorAll('.time-filter .filter-btn');
+            if (currentTimeFilter === 'all') buttons[0].classList.add('active');
+            else if (currentTimeFilter === 'month') buttons[1].classList.add('active');
+            else if (currentTimeFilter === 'week') buttons[2].classList.add('active');
+            else buttons[3].classList.add('active');
+        }
+
+        function showResetConfirm() {
+            if (confirm(`⚠️ ALLE DATEN wirklich zurücksetzen?\n\nDies löscht:\n• Alle Events\n• Alle Auszahlungsdaten\n• Alle Statistiken\n\nDiese Aktion kann nicht rückgängig gemacht werden!`)) {
+                localStorage.setItem('hj_events', JSON.stringify([]));
+                localStorage.setItem('hj_completed_payouts', JSON.stringify([]));
+                showNotification('✅ Alle Daten wurden zurückgesetzt!', 'success');
+                updateStatistics();
+            }
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatistics();
+            updateSortButtons();
+            updateFilterButtons();
+            
+            // Auto-Refresh alle 60 Sekunden
+            setInterval(updateStatistics, 60000);
+        });
+    </script>
+</body>
+</html>
