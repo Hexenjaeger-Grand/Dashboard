@@ -148,9 +148,119 @@
             padding: 30px;
             color: var(--text-muted);
         }
+
+        /* Passwort Screen Styles */
+        .password-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .password-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .password-header h1 {
+            color: var(--accent-purple-light);
+            margin-bottom: 10px;
+        }
+
+        .password-header p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .password-form {
+            margin-bottom: 30px;
+        }
+
+        #passwordInput {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-darker);
+            color: var(--text-light);
+        }
+
+        .password-info {
+            text-align: left;
+            background: var(--bg-darker);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .password-info ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .password-info li {
+            margin-bottom: 5px;
+        }
+
+        .password-note {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
+    <!-- Passwort-Abfrage Screen -->
+    <div id="passwordOverlay" style="display: none;">
+        <div class="password-container">
+            <div class="password-box">
+                <div class="password-header">
+                    <h1>🔐 Hexenjäger Event-System</h1>
+                    <p>Bitte gib das aktuelle Zugangspasswort ein</p>
+                </div>
+                
+                <div class="password-form">
+                    <input type="password" id="passwordInput" placeholder="Aktuelles Passwort eingeben" maxlength="6">
+                    <button onclick="checkPassword()" class="btn btn-primary">🔓 Zugang</button>
+                </div>
+                
+                <div class="password-info">
+                    <p>💡 <strong>Passwort bekommen:</strong></p>
+                    <ol>
+                        <li>Gehe in den Hexenjäger Discord</li>
+                        <li>Finde den Passwort-Embed</li>
+                        <li>Klicke auf "🔑 Passwort anfordern"</li>
+                        <li>Du erhältst das aktuelle Passwort</li>
+                    </ol>
+                    <p class="password-note">⚠️ Das Passwort wechselt alle 24 Stunden automatisch!</p>
+                </div>
+                
+                <div id="passwordError" class="error-message" style="display: none;">
+                    ❌ Falsches Passwort oder abgelaufen!
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <div class="hexenjaeger-symbol"></div>
@@ -250,6 +360,79 @@
 
     <script src="app.js"></script>
     <script>
+        // Passwort-Überprüfung
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value.trim().toUpperCase();
+            const errorElement = document.getElementById('passwordError');
+            
+            // Hier würdest du das Passwort gegen den Bot validieren
+            // Für jetzt simulieren wir das mit localStorage
+            const isValid = validatePasswordWithBot(password);
+            
+            if (isValid) {
+                // Zugang gewährt - Passwort für 24h speichern
+                localStorage.setItem('hj_access', password);
+                localStorage.setItem('hj_access_time', Date.now());
+                document.getElementById('passwordOverlay').style.display = 'none';
+            } else {
+                errorElement.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        function validatePasswordWithBot(password) {
+            // In der echten Version: API Call zum Bot
+            // Für Simulation: Prüfe gegen gespeichertes Passwort
+            const storedPassword = localStorage.getItem('hj_access');
+            const storedTime = localStorage.getItem('hj_access_time');
+            
+            if (storedPassword && storedTime) {
+                // Prüfe ob weniger als 24 Stunden vergangen
+                const timePassed = Date.now() - parseInt(storedTime);
+                if (timePassed < 24 * 60 * 60 * 1000 && password === storedPassword) {
+                    return true;
+                }
+            }
+            
+            // Falls keine lokale Validierung: immer false (in Produktion: Bot-API call)
+            return false;
+        }
+
+        function checkAccess() {
+            const password = localStorage.getItem('hj_access');
+            const storedTime = localStorage.getItem('hj_access_time');
+            
+            if (!password || !storedTime) {
+                showPasswordScreen();
+                return false;
+            }
+            
+            // Prüfe ob Passwort älter als 24 Stunden
+            const timePassed = Date.now() - parseInt(storedTime);
+            if (timePassed > 24 * 60 * 60 * 1000) {
+                localStorage.removeItem('hj_access');
+                localStorage.removeItem('hj_access_time');
+                showPasswordScreen();
+                return false;
+            }
+            
+            return true;
+        }
+
+        function showPasswordScreen() {
+            document.getElementById('passwordOverlay').style.display = 'flex';
+            document.getElementById('passwordInput').focus();
+        }
+
+        // Enter-Taste für Passwort-Eingabe
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Dashboard Funktionen
         function updateDashboard() {
             const members = db.getMembers();
             const events = db.getEvents();
@@ -378,7 +561,15 @@
         }
 
         // Initialisiere Dashboard
-        document.addEventListener('DOMContentLoaded', updateDashboard);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Erst Passwort prüfen
+            if (!checkAccess()) {
+                return;
+            }
+            
+            // Dann Dashboard laden
+            updateDashboard();
+        });
     </script>
 </body>
 </html>
