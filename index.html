@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexenjäger Family</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 2em;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+        }
+
+        .card-title {
+            color: var(--text-light);
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--accent-purple-light);
+            margin: 10px 0;
+        }
+
+        .card-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-darker);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8em;
+        }
+
+        .recent-activity {
+            margin-top: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 6px;
+            font-size: 1.1em;
+        }
+
+        .activity-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-member {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .activity-event {
+            color: var(--text-muted);
+            font-size: 0.85em;
+        }
+
+        .activity-amount {
+            font-weight: bold;
+            color: var(--accent-purple-light);
+        }
+
+        .no-activity {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hexenjaeger-symbol"></div>
+            <h1>Hexenjäger Family</h1>
+            <p>Event Management & Auszahlungssystem</p>
+        </header>
+
+        <!-- Hauptnavigation -->
+        <nav class="main-nav">
+            <a href="eingabe.html" class="nav-card">
+                <span class="nav-icon">📝</span>
+                <h3>Event Eingabe</h3>
+                <p>Neue Events für Mitglieder erfassen</p>
+            </a>
+
+            <a href="auszahlungen.html" class="nav-card">
+                <span class="nav-icon">💰</span>
+                <h3>Auszahlungen</h3>
+                <p>Offene Auszahlungen verwalten</p>
+            </a>
+
+            <a href="mitglieder.html" class="nav-card">
+                <span class="nav-icon">👥</span>
+                <h3>Mitglieder</h3>
+                <p>Family Mitglieder verwalten</p>
+            </a>
+
+            <a href="statistik.html" class="nav-card">
+                <span class="nav-icon">📊</span>
+                <h3>Statistik</h3>
+                <p>Daten analysieren und einsehen</p>
+            </a>
+        </nav>
+
+        <!-- Dashboard Übersicht -->
+        <div class="dashboard-grid">
+            <!-- Offene Auszahlungen -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">💰</div>
+                    <h3 class="card-title">Offene Auszahlungen</h3>
+                </div>
+                <div class="card-value" id="openPayoutsCount">0</div>
+                <div class="card-label">Gesamtbetrag: <span id="openPayoutsAmount">$0</span></div>
+                
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="affectedMembers">0</div>
+                        <div class="stat-label">Betroffene Mitglieder</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mitglieder Statistik -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">👥</div>
+                    <h3 class="card-title">Mitglieder</h3>
+                </div>
+                <div class="card-value" id="totalMembers">0</div>
+                <div class="card-label">Aktive Family Mitglieder</div>
+                
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="activeMembers">0</div>
+                        <div class="stat-label">Mit offenen Auszahlungen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Abgeschlossene Auszahlungen -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">✅</div>
+                    <h3 class="card-title">Abgeschlossen</h3>
+                </div>
+                <div class="card-value" id="completedPayouts">0</div>
+                <div class="card-label">Ausgezahlte Beträge</div>
+                
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalPaid">$0</div>
+                        <div class="stat-label">Gesamt ausgezahlt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aktuelle Aktivität -->
+        <div class="card">
+            <h2>Letzte Aktivität</h2>
+            <div class="recent-activity" id="recentActivity">
+                <!-- Wird via JavaScript gefüllt -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function updateDashboard() {
+            const members = db.getMembers();
+            const events = db.getEvents();
+            const completedPayouts = db.getCompletedPayouts();
+
+            // Berechne offene Auszahlungen
+            const memberPayouts = {};
+            let totalOpenAmount = 0;
+            
+            events.forEach(event => {
+                const eventType = event.eventType;
+                const amount = event.amount || 1;
+                const totalAmount = event.totalAmount || 0;
+                
+                let calculatedAmount = 0;
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(eventType)) {
+                    calculatedAmount = totalAmount > 0 ? Math.round(totalAmount / event.memberIds.length) : 0;
+                } else {
+                    calculatedAmount = db.getEventPrice(eventType, amount);
+                }
+                
+                event.memberIds.forEach(memberId => {
+                    if (!memberPayouts[memberId]) {
+                        memberPayouts[memberId] = 0;
+                    }
+                    memberPayouts[memberId] += calculatedAmount;
+                    totalOpenAmount += calculatedAmount;
+                });
+            });
+
+            // Update Dashboard Werte
+            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('openPayoutsCount').textContent = events.length;
+            document.getElementById('affectedMembers').textContent = Object.keys(memberPayouts).length;
+            document.getElementById('openPayoutsAmount').textContent = formatCurrency(totalOpenAmount);
+            document.getElementById('completedPayouts').textContent = completedPayouts.length;
+            
+            const totalPaid = completedPayouts.reduce((sum, payout) => sum + payout.total, 0);
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+
+            // Aktive Mitglieder (mit offenen Auszahlungen)
+            const activeMembers = members.filter(member => memberPayouts[member.id]);
+            document.getElementById('activeMembers').textContent = activeMembers.length;
+
+            // Zeige letzte Aktivität
+            updateRecentActivity(events);
+        }
+
+        function updateRecentActivity(events) {
+            const activityContainer = document.getElementById('recentActivity');
+            const recentEvents = events.slice(-5).reverse(); // Letzte 5 Events
+
+            if (recentEvents.length === 0) {
+                activityContainer.innerHTML = `
+                    <div class="no-activity">
+                        Noch keine Aktivität<br>
+                        <small>Erfasse dein erstes Event!</small>
+                    </div>
+                `;
+                return;
+            }
+
+            activityContainer.innerHTML = recentEvents.map(event => {
+                const eventNames = {
+                    'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
+                    '40er_win': '40er Win', '40er_lose': '40er Lose',
+                    'giesserei': 'Gießerei', 'waffenfabrik': 'Waffenfabrik',
+                    'hafen': 'Hafen', 'cayo': 'Cayo Perico', 
+                    'rp_fabrik': 'RP Fabrik', 'ekz': 'EKZ'
+                };
+
+                const eventIcon = {
+                    'bizwar_win': '⚔️', 'bizwar_lose': '⚔️',
+                    '40er_win': '🔫', '40er_lose': '🔫',
+                    'giesserei': '🏭', 'waffenfabrik': '🔫',
+                    'hafen': '⚓', 'cayo': '🏝️', 
+                    'rp_fabrik': '🏭', 'ekz': '🎯'
+                };
+
+                const memberNames = event.memberIds.map(id => {
+                    const member = db.getMembers().find(m => m.id === id);
+                    return member ? member.name : 'Unbekannt';
+                }).join(', ');
+
+                const eventName = eventNames[event.eventType] || event.eventType;
+                const amount = event.amount || 1;
+                const unit = event.eventType.includes('hafen') ? 'Drops' : 
+                            event.eventType === 'ekz' ? 'Wins' : 'Kills';
+
+                let calculatedAmount = 0;
+                if (['cayo', 'rp_fabrik', 'ekz'].includes(event.eventType)) {
+                    calculatedAmount = event.totalAmount > 0 ? Math.round(event.totalAmount / event.memberIds.length) : 0;
+                } else {
+                    calculatedAmount = db.getEventPrice(event.eventType, amount);
+                }
+
+                const timeAgo = getTimeAgo(new Date(event.date));
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-info">
+                            <div class="activity-icon">${eventIcon[event.eventType] || '🎯'}</div>
+                            <div class="activity-details">
+                                <div class="activity-member">${memberNames}</div>
+                                <div class="activity-event">${eventName} - ${amount} ${unit}</div>
+                            </div>
+                        </div>
+                        <div class="activity-amount">${formatCurrency(calculatedAmount)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Gerade eben';
+            if (diffMins < 60) return `Vor ${diffMins} min`;
+            if (diffHours < 24) return `Vor ${diffHours} h`;
+            if (diffDays === 1) return 'Gestern';
+            return `Vor ${diffDays} Tagen`;
+        }
+
+        // Initialisiere Dashboard
+        document.addEventListener('DOMContentLoaded', updateDashboard);
+    </script>
+</body>
+</html>
