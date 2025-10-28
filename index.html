@@ -160,8 +160,10 @@
 
 body.dashboard .header__logo img {
   border-radius: 50%;
-  border: 4px solid var(--Primary); /* Dicke, farbige Umrandung */
-  box-shadow: 0 0 15px 5px var(--Primary); /* Einfacher Glow */
+  border: 2px solid var(--Primary);
+  box-shadow: 
+    inset 0 0 5px var(--Primary), /* Glow nach INNEN */
+    0 0 10px 2px var(--Primary);  /* Glow nach außen */
   transform: scale(1.02);
   transition: all 0.3s ease;
 }
