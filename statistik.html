@@ -666,6 +666,7 @@
 
   // Alle Statistiken in einer Funktion laden
 // Alle Statistiken in einer Funktion laden
+javascript
 function loadAllStats() {
   console.log('Lade alle Statistiken...');
   
@@ -675,7 +676,7 @@ function loadAllStats() {
     db.collection('members').get(),
     // Ausgezahlte Beträge - Transaktionen mit type "auszahlung"
     db.collection('transactions').where('type', '==', 'auszahlung').get(),
-    // Chart Daten - ALLE Transaktionen (Einzahlungen + Auszahlungen)
+    // Chart Daten - ALLE Transaktionen
     db.collection('transactions').get()
   ]).then(([membersSnap, payoutSnap, allTransactionsSnap]) => {
     
@@ -701,26 +702,20 @@ function loadAllStats() {
     // 3. Gesamtauszahlungen = Offene + Ausgezahlte
     totalPayouts = openPayouts + paidOutTotal;
     
-    // 4. Chart Daten berechnen - ALLE Transaktionen für die Charts
+    // 4. Chart Daten berechnen - NUR Einzahlungen für die Charts!
     eventTotals = {};
     memberTotals = {};
     allTransactionsSnap.forEach(doc => {
       const transaction = doc.data();
       
-      // Events zählen - sowohl Einzahlungen als auch Auszahlungen
-      if (transaction.event) {
+      // Events zählen - NUR Einzahlungen, keine Auszahlungen!
+      if (transaction.event && transaction.type === 'einzahlung') {
         eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
       }
       
-      // Mitglieder zählen - ALLE Transaktionen (Einzahlungen + Auszahlungen)
-      if (transaction.member) {
-        if (transaction.type === 'einzahlung') {
-          // Einzahlungen addieren
-          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
-        } else if (transaction.type === 'auszahlung') {
-          // Auszahlungen subtrahieren (weil Geld ausgezahlt wurde)
-          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) - (transaction.amount || 0);
-        }
+      // Mitglieder zählen - NUR Einzahlungen (verdientes Geld), keine Auszahlungen!
+      if (transaction.member && transaction.type === 'einzahlung') {
+        memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
       }
     });
     
