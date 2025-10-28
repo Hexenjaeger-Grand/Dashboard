@@ -125,38 +125,38 @@
     }
 
     /* Login Status Indicator */
-.login-status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+    .login-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.login-status-indicator.logged-in {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
+    .login-status-indicator.logged-in {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
 
-.login-status-indicator.logged-out {
-  background: rgba(107, 114, 128, 0.2);
-  color: #6b7280;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-}
+    .login-status-indicator.logged-out {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
 
-.user-email {
-  font-size: 11px;
-  opacity: 0.9;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .user-email {
+      font-size: 11px;
+      opacity: 0.9;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* Leaderschaft Button */
     .leaderschaft-btn {
@@ -176,6 +176,94 @@
 
     .leaderschaft-btn:hover {
       background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
+      border-radius: 24px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .modal h2 {
+      color: var(--White);
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(124,91,241,.2);
+      border: none;
+      color: var(--White);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(124,91,241,.4);
+    }
+
+    /* Input Groups im Modal */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .48px;
+      text-transform: uppercase;
+      color: var(--White);
+    }
+
+    .input-group input {
+      border-radius: 6px;
+      background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1;
+      padding: 14px 18px;
+      color: var(--Dark);
+      font-size: 16px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .input-group input:focus {
+      background: var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1, 0 1px 0 3px #7c5bf1;
     }
 
     /* Buttons */
@@ -282,17 +370,17 @@
       text-transform: uppercase;
     }
 
-.admin-only { 
-  display: none; 
-  visibility: hidden; 
-  opacity: 0; 
-  transition: opacity 0.3s ease;
-}
-body.admin .admin-only { 
-  display: block; 
-  visibility: visible; 
-  opacity: 1; 
-}
+    .admin-only { 
+      display: none; 
+      visibility: hidden; 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    body.admin .admin-only { 
+      display: block; 
+      visibility: visible; 
+      opacity: 1; 
+    }
 
     /* Responsive */
     @media (max-width: 1040px) {
@@ -328,12 +416,12 @@ body.admin .admin-only {
     </div>
   </div>
   
-<div class="header__nav">
-  <a href="auszahlung.html">Auszahlungen</a>
-  <a href="statistik.html">Statistik</a>  <!-- active WEGLASSEN -->
-  <a href="events.html" class="admin-only">Events</a>
-  <a href="mitglieder.html" class="admin-only">Mitglieder</a>
-</div>
+  <div class="header__nav">
+    <a href="auszahlung.html">Auszahlungen</a>
+    <a href="statistik.html">Statistik</a>
+    <a href="events.html" class="admin-only">Events</a>
+    <a href="mitglieder.html" class="admin-only">Mitglieder</a>
+  </div>
 
   <div style="display: flex; align-items: center; gap: 12px;">
     <div id="loginStatusIndicator" class="login-status-indicator logged-out">
@@ -343,207 +431,253 @@ body.admin .admin-only {
   </div>
 </div>
 
-  <div class="container main-content">
-    <h1>💰 Offene Auszahlungen</h1>
-
-    <div class="summary-card">
-      <h2>📊 Zusammenfassung</h2>
-      <p>Gesamtsumme offener Auszahlungen: <strong id="totalOpenAmount" style="color: var(--Yellow);">0 €</strong></p>
-      <p>Anzahl der Mitglieder mit offenen Auszahlungen: <strong id="membersWithOpen" style="color: var(--Yellow);">0</strong></p>
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2>LEADERSCHAFT LOGIN</h2>
+    
+    <div class="input-group">
+      <label>E-MAIL</label>
+      <input type="email" id="email" placeholder="admin@hexenjaeger.de">
     </div>
-
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Mitglied</th>
-            <th>Offener Betrag</th>
-            <th>Letzte Aktivität</th>
-            <th class="admin-only">Aktionen</th>
-          </tr>
-        </thead>
-        <tbody id="payoutsTable">
-          <!-- Wird mit JavaScript gefüllt -->
-        </tbody>
-      </table>
+    
+    <div class="input-group">
+      <label>PASSWORT</label>
+      <input type="password" id="password" placeholder="********">
     </div>
+    
+    <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
+    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+  </div>
+</div>
 
-    <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
-      <button class="btn admin-only" onclick="markAllAsPaid()">Alle als bezahlt markieren</button>
-      <button class="btn btn-yellow admin-only" onclick="exportToCSV()">📥 Als CSV exportieren</button>
-    </div>
+<div class="container main-content">
+  <h1>💰 Offene Auszahlungen</h1>
+
+  <div class="summary-card">
+    <h2>📊 Zusammenfassung</h2>
+    <p>Gesamtsumme offener Auszahlungen: <strong id="totalOpenAmount" style="color: var(--Yellow);">0 €</strong></p>
+    <p>Anzahl der Mitglieder mit offenen Auszahlungen: <strong id="membersWithOpen" style="color: var(--Yellow);">0</strong></p>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-      projectId: "hexenjaeger-dashboard",
-      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-      messagingSenderId: "48507598074",
-      appId: "1:48507598074:web:d736c118fd74d1968d0543"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Mitglied</th>
+          <th>Offener Betrag</th>
+          <th>Letzte Aktivität</th>
+          <th class="admin-only">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="payoutsTable">
+        <!-- Wird mit JavaScript gefüllt -->
+      </tbody>
+    </table>
+  </div>
 
-    // Session Persistence setzen
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch((error) => {
-    console.error('Auth persistence error:', error);
+  <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+    <button class="btn admin-only" onclick="markAllAsPaid()">Alle als bezahlt markieren</button>
+    <button class="btn btn-yellow admin-only" onclick="exportToCSV()">📥 Als CSV exportieren</button>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+    projectId: "hexenjaeger-dashboard",
+    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+    messagingSenderId: "48507598074",
+    appId: "1:48507598074:web:d736c118fd74d1968d0543"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Session Persistence setzen
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+      console.error('Auth persistence error:', error);
+    });
+
+  let members = [];
+
+  // Modal Funktionen
+  document.getElementById('leaderschaftBtn').onclick = () => {
+    document.getElementById('loginModal').classList.add('active');
+  };
+
+  document.getElementById('modalClose').onclick = () => {
+    document.getElementById('loginModal').classList.remove('active');
+  };
+
+  // Klick außerhalb des Modals schließt es
+  document.getElementById('loginModal').onclick = (e) => {
+    if (e.target === document.getElementById('loginModal')) {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+  };
+
+  // Login/Logout
+  document.getElementById('btnLogin').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const status = document.getElementById('loginStatus');
+    
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      status.textContent = 'Erfolgreich angemeldet!';
+      setTimeout(() => {
+        document.getElementById('loginModal').classList.remove('active');
+      }, 1000);
+    } catch (error) {
+      status.textContent = 'Login fehlgeschlagen: ' + error.message;
+    }
+  };
+
+  document.getElementById('btnLogout').onclick = async () => {
+    await auth.signOut();
+  };
+
+  // Auth Check mit Status-Indicator
+  auth.onAuthStateChanged(user => {
+    const isAdmin = !!user;
+    document.body.classList.toggle('admin', isAdmin);
+    
+    const statusIndicator = document.getElementById('loginStatusIndicator');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    
+    if (user) {
+      statusIndicator.className = 'login-status-indicator logged-in';
+      statusIndicator.innerHTML = `
+        <span>🔐 Eingeloggt</span>
+        <div class="user-email" title="${user.email}">${user.email}</div>
+      `;
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (btnLogout) btnLogout.style.display = 'block';
+    } else {
+      statusIndicator.className = 'login-status-indicator logged-out';
+      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+      if (btnLogin) btnLogin.style.display = 'block';
+      if (btnLogout) btnLogout.style.display = 'none';
+    }
   });
 
-    let members = [];
+  // Enter-Taste für Login
+  document.getElementById('email')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
 
-    // Auth Check
-    auth.onAuthStateChanged(user => {
-      document.body.classList.toggle('admin', !!user);
+  document.getElementById('password')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  // Mitglieder mit offenen Auszahlungen laden
+  db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
+    members = [];
+    let totalOpen = 0;
+    
+    snap.forEach(doc => {
+      const member = { id: doc.id, ...doc.data() };
+      members.push(member);
+      totalOpen += member.balance || 0;
     });
+    
+    updateTable();
+    document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
+    document.getElementById('membersWithOpen').textContent = members.length;
+  });
 
-    // Mitglieder mit offenen Auszahlungen laden
-    db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
-      members = [];
-      let totalOpen = 0;
-      
-      snap.forEach(doc => {
-        const member = { id: doc.id, ...doc.data() };
-        members.push(member);
-        totalOpen += member.balance || 0;
-      });
-      
-      updateTable();
-      document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
-      document.getElementById('membersWithOpen').textContent = members.length;
-    });
-
-    function updateTable() {
-      const table = document.getElementById('payoutsTable');
-      table.innerHTML = '';
-      
-      if (members.length === 0) {
-        table.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine offenen Auszahlungen</td></tr>';
-        return;
-      }
-      
-      members.forEach(member => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${member.name || member.id}</td>
-          <td class="amount">${(member.balance || 0).toLocaleString('de-DE')} €</td>
-          <td>${member.lastActivity || 'Unbekannt'}</td>
-          <td class="admin-only">
-            <button class="btn" onclick="markAsPaid('${member.id}')">Als bezahlt markieren</button>
-          </td>
-        `;
-        table.appendChild(row);
-      });
+  function updateTable() {
+    const table = document.getElementById('payoutsTable');
+    table.innerHTML = '';
+    
+    if (members.length === 0) {
+      table.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine offenen Auszahlungen</td></tr>';
+      return;
     }
-
-    // Auth Check mit Status-Indicator
-auth.onAuthStateChanged(user => {
-  const isAdmin = !!user;
-  document.body.classList.toggle('admin', isAdmin);
-  
-  const statusIndicator = document.getElementById('loginStatusIndicator');
-  if (user) {
-    statusIndicator.className = 'login-status-indicator logged-in';
-    statusIndicator.innerHTML = `
-      <span>🔐 Eingeloggt</span>
-      <div class="user-email" title="${user.email}">${user.email}</div>
-    `;
-  } else {
-    statusIndicator.className = 'login-status-indicator logged-out';
-    statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+    
+    members.forEach(member => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${member.name || member.id}</td>
+        <td class="amount">${(member.balance || 0).toLocaleString('de-DE')} €</td>
+        <td>${member.lastActivity || 'Unbekannt'}</td>
+        <td class="admin-only">
+          <button class="btn" onclick="markAsPaid('${member.id}')">Als bezahlt markieren</button>
+        </td>
+      `;
+      table.appendChild(row);
+    });
   }
-});
 
-    function markAsPaid(memberId) {
-      if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
-      
-      db.collection('members').doc(memberId).update({
+  function markAsPaid(memberId) {
+    if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
+    
+    db.collection('members').doc(memberId).update({
+      balance: 0,
+      lastPayout: new Date().toISOString()
+    });
+  }
+
+  function markAllAsPaid() {
+    if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
+    
+    members.forEach(member => {
+      db.collection('members').doc(member.id).update({
         balance: 0,
         lastPayout: new Date().toISOString()
       });
-    }
+    });
+  }
 
-    function markAllAsPaid() {
-      if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
-      
-      members.forEach(member => {
-        db.collection('members').doc(member.id).update({
-          balance: 0,
-          lastPayout: new Date().toISOString()
-        });
-      });
-    }
+  function exportToCSV() {
+    let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
+    
+    members.forEach(member => {
+      csv += `"${member.name || member.id}",${member.balance || 0},"${member.lastActivity || 'Unbekannt'}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `auszahlungen_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 
-    function exportToCSV() {
-      let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
-      
-      members.forEach(member => {
-        csv += `"${member.name || member.id}",${member.balance || 0},"${member.lastActivity || 'Unbekannt'}"\n`;
-      });
-      
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `auszahlungen_${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-
-    // Leaderschaft Button Event
-    document.getElementById('leaderschaftBtn').onclick = () => {
-      alert('Bitte auf dem Dashboard einloggen');
-    };
-        document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
-      document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
-      
-      window.handleLogin = async () => {
-        const email = document.getElementById('modalEmail').value;
-        const password = document.getElementById('modalPassword').value;
-        const status = document.getElementById('modalStatus');
-        
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          status.textContent = 'Erfolgreich angemeldet!';
-          setTimeout(() => {
-            loginModal.remove();
-          }, 1000);
-        } catch (error) {
-          status.textContent = 'Login fehlgeschlagen: ' + error.message;
-        }
-      };
-    };
-    // Aktive Navigation setzen
-function setActiveNav() {
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const navLinks = document.querySelectorAll('.header__nav a');
-  
-  navLinks.forEach(link => {
-    const linkPage = link.getAttribute('href');
-    if (linkPage === currentPage) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
+  // Aktive Navigation setzen
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
   });
-}
 
-// Beim Laden und bei Navigation
-document.addEventListener('DOMContentLoaded', setActiveNav);
-window.addEventListener('popstate', setActiveNav);
-  </script>
-</body>
-</html>
+  function setActiveNav() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.header__nav a');
+    
+    navLinks.forEach(link => {
+      const linkPage = link.getAttribute('href');
+      if (linkPage === currentPage) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
 
-  </script>
+  window.addEventListener('popstate', setActiveNav);
+</script>
 </body>
 </html>
