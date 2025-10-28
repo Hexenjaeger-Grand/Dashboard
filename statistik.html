@@ -361,36 +361,90 @@
       color: var(--Yellow);
     }
 
-    .chart {
+    /* Events Chart - Linksbündig mit fester Höhe */
+    .events-chart {
       display: flex;
       align-items: flex-end;
-      justify-content: space-around;
+      gap: 20px;
       height: 200px;
-      gap: 15px;
       padding: 20px 10px;
+      overflow-x: auto;
+    }
+
+    /* Members Chart - Horizontale Scrollleiste */
+    .members-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 15px;
+      height: 200px;
+      padding: 20px 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .members-chart::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .members-chart::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+
+    .members-chart::-webkit-scrollbar-thumb {
+      background: var(--Primary);
+      border-radius: 4px;
+    }
+
+    .members-chart::-webkit-scrollbar-thumb:hover {
+      background: var(--Yellow);
+    }
+
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 60px;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .bar-value {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--Yellow);
+      text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
     }
 
     .bar {
-      background: var(--Primary);
-      border-radius: 8px 8px 0 0;
-      flex: 1;
+      background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
+      border-radius: 6px 6px 0 0;
+      width: 40px;
       position: relative;
-      transition: .3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
+      min-height: 15px;
     }
 
     .bar:hover {
-      background: var(--Yellow);
-      transform: translateY(-2px);
+      background: linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(255, 222, 42, 0.4);
     }
 
     .bar-label {
-      position: absolute;
-      top: -30px;
-      left: 0;
-      right: 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--White);
       text-align: center;
-      font-size: 12px;
-      font-weight: 600;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      letter-spacing: 0.3px;
     }
 
     .admin-only { 
@@ -412,7 +466,8 @@
     }
 
     @media (max-width: 768px) {
-      .chart {
+      .events-chart,
+      .members-chart {
         height: 150px;
       }
     }
@@ -493,14 +548,14 @@
 
   <div class="chart-container">
     <h2>Top Events (nach Auszahlungen)</h2>
-    <div class="chart" id="eventsChart">
+    <div class="events-chart" id="eventsChart">
       <!-- Chart wird mit JavaScript gefüllt -->
     </div>
   </div>
 
   <div class="chart-container">
-    <h2>Top Mitglieder (nach Auszahlungen)</h2>
-    <div class="chart" id="membersChart">
+    <h2>Alle Mitglieder (nach Auszahlungen)</h2>
+    <div class="members-chart" id="membersChart">
       <!-- Chart wird mit JavaScript gefüllt -->
     </div>
   </div>
@@ -602,7 +657,7 @@
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Statistiken Variablen - EINMAL deklarieren
+  // Statistiken Variablen
   let totalPayouts = 0;
   let openPayouts = 0;
   let activeMembers = 0;
@@ -618,7 +673,7 @@
     loadChartData();
   }
 
-  // Offene Auszahlungen laden
+  // Offene Auszahlungen laden (Summe aller Member Balances)
   function loadOpenPayouts() {
     db.collection('members').get().then(snapshot => {
       openPayouts = 0;
@@ -626,24 +681,40 @@
         const member = doc.data();
         openPayouts += member.balance || 0;
       });
+      console.log('Offene Auszahlungen:', openPayouts);
       updateStats();
     }).catch(error => {
       console.error('Fehler beim Laden offener Auszahlungen:', error);
     });
   }
 
-  // Gesamte Auszahlungen laden
+  // Gesamte Auszahlungen laden (Summe aller ausgezahlten Beträge + offene Beträge)
   function loadTotalPayouts() {
+    // Zuerst alle ausgezahlten Beträge summieren
     db.collection('transactions')
       .where('type', '==', 'auszahlung')
       .get()
       .then(snapshot => {
-        totalPayouts = 0;
+        let paidOutTotal = 0;
         snapshot.forEach(doc => {
           const transaction = doc.data();
-          totalPayouts += transaction.amount || 0;
+          paidOutTotal += transaction.amount || 0;
         });
-        updateStats();
+        console.log('Ausgezahlte Beträge:', paidOutTotal);
+        
+        // Dann offene Beträge addieren
+        db.collection('members').get().then(membersSnap => {
+          let openTotal = 0;
+          membersSnap.forEach(doc => {
+            const member = doc.data();
+            openTotal += member.balance || 0;
+          });
+          
+          // Gesamt = Ausgezahlte + Offene
+          totalPayouts = paidOutTotal + openTotal;
+          console.log('Gesamte Auszahlungen:', totalPayouts, '(Ausgezahlt:', paidOutTotal, '+ Offen:', openTotal, ')');
+          updateStats();
+        });
       })
       .catch(error => {
         console.error('Fehler beim Laden der Gesamtauszahlungen:', error);
@@ -681,12 +752,14 @@
           eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
         }
         
-        // Mitglieder zählen
+        // Mitglieder zählen - ALLE Transaktionen (Einzahlungen + Auszahlungen)
         if (transaction.member) {
           memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
         }
       });
       
+      console.log('Event Totals:', eventTotals);
+      console.log('Member Totals:', memberTotals);
       updateCharts();
     }).catch(error => {
       console.error('Fehler beim Laden der Chart-Daten:', error);
@@ -712,13 +785,13 @@
       'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
     };
 
-    // Events Chart
+    // Events Chart - Linksbündig, Top 10 Events
     const eventsChart = document.getElementById('eventsChart');
     eventsChart.innerHTML = '';
     
     const sortedEvents = Object.entries(eventTotals)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
+      .slice(0, 10); // Top 10 Events
     
     if (sortedEvents.length === 0) {
       eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
@@ -727,19 +800,11 @@
       
       sortedEvents.forEach(([event, amount]) => {
         const barContainer = document.createElement('div');
-        barContainer.style.display = 'flex';
-        barContainer.style.flexDirection = 'column';
-        barContainer.style.alignItems = 'center';
-        barContainer.style.flex = '1';
-        barContainer.style.height = '100%';
-        barContainer.style.justifyContent = 'flex-end';
-        barContainer.style.gap = '8px';
+        barContainer.className = 'bar-container';
         
         // Wert oben
         const value = document.createElement('div');
-        value.style.fontSize = '12px';
-        value.style.fontWeight = '800';
-        value.style.color = 'var(--Yellow)';
+        value.className = 'bar-value';
         value.textContent = `${(amount/1000).toFixed(0)}k`;
         
         // Balken
@@ -747,16 +812,11 @@
         const bar = document.createElement('div');
         bar.className = 'bar';
         bar.style.height = height + 'px';
-        bar.style.width = '40px';
-        bar.style.background = 'var(--Primary)';
-        bar.style.borderRadius = '6px 6px 0 0';
+        bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
         
         // Event-Name unten
         const label = document.createElement('div');
-        label.style.fontSize = '11px';
-        label.style.fontWeight = '700';
-        label.style.color = 'var(--White)';
-        label.style.textAlign = 'center';
+        label.className = 'bar-label';
         label.textContent = eventNames[event] || event;
         
         barContainer.appendChild(value);
@@ -766,13 +826,13 @@
       });
     }
 
-    // Members Chart
+    // Members Chart - Linksbündig mit Scrollleiste, ALLE Mitglieder
     const membersChart = document.getElementById('membersChart');
     membersChart.innerHTML = '';
     
+    // ALLE Mitglieder sortiert nach Betrag (absteigend)
     const sortedMembers = Object.entries(memberTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
+      .sort((a, b) => b[1] - a[1]);
     
     if (sortedMembers.length === 0) {
       membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
@@ -781,19 +841,11 @@
       
       sortedMembers.forEach(([member, amount]) => {
         const barContainer = document.createElement('div');
-        barContainer.style.display = 'flex';
-        barContainer.style.flexDirection = 'column';
-        barContainer.style.alignItems = 'center';
-        barContainer.style.flex = '1';
-        barContainer.style.height = '100%';
-        barContainer.style.justifyContent = 'flex-end';
-        barContainer.style.gap = '8px';
+        barContainer.className = 'bar-container';
         
         // Wert oben
         const value = document.createElement('div');
-        value.style.fontSize = '12px';
-        value.style.fontWeight = '800';
-        value.style.color = 'var(--Yellow)';
+        value.className = 'bar-value';
         value.textContent = `${(amount/1000).toFixed(0)}k`;
         
         // Balken
@@ -801,16 +853,11 @@
         const bar = document.createElement('div');
         bar.className = 'bar';
         bar.style.height = height + 'px';
-        bar.style.width = '40px';
-        bar.style.background = 'var(--Primary)';
-        bar.style.borderRadius = '6px 6px 0 0';
+        bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
         
         // Mitglieds-Name unten
         const label = document.createElement('div');
-        label.style.fontSize = '11px';
-        label.style.fontWeight = '700';
-        label.style.color = 'var(--White)';
-        label.style.textAlign = 'center';
+        label.className = 'bar-label';
         label.textContent = member;
         
         barContainer.appendChild(value);
@@ -827,6 +874,7 @@
     db.collection('members').onSnapshot(() => {
       loadOpenPayouts();
       loadActiveMembers();
+      loadTotalPayouts(); // Auch Gesamtauszahlungen neu berechnen
     });
 
     // Transactions Collection für Gesamtauszahlungen und Charts
