@@ -4,8 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitglieder - Hexenjäger</title>
-    <link rel="stylesheet" href="style.css">
     <style>
+        /* CSS Variablen und Grundstil */
+        :root {
+            --bg-primary: #0d0b1b;
+            --bg-card: #1a1730;
+            --bg-darker: #151229;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-purple: #7c5bf1;
+            --accent-purple-light: #8d6ef3;
+            --border-color: #2a2545;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Stil */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-darker) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hexenjaeger-symbol {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            border: 3px solid var(--accent-purple-light);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--bg-darker);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        /* Card Stil */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
         .header-actions {
             display: flex;
             justify-content: space-between;
@@ -41,7 +137,12 @@
         .search-box input {
             width: 100%;
             max-width: 300px;
-            padding-left: 35px;
+            padding: 10px 15px 10px 40px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 14px;
         }
 
         .search-icon {
@@ -77,6 +178,7 @@
             border-color: var(--accent-purple);
         }
 
+        /* Mitglieder Liste */
         .members-list {
             display: flex;
             flex-direction: column;
@@ -84,7 +186,7 @@
         }
 
         .member-item {
-            background: var(--bg-card);
+            background: var(--bg-darker);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 16px 20px;
@@ -117,7 +219,7 @@
             color: var(--text-muted);
             font-family: monospace;
             font-size: 0.9em;
-            background: var(--bg-darker);
+            background: rgba(255, 255, 255, 0.05);
             padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
@@ -127,6 +229,40 @@
         .member-actions {
             display: flex;
             gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-purple-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-darker);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
         }
 
         .btn-icon {
@@ -149,8 +285,8 @@
         }
 
         .btn-edit:hover {
-            color: var(--accent-blue);
-            border-color: var(--accent-blue);
+            color: var(--accent-purple);
+            border-color: var(--accent-purple);
         }
 
         .btn-delete:hover {
@@ -158,6 +294,7 @@
             border-color: #ef4444;
         }
 
+        /* Modal Stil */
         .modal {
             display: none;
             position: fixed;
@@ -196,6 +333,33 @@
 
         .modal-close:hover {
             color: var(--text-light);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            padding: 10px 12px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-purple);
+            outline: none;
         }
 
         .error-message {
@@ -238,18 +402,7 @@
             font-style: italic;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            color: var(--text-light);
-            font-size: 0.9em;
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
             .header-actions {
                 flex-direction: column;
@@ -273,6 +426,14 @@
             
             .member-actions {
                 align-self: flex-end;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
             }
         }
     </style>
@@ -300,11 +461,11 @@
             <div class="search-sort-container">
                 <div class="search-box">
                     <span class="search-icon">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Mitglieder suchen..." onkeyup="searchMembers()">
+                    <input type="text" id="searchInput" placeholder="Mitglieder suchen...">
                 </div>
                 <div class="sort-options">
-                    <button class="sort-btn active" onclick="sortMembers('name')">Nach Name</button>
-                    <button class="sort-btn" onclick="sortMembers('id')">Nach ID</button>
+                    <button class="sort-btn active" data-sort="name">Nach Name</button>
+                    <button class="sort-btn" data-sort="id">Nach ID</button>
                 </div>
             </div>
 
@@ -316,7 +477,7 @@
         <!-- Modal für neues Mitglied -->
         <div id="memberModal" class="modal">
             <div class="modal-content">
-                <button class="modal-close" onclick="closeModal()">×</button>
+                <button class="modal-close" id="modalClose">×</button>
                 <h3 style="margin-bottom: 20px; color: var(--accent-purple-light);">Neues Mitglied</h3>
                 <div style="display: grid; gap: 16px;">
                     <div class="form-group">
@@ -326,7 +487,7 @@
                     </div>
                     <div class="form-group">
                         <label for="memberId">Mitglieds-ID</label>
-                        <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)" oninput="checkIdAvailability()">
+                        <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)">
                         <div class="id-check">
                             <span class="id-status id-available" id="idAvailable">✓ ID verfügbar</span>
                             <span class="id-status id-taken" id="idTaken">✗ ID bereits vergeben</span>
@@ -342,12 +503,65 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
     <script>
-        let currentMembers = [];
-        let currentSort = 'name';
-        let currentSearchTerm = '';
+        // Simulierte Datenbank - ersetzt app.js
+        const db = {
+            getMembers: function() {
+                const members = localStorage.getItem('hexenjaeger-members');
+                return members ? JSON.parse(members) : [];
+            },
+            
+            saveMembers: function(members) {
+                localStorage.setItem('hexenjaeger-members', JSON.stringify(members));
+            },
+            
+            addMember: function(name, id) {
+                const members = this.getMembers();
+                
+                // Prüfe ob ID bereits existiert
+                if (members.some(member => member.id.toUpperCase() === id.toUpperCase())) {
+                    return { success: false, error: 'Diese ID ist bereits vergeben' };
+                }
+                
+                const newMember = {
+                    id: id.toUpperCase(),
+                    name: name,
+                    balance: 0,
+                    joinDate: new Date().toISOString()
+                };
+                
+                members.push(newMember);
+                this.saveMembers(members);
+                return { success: true };
+            },
+            
+            updateMember: function(id, newName) {
+                const members = this.getMembers();
+                const memberIndex = members.findIndex(member => member.id === id);
+                
+                if (memberIndex === -1) {
+                    return { success: false, error: 'Mitglied nicht gefunden' };
+                }
+                
+                members[memberIndex].name = newName;
+                this.saveMembers(members);
+                return { success: true };
+            },
+            
+            deleteMember: function(id) {
+                const members = this.getMembers();
+                const filteredMembers = members.filter(member => member.id !== id);
+                
+                if (filteredMembers.length === members.length) {
+                    return { success: false, error: 'Mitglied nicht gefunden' };
+                }
+                
+                this.saveMembers(filteredMembers);
+                return { success: true };
+            }
+        };
 
+        // Utility Funktionen
         function escapeHtml(unsafe) {
             return unsafe
                 .replace(/&/g, "&amp;")
@@ -358,7 +572,6 @@
         }
 
         function showNotification(message, type = 'success') {
-            // Einfache Notification-Implementierung
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -371,6 +584,7 @@
                 z-index: 1001;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 transition: all 0.3s ease;
+                font-weight: 500;
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
@@ -383,6 +597,11 @@
                 }, 300);
             }, 3000);
         }
+
+        // Haupt-Logik
+        let currentMembers = [];
+        let currentSort = 'name';
+        let currentSearchTerm = '';
 
         function updateMemberCount() {
             const memberCount = document.getElementById('memberCount');
@@ -465,18 +684,6 @@
                 renderMembers();
             } else {
                 searchMembers();
-            }
-        }
-
-        function updateSortButtons() {
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            if (currentSort === 'name') {
-                document.querySelector('.sort-btn:nth-child(1)').classList.add('active');
-            } else {
-                document.querySelector('.sort-btn:nth-child(2)').classList.add('active');
             }
         }
 
@@ -607,14 +814,32 @@
             }
         };
 
+        // Event Listeners wenn DOM geladen
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('memberModal');
             const addMemberBtn = document.getElementById('addMemberBtn');
             const saveMemberBtn = document.getElementById('saveMember');
             const cancelBtn = document.getElementById('cancelMember');
+            const modalClose = document.getElementById('modalClose');
             const memberNameInput = document.getElementById('memberName');
             const memberIdInput = document.getElementById('memberId');
+            const searchInput = document.getElementById('searchInput');
+            const sortButtons = document.querySelectorAll('.sort-btn');
 
+            // Suchfunktion
+            searchInput.addEventListener('input', searchMembers);
+
+            // Sortierfunktion
+            sortButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    sortMembers(this.dataset.sort);
+                });
+            });
+
+            // ID Verfügbarkeit prüfen
+            memberIdInput.addEventListener('input', checkIdAvailability);
+
+            // Modal öffnen
             addMemberBtn.addEventListener('click', () => {
                 modal.style.display = 'block';
                 memberNameInput.value = '';
@@ -633,9 +858,12 @@
                 memberNameInput.focus();
             });
 
+            // Mitglied speichern
             saveMemberBtn.addEventListener('click', saveMember);
 
+            // Modal schließen
             cancelBtn.addEventListener('click', closeModal);
+            modalClose.addEventListener('click', closeModal);
 
             // Klick außerhalb des Modals zum Schließen
             modal.addEventListener('click', (event) => {
@@ -644,9 +872,15 @@
                 }
             });
 
+            // Escape-Taste zum Schließen
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && modal.style.display === 'block') {
+                    closeModal();
+                }
+            });
+
             // Initial rendern
             renderMembers();
-            updateSortButtons();
         });
     </script>
 </body>
