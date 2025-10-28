@@ -691,7 +691,7 @@ function updateCharts() {
     .slice(0, 6);
   
   if (sortedEvents.length === 0) {
-    eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Event-Daten verfügbar</div>';
+    eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
   } else {
     const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
     
@@ -703,26 +703,54 @@ function updateCharts() {
       barContainer.style.flex = '1';
       barContainer.style.height = '100%';
       barContainer.style.justifyContent = 'flex-end';
+      barContainer.style.gap = '8px';
       
-      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 10;
+      // Wert oben
+      const value = document.createElement('div');
+      value.style.fontSize = '12px';
+      value.style.fontWeight = '800';
+      value.style.color = 'var(--Yellow)';
+      value.style.textShadow = '0 0 10px rgba(255, 222, 42, 0.3)';
+      value.textContent = `${(amount/1000).toFixed(0)}k`;
+      
+      // Balken
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.style.width = '100%';
-      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.style.width = '40px';
+      bar.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
+      bar.style.borderRadius = '6px 6px 0 0';
+      bar.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
+      bar.style.transition = 'all 0.3s ease';
       
+      // Balken Hover-Effekt
+      bar.onmouseover = function() {
+        this.style.background = 'linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%)';
+        this.style.transform = 'translateY(-4px)';
+        this.style.boxShadow = '0 6px 20px rgba(255, 222, 42, 0.4)';
+      };
+      bar.onmouseout = function() {
+        this.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
+      };
+      
+      // Event-Name unten
       const label = document.createElement('div');
-      label.style.marginTop = '8px';
       label.style.fontSize = '11px';
-      label.style.fontWeight = '600';
+      label.style.fontWeight = '700';
       label.style.color = 'var(--White)';
       label.style.textAlign = 'center';
-      label.style.maxWidth = '80px';
+      label.style.maxWidth = '90px';
       label.style.overflow = 'hidden';
       label.style.textOverflow = 'ellipsis';
       label.style.whiteSpace = 'nowrap';
+      label.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
+      label.style.letterSpacing = '0.3px';
       label.textContent = eventNames[event] || event;
       
+      barContainer.appendChild(value);
       barContainer.appendChild(bar);
       barContainer.appendChild(label);
       eventsChart.appendChild(barContainer);
@@ -738,7 +766,7 @@ function updateCharts() {
     .slice(0, 6);
   
   if (sortedMembers.length === 0) {
-    membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Mitglieder-Daten verfügbar</div>';
+    membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
   } else {
     const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
     
@@ -750,26 +778,54 @@ function updateCharts() {
       barContainer.style.flex = '1';
       barContainer.style.height = '100%';
       barContainer.style.justifyContent = 'flex-end';
+      barContainer.style.gap = '8px';
       
-      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 10;
+      // Wert oben
+      const value = document.createElement('div');
+      value.style.fontSize = '12px';
+      value.style.fontWeight = '800';
+      value.style.color = 'var(--Yellow)';
+      value.style.textShadow = '0 0 10px rgba(255, 222, 42, 0.3)';
+      value.textContent = `${(amount/1000).toFixed(0)}k`;
+      
+      // Balken
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.style.width = '100%';
-      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.style.width = '40px';
+      bar.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
+      bar.style.borderRadius = '6px 6px 0 0';
+      bar.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
+      bar.style.transition = 'all 0.3s ease';
       
+      // Balken Hover-Effekt
+      bar.onmouseover = function() {
+        this.style.background = 'linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%)';
+        this.style.transform = 'translateY(-4px)';
+        this.style.boxShadow = '0 6px 20px rgba(255, 222, 42, 0.4)';
+      };
+      bar.onmouseout = function() {
+        this.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
+      };
+      
+      // Mitglieds-Name unten
       const label = document.createElement('div');
-      label.style.marginTop = '8px';
       label.style.fontSize = '11px';
-      label.style.fontWeight = '600';
+      label.style.fontWeight = '700';
       label.style.color = 'var(--White)';
       label.style.textAlign = 'center';
-      label.style.maxWidth = '80px';
+      label.style.maxWidth = '90px';
       label.style.overflow = 'hidden';
       label.style.textOverflow = 'ellipsis';
       label.style.whiteSpace = 'nowrap';
+      label.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
+      label.style.letterSpacing = '0.3px';
       label.textContent = member;
       
+      barContainer.appendChild(value);
       barContainer.appendChild(bar);
       barContainer.appendChild(label);
       membersChart.appendChild(barContainer);
