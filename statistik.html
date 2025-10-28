@@ -675,14 +675,11 @@ function loadAllStats() {
     db.collection('members').get(),
     // Ausgezahlte Beträge - Transaktionen mit type "auszahlung"
     db.collection('transactions').where('type', '==', 'auszahlung').get(),
-    // Chart Daten - ALLE Transaktionen
+    // Chart Daten - ALLE Transaktionen (Einzahlungen + Auszahlungen)
     db.collection('transactions').get()
   ]).then(([membersSnap, payoutSnap, allTransactionsSnap]) => {
     
-    // DEBUG: Zeige alle Auszahlungs-Transaktionen an
-    console.log('Auszahlungs-Transaktionen:', payoutSnap.docs.map(doc => doc.data()));
-    
-    // 1. Offene Auszahlungen berechnen
+    // 1. Offene Auszahlungen berechnen (das was in der Auszahlungsliste steht)
     openPayouts = 0;
     activeMembers = 0;
     membersSnap.forEach(doc => {
@@ -694,7 +691,7 @@ function loadAllStats() {
       }
     });
     
-    // 2. Ausgezahlte Beträge berechnen
+    // 2. Bereits ausgezahlte Beträge berechnen
     let paidOutTotal = 0;
     payoutSnap.forEach(doc => {
       const transaction = doc.data();
@@ -704,20 +701,26 @@ function loadAllStats() {
     // 3. Gesamtauszahlungen = Offene + Ausgezahlte
     totalPayouts = openPayouts + paidOutTotal;
     
-    // 4. Chart Daten berechnen - für Charts zählen wir ALLE Einzahlungen
+    // 4. Chart Daten berechnen - ALLE Transaktionen für die Charts
     eventTotals = {};
     memberTotals = {};
     allTransactionsSnap.forEach(doc => {
       const transaction = doc.data();
       
-      // Events zählen (nur Einzahlungen, da Auszahlungen keine Events sind)
-      if (transaction.event && transaction.type === 'einzahlung') {
+      // Events zählen - sowohl Einzahlungen als auch Auszahlungen
+      if (transaction.event) {
         eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
       }
       
-      // Mitglieder zählen - ALLE Einzahlungen (verdientes Geld)
-      if (transaction.member && transaction.type === 'einzahlung') {
-        memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
+      // Mitglieder zählen - ALLE Transaktionen (Einzahlungen + Auszahlungen)
+      if (transaction.member) {
+        if (transaction.type === 'einzahlung') {
+          // Einzahlungen addieren
+          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
+        } else if (transaction.type === 'auszahlung') {
+          // Auszahlungen subtrahieren (weil Geld ausgezahlt wurde)
+          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) - (transaction.amount || 0);
+        }
       }
     });
     
