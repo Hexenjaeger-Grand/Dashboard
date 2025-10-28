@@ -497,6 +497,47 @@ auth.onAuthStateChanged(user => {
     document.getElementById('leaderschaftBtn').onclick = () => {
       alert('Bitte auf dem Dashboard einloggen');
     };
+        document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
+      document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
+      
+      window.handleLogin = async () => {
+        const email = document.getElementById('modalEmail').value;
+        const password = document.getElementById('modalPassword').value;
+        const status = document.getElementById('modalStatus');
+        
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          status.textContent = 'Erfolgreich angemeldet!';
+          setTimeout(() => {
+            loginModal.remove();
+          }, 1000);
+        } catch (error) {
+          status.textContent = 'Login fehlgeschlagen: ' + error.message;
+        }
+      };
+    };
+    // Aktive Navigation setzen
+function setActiveNav() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  const navLinks = document.querySelectorAll('.header__nav a');
+  
+  navLinks.forEach(link => {
+    const linkPage = link.getAttribute('href');
+    if (linkPage === currentPage) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+}
+
+// Beim Laden und bei Navigation
+document.addEventListener('DOMContentLoaded', setActiveNav);
+window.addEventListener('popstate', setActiveNav);
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
