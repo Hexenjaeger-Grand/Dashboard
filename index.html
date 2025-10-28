@@ -375,9 +375,17 @@
       font-weight: 600;
     }
 
-    /* Admin Only */
-    .admin-only { display: none; }
-    body.admin .admin-only { display: block; }
+.admin-only { 
+  display: none; 
+  visibility: hidden; 
+  opacity: 0; 
+  transition: opacity 0.3s ease;
+}
+body.admin .admin-only { 
+  display: block; 
+  visibility: visible; 
+  opacity: 1; 
+}
 
     /* Login Status Card */
     .login-status {
