@@ -400,52 +400,63 @@
       background: var(--Yellow);
     }
 
-    .bar-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      width: 60px;
-      height: 100%;
-      justify-content: flex-end;
-      gap: 8px;
-    }
+   .bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+  position: relative;
+}
 
-    .bar-value {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--Yellow);
-      text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
-    }
+.bar-value {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--Yellow);
+  text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
 
-    .bar {
-      background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
-      border-radius: 6px 6px 0 0;
-      width: 40px;
-      position: relative;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
-      min-height: 15px;
-    }
+.bar {
+  background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
+  border-radius: 6px 6px 0 0;
+  width: 40px;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
+  min-height: 15px;
+  margin-bottom: 30px;
+}
 
-    .bar:hover {
-      background: linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%);
-      transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(255, 222, 42, 0.4);
-    }
+.bar:hover {
+  background: linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(255, 222, 42, 0.4);
+}
 
-    .bar-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--White);
-      text-align: center;
-      max-width: 90px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-      letter-spacing: 0.3px;
-    }
+.bar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--White);
+  text-align: center;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  letter-spacing: 0.3px;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  right: 0;
+}
 
     .admin-only { 
       display: none; 
@@ -766,30 +777,30 @@
       const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
       
       sortedEvents.forEach(([event, amount]) => {
-        const barContainer = document.createElement('div');
-        barContainer.className = 'bar-container';
-        
-        // Wert oben
-        const value = document.createElement('div');
-        value.className = 'bar-value';
-        value.textContent = `${(amount/1000).toFixed(0)}k`;
-        
-        // Balken
-        const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = height + 'px';
-        bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
-        
-        // Event-Name unten
-        const label = document.createElement('div');
-        label.className = 'bar-label';
-        label.textContent = eventNames[event] || event;
-        
-        barContainer.appendChild(value);
-        barContainer.appendChild(bar);
-        barContainer.appendChild(label);
-        eventsChart.appendChild(barContainer);
+// Balken-Container erstellen
+const barContainer = document.createElement('div');
+barContainer.className = 'bar-container';
+
+// Wert oben (absolut positioniert)
+const value = document.createElement('div');
+value.className = 'bar-value';
+value.textContent = `${(amount/1000).toFixed(0)}k`;
+
+// Balken
+const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
+const bar = document.createElement('div');
+bar.className = 'bar';
+bar.style.height = height + 'px';
+bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
+
+// Event-Name unten (absolut positioniert)
+const label = document.createElement('div');
+label.className = 'bar-label';
+label.textContent = eventNames[event] || event;
+
+barContainer.appendChild(value);
+barContainer.appendChild(bar);
+barContainer.appendChild(label);
       });
     }
 
