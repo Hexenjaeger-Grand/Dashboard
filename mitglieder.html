@@ -436,27 +436,31 @@ body.admin .admin-only {
   </style>
 </head>
 <body>
-  <!-- Header mit Logo und Text -->
-  <div class="header">
-    <div class="header__brand" onclick="window.location.href='index.html'">
-      <div class="header__logo">
-        <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
-      </div>
-      <div class="header__text">
-        <div class="header__title">Hexenjäger</div>
-        <div class="header__subtitle">Grand Roleplay<br>GTA5</div>
-      </div>
+<div class="header">
+  <div class="header__brand" onclick="window.location.href='index.html'">
+    <div class="header__logo">
+      <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
     </div>
-    
-    <div class="header__nav">
-      <a href="auszahlung.html">Auszahlungen</a>
-      <a href="statistik.html">Statistik</a>
-      <a href="events.html" class="admin-only">Events</a>
-      <a href="mitglieder.html" class="active admin-only">Mitglieder</a>
+    <div class="header__text">
+      <div class="header__title">Hexenjäger</div>
+      <div class="header__subtitle">Grand Roleplay<br>GTA5</div>
     </div>
+  </div>
+  
+  <div class="header__nav">
+    <a href="auszahlung.html" class="active">Auszahlungen</a>
+    <a href="statistik.html">Statistik</a>
+    <a href="events.html" class="admin-only">Events</a>
+    <a href="mitglieder.html" class="admin-only">Mitglieder</a>
+  </div>
 
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <div id="loginStatusIndicator" class="login-status-indicator logged-out">
+      <span>🔓 Nicht eingeloggt</span>
+    </div>
     <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
   </div>
+</div>
 
   <div class="container main-content">
     <h1>👥 Mitgliederverwaltung</h1>
