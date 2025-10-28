@@ -609,43 +609,52 @@
   let eventTotals = {};
   let memberTotals = {};
 
-// Für GESAMTE AUSZAHLUNGEN - nur echte Auszahlungen
-db.collection('transactions')
-  .where('type', '==', 'auszahlung')
-  .onSnapshot(snap => {
-    totalPayouts = 0;
-    snap.forEach(doc => {
-      const transaction = doc.data();
-      totalPayouts += transaction.amount || 0;
-    });
-    console.log('Gesamte Auszahlungen:', totalPayouts);
-    updateStats();
-  });
+// Für GESAMTE AUSZAHLUNGEN - Summe aller offenen + ausgezahlten Beträge
+let totalPayouts = 0;
+let openPayouts = 0;
+let activeMembers = 0;
+let eventTotals = {};
+let memberTotals = {};
 
-db.collection('transactions').onSnapshot(snap => {
-  console.log('Alle Transaktionen für Charts:', snap.size, 'Dokumente');
-  
-  eventTotals = {};
-  memberTotals = {};
-  
-  snap.forEach(doc => {
-    const transaction = doc.data();
-    console.log('Transaktion für Chart:', transaction);
-    
-    // Für Events-Statistik: ALLE Events (auch 'auszahlung' Events)
-    if (transaction.event) {
-      eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
-    }
-    
-    // Für Mitglieder-Statistik: alle Transaktionen (Einzahlungen + Auszahlungen)
-    if (transaction.member) {
-      memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
-    }
-  });
-  
-  console.log('Event Totals für Charts:', eventTotals);
-  console.log('Member Totals für Charts:', memberTotals);
-  updateCharts();
+// Berechne Gesamtauszahlungen (offene + ausgezahlte)
+function calculateTotalPayouts() {
+  // Summiere alle ausgezahlten Beträge
+  db.collection('transactions')
+    .where('type', '==', 'auszahlung')
+    .get()
+    .then(snap => {
+      let paidOutTotal = 0;
+      snap.forEach(doc => {
+        const transaction = doc.data();
+        paidOutTotal += transaction.amount || 0;
+      });
+      
+      // Summiere alle offenen Beträge
+      db.collection('members').get().then(membersSnap => {
+        let openTotal = 0;
+        membersSnap.forEach(doc => {
+          const member = doc.data();
+          openTotal += member.balance || 0;
+        });
+        
+        // Gesamt = Ausgezahlte + Offene
+        totalPayouts = paidOutTotal + openTotal;
+        console.log('Gesamte Auszahlungen:', totalPayouts, '(Ausgezahlt:', paidOutTotal, '+ Offen:', openTotal, ')');
+        updateStats();
+      });
+    });
+}
+
+// Initial berechnen und auf Änderungen hören
+calculateTotalPayouts();
+
+// Auf Änderungen in beiden Collections hören
+db.collection('transactions').where('type', '==', 'auszahlung').onSnapshot(() => {
+  calculateTotalPayouts();
+});
+
+db.collection('members').onSnapshot(() => {
+  calculateTotalPayouts();
 });
 
 // Für OFFENE AUSZAHLUNGEN und AKTIVE MITGLIEDER
