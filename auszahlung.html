@@ -439,6 +439,24 @@ body.admin .admin-only {
       });
     }
 
+    // Auth Check mit Status-Indicator
+auth.onAuthStateChanged(user => {
+  const isAdmin = !!user;
+  document.body.classList.toggle('admin', isAdmin);
+  
+  const statusIndicator = document.getElementById('loginStatusIndicator');
+  if (user) {
+    statusIndicator.className = 'login-status-indicator logged-in';
+    statusIndicator.innerHTML = `
+      <span>🔐 Eingeloggt</span>
+      <div class="user-email" title="${user.email}">${user.email}</div>
+    `;
+  } else {
+    statusIndicator.className = 'login-status-indicator logged-out';
+    statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+  }
+});
+
     function markAsPaid(memberId) {
       if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
       
