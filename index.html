@@ -3,68 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hexenjäger Dashboard - GTA5Grand Style</title>
+  <title>Hexenjäger Dashboard</title>
   
-  <!-- Akrobat Font -->
+  <!-- Google Fonts als Ersatz für Akrobat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat Thin'), local('Akrobat-Thin'), url('Akrobatthin.woff2') format('woff2'), url('Akrobatthin.woff') format('woff'), url('Akrobatthin.ttf') format('truetype');
-      font-weight: 100;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat ExtraLight'), local('Akrobat-ExtraLight'), url('Akrobatextralight.woff2') format('woff2'), url('Akrobatextralight.woff') format('woff'), url('Akrobatextralight.ttf') format('truetype');
-      font-weight: 200;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat Light'), local('Akrobat-Light'), url('Akrobatlight.woff2') format('woff2'), url('Akrobatlight.woff') format('woff'), url('Akrobatlight.ttf') format('truetype');
-      font-weight: 300;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat'), local('Akrobat-Regular'), url('Akrobat.woff2') format('woff2'), url('Akrobat.woff') format('woff'), url('Akrobat.ttf') format('truetype');
-      font-weight: 400;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat SemiBold'), local('Akrobat-SemiBold'), url('Akrobatsemibold.woff2') format('woff2'), url('Akrobatsemibold.woff') format('woff'), url('Akrobatsemibold.ttf') format('truetype');
-      font-weight: 600;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat Bold'), local('Akrobat-Bold'), url('Akrobatbold.woff2') format('woff2'), url('Akrobatbold.woff') format('woff'), url('Akrobatbold.ttf') format('truetype');
-      font-weight: 700;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat ExtraBold'), local('Akrobat-ExtraBold'), url('Akrobatextrabold.woff2') format('woff2'), url('Akrobatextrabold.woff') format('woff'), url('Akrobatextrabold.ttf') format('truetype');
-      font-weight: 800;
-      font-style: normal;
-    }
-    @font-face {
-      font-family: 'Akrobat';
-      src: local('Akrobat Black'), local('Akrobat-Black'), url('Akrobatblack.woff2') format('woff2'), url('Akrobatblack.woff') format('woff'), url('Akrobatblack.ttf') format('truetype');
-      font-weight: 900;
-      font-style: normal;
-    }
-  </style>
-
-  <style>
-    /* GTA5Grand Variablen - EXAKT */
+    /* Google Fonts als Ersatz - sehr ähnlich zu Akrobat */
     :root {
-      --Font: "Akrobat";
+      --Font: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --White: #F1F1F1;
       --Dark: #151617;
       --Neutral: #F9F3DE;
-      --Neutral-lighten: rgba(249, 243, 222, 0.06);
       --Firmcolor: #EE2759;
       --Red: #FF4848;
       --Yellow: #FFDE2A;
@@ -93,7 +43,7 @@
     }
 
     body {
-      font-family: "Akrobat", sans-serif;
+      font-family: var(--Font);
       background: #0d0b1b;
       color: var(--White);
       overflow-x: hidden;
@@ -107,11 +57,11 @@
       position: relative;
     }
 
-    /* Header - EXAKT wie GTA5Grand */
+    /* Header mit Logo */
     .header {
       background: var(--White);
       display: flex;
-      padding: 12px 12px 12px 22px;
+      padding: 8px 12px 8px 22px;
       justify-content: space-between;
       align-items: center;
       position: fixed;
@@ -122,11 +72,23 @@
       box-shadow: 0 12px 100px 0 rgba(0,0,0,.25);
     }
 
-    .header__logo h2 {
+    .header__logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header__logo img {
+      height: 45px;
+      width: auto;
+    }
+
+    .header__logo-text {
       color: var(--Dark);
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 900;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .header__nav {
@@ -159,7 +121,7 @@
       color: var(--White);
     }
 
-    /* Login Section - GTA5Grand Style */
+    /* Login Section */
     .login-section {
       display: flex;
       gap: 12px;
@@ -197,7 +159,7 @@
       height: 48px;
       width: 100%;
       color: var(--Dark);
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 600;
       line-height: 100%;
       transition: .2s;
@@ -208,7 +170,7 @@
       box-shadow: 0 2px 0 0 #7c5bf1, 0 1px 0 3px #7c5bf1;
     }
 
-    /* Buttons - EXAKT wie GTA5Grand */
+    /* Buttons */
     .btn {
       display: flex;
       padding: 18px 24px;
@@ -244,7 +206,7 @@
       background: linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);
     }
 
-    /* Hero Section - GTA5Grand Style */
+    /* Hero Section */
     .hero {
       min-height: 700px;
       background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
@@ -282,7 +244,7 @@
       margin-bottom: 32px;
     }
 
-    /* Stats Grid - GTA5Grand Card Style */
+    /* Stats Grid */
     .stats {
       display: flex;
       gap: 20px;
@@ -317,7 +279,7 @@
       letter-spacing: .48px;
     }
 
-    /* Navigation Cards - GTA5Grand Style */
+    /* Navigation Cards */
     .nav-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -386,14 +348,16 @@
       .hero h1 { font-size: 32px; }
       .stats { flex-direction: column; align-items: center; }
       .nav-cards { grid-template-columns: 1fr; }
+      .header__logo-text { display: none; } /* Text auf Mobile ausblenden */
     }
   </style>
 </head>
 <body>
-  <!-- Header - EXAKT wie GTA5Grand -->
+  <!-- Header mit Logo -->
   <div class="header">
     <div class="header__logo">
-      <h2>HEXENJÄGER</h2>
+      <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
+      <div class="header__logo-text">HEXENJÄGER</div>
     </div>
     
     <div class="header__nav">
