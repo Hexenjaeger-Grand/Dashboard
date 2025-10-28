@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mitglieder - Hexenjäger</title>
+  <style>
+    :root {
+      --bg: #0f172a; --text: #e5e7eb; --muted: #9ca3af; 
+      --border: #1f2937; --accent: #7c3aed; --card: rgba(255,255,255,0.05);
+      --success: #22c55e; --danger: #ef4444;
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui; padding:20px;}
+    .container{max-width:1200px; margin:0 auto;}
+    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
+    .back-btn{padding:10px 20px; background:var(--accent); color:white; text-decoration:none; border-radius:8px;}
+    
+    .member-form{background:var(--card); border:1px solid var(--border); border-radius:15px; padding:20px; margin-bottom:30px;}
+    .form-group{margin-bottom:15px;}
+    label{display:block; margin-bottom:5px; font-weight:bold;}
+    input, button{padding:10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.3); color:var(--text); width:100%;}
+    button{background:var(--accent); color:white; border:none; cursor:pointer; margin-top:10px; width:auto;}
+    .btn-danger{background:var(--danger);}
+    
+    table{width:100%; border-collapse:collapse; background:var(--card); border-radius:10px; overflow:hidden; margin-top:20px;}
+    th, td{padding:12px; text-align:left; border-bottom:1px solid var(--border);}
+    th{background:rgba(0,0,0,0.3);}
+    
+    .action-btn{padding:5px 10px; margin:0 2px; border-radius:5px; cursor:pointer; border:none;}
+    .edit-btn{background:var(--accent); color:white;}
+    .delete-btn{background:var(--danger); color:white;}
+    
+    .admin-only{display:none;}
+    body.admin .admin-only{display:block;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>👥 Mitglieder verwalten</h1>
+      <a href="index.html" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="admin-only">
+      <!-- Neues Mitglied Formular -->
+      <div class="member-form">
+        <h3>Neues Mitglied hinzufügen</h3>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="newMemberName" placeholder="Vollständiger Name">
+        </div>
+        <div class="form-group">
+          <label>ID</label>
+          <input type="text" id="newMemberId" placeholder="z.B. H001">
+        </div>
+        <button onclick="addMember()">Mitglied hinzufügen</button>
+        <p id="addStatus"></p>
+      </div>
+
+      <!-- Mitglieder Liste -->
+      <div class="member-form">
+        <h3>Mitglieder Liste</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>ID</th>
+              <th>Aktueller Stand</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="membersTable">
+            <!-- Wird mit JavaScript gefüllt -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-only" style="text-align:center; padding:40px; display:none;" id="notAdmin">
+      <h3>🔒 Nur für Leaderschaft zugänglich</h3>
+      <p>Bitte auf dem Dashboard einloggen</p>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:var(--card); padding:30px; border-radius:15px; width:90%; max-width:500px;">
+      <h3>Mitglied bearbeiten</h3>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="editMemberName">
+      </div>
+      <div class="form-group">
+        <label>ID</label>
+        <input type="text" id="editMemberId">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="saveMemberEdit()">Speichern</button>
+        <button onclick="closeEditModal()" style="background:var(--muted);">Abbrechen</button>
+      </div>
+      <input type="hidden" id="editMemberDocId">
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentEditingId = null;
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      const isAdmin = !!user;
+      document.body.classList.toggle('admin', isAdmin);
+      document.getElementById('notAdmin').style.display = isAdmin ? 'none' : 'block';
+      
+      if (isAdmin) {
+        loadMembers();
+      }
+    });
+
+    // Mitglieder laden
+    function loadMembers() {
+      db.collection('members').orderBy('name').onSnapshot(snap => {
+        const tbody = document.getElementById('membersTable');
+        tbody.innerHTML = '';
+        
+        snap.forEach(doc => {
+          const member = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${member.name}</td>
+            <td>${member.id || '-'}</td>
+            <td>${(member.balance || 0).toLocaleString('de-DE')} €</td>
+            <td>
+              <button class="action-btn edit-btn" onclick="openEditModal('${doc.id}', '${member.name}', '${member.id || ''}')">Bearbeiten</button>
+              <button class="action-btn delete-btn" onclick="deleteMember('${doc.id}', '${member.name}')">Löschen</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    // Mitglied hinzufügen
+    async function addMember() {
+      const name = document.getElementById('newMemberName').value.trim();
+      const id = document.getElementById('newMemberId').value.trim();
+      
+      if (!name) {
+        alert('Bitte einen Namen eingeben!');
+        return;
+      }
+
+      try {
+        await db.collection('members').doc(name).set({
+          name: name,
+          id: id,
+          balance: 0,
+          createdAt: new Date().toISOString()
+        });
+
+        document.getElementById('addStatus').innerHTML = '<span style="color:var(--success)">✅ Mitglied erfolgreich hinzugefügt!</span>';
+        document.getElementById('newMemberName').value = '';
+        document.getElementById('newMemberId').value = '';
+        
+        setTimeout(() => {
+          document.getElementById('addStatus').innerHTML = '';
+        }, 3000);
+
+      } catch (error) {
+        document.getElementById('addStatus').innerHTML = '<span style="color:var(--danger)">❌ Fehler: ' + error.message + '</span>';
+      }
+    }
+
+    // Mitglied bearbeiten
+    function openEditModal(docId, currentName, currentId) {
+      currentEditingId = docId;
+      document.getElementById('editMemberName').value = currentName;
+      document.getElementById('editMemberId').value = currentId;
+      document.getElementById('editMemberDocId').value = docId;
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      currentEditingId = null;
+    }
+
+    async function saveMemberEdit() {
+      const newName = document.getElementById('editMemberName').value.trim();
+      const newId = document.getElementById('editMemberId').value.trim();
+      
+      if (!newName) {
+        alert('Name darf nicht leer sein!');
+        return;
+      }
+
+      try {
+        // Wenn sich der Name geändert hat, neues Dokument erstellen und altes löschen
+        if (newName !== currentEditingId) {
+          const oldDoc = await db.collection('members').doc(currentEditingId).get();
+          if (oldDoc.exists) {
+            const oldData = oldDoc.data();
+            await db.collection('members').doc(newName).set({
+              ...oldData,
+              name: newName,
+              id: newId
+            });
+            await db.collection('members').doc(currentEditingId).delete();
+          }
+        } else {
+          // Nur ID aktualisieren
+          await db.collection('members').doc(currentEditingId).update({
+            id: newId
+          });
+        }
+
+        closeEditModal();
+        loadMembers(); // Liste neu laden
+
+      } catch (error) {
+        alert('Fehler beim Speichern: ' + error.message);
+      }
+    }
+
+    // Mitglied löschen
+    async function deleteMember(docId, memberName) {
+      if (!confirm(`Mitglied "${memberName}" wirklich löschen?`)) {
+        return;
+      }
+
+      try {
+        await db.collection('members').doc(docId).delete();
+        // Optional: Auch alle Transaktionen des Mitglieds löschen
+        // const transactions = await db.collection('transactions').where('member', '==', memberName).get();
+        // transactions.forEach(doc => doc.ref.delete());
+        
+      } catch (error) {
+        alert('Fehler beim Löschen: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
