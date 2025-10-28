@@ -68,6 +68,7 @@
       display: flex;
       align-items: center;
       gap: 15px;
+      cursor: pointer;
     }
 
     .header__logo img {
@@ -475,7 +476,7 @@
 <body>
   <!-- Header mit Logo und Text -->
   <div class="header">
-    <div class="header__brand">
+    <div class="header__brand" onclick="window.location.href='index.html'">
       <div class="header__logo">
         <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
       </div>
