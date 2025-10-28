@@ -1,887 +1,962 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitglieder - Hexenjäger</title>
-    <style>
-        /* CSS Variablen und Grundstil */
-        :root {
-            --bg-primary: #0d0b1b;
-            --bg-card: #1a1730;
-            --bg-darker: #151229;
-            --text-light: #ffffff;
-            --text-muted: #a0a0a0;
-            --accent-purple: #7c5bf1;
-            --accent-purple-light: #8d6ef3;
-            --border-color: #2a2545;
-            --success: #10b981;
-            --error: #ef4444;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mitglieder - Hexenjäger</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --Font: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --White: #F1F1F1;
+      --Dark: #151617;
+      --Neutral: #F9F3DE;
+      --Firmcolor: #EE2759;
+      --Red: #FF4848;
+      --Yellow: #FFDE2A;
+      --Ice: #3581DB;
+      --Grey: #6A6373;
+      --Primary: #7c5bf1;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      vertical-align: baseline;
+      appearance: none;
+      outline: 0;
+      font-family: inherit;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-light);
-            line-height: 1.6;
-        }
+    body {
+      font-family: var(--Font);
+      background: #0d0b1b;
+      color: var(--White);
+      overflow-x: hidden;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 20px;
+      margin: 0 auto;
+      position: relative;
+    }
 
-        /* Header Stil */
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-darker) 100%);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
+    /* Header mit Logo und Text */
+    .header {
+      background: var(--White);
+      display: flex;
+      padding: 8px 22px;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      box-shadow: 0 12px 100px 0 rgba(0,0,0,.25);
+      height: 80px;
+    }
 
-        .hexenjaeger-symbol {
-            width: 80px;
-            height: 80px;
-            background: var(--accent-purple);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0 auto 20px;
-            border: 3px solid var(--accent-purple-light);
-        }
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+    }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    .header__logo img {
+      height: 60px;
+      width: auto;
+    }
 
-        header p {
-            color: var(--text-muted);
-            font-size: 1.1em;
-            margin-bottom: 20px;
-        }
+    .header__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .back-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: var(--bg-darker);
-            color: var(--text-light);
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
+    .header__title {
+      color: var(--Primary);
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1;
+    }
 
-        .back-btn:hover {
-            background: var(--accent-purple);
-            border-color: var(--accent-purple);
-        }
+    .header__subtitle {
+      color: var(--Dark);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
 
-        /* Card Stil */
-        .card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 30px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
+    .header__nav {
+      display: flex;
+      gap: 8px;
+    }
 
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+    .header__nav a {
+      color: var(--Dark);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: .2s;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
 
-        .member-count {
-            color: var(--text-muted);
-            font-size: 0.9em;
-            background: var(--bg-darker);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
+    .header__nav a:hover {
+      background: var(--Yellow);
+    }
 
-        .search-sort-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    .header__nav a.active {
+      background: var(--Primary);
+      color: var(--White);
+    }
 
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
+    /* Leaderschaft Button */
+    .leaderschaft-btn {
+      background: var(--Primary);
+      color: var(--White);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .2s;
+      height: 44px;
+    }
 
-        .search-box input {
-            width: 100%;
-            max-width: 300px;
-            padding: 10px 15px 10px 40px;
-            background: var(--bg-darker);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-light);
-            font-size: 14px;
-        }
+    .leaderschaft-btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
 
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
+    /* Buttons */
+    .btn {
+      display: flex;
+      padding: 12px 20px;
+      gap: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      border-radius: 8px;
+      background: var(--Primary);
+      color: var(--White);
+      align-items: center;
+      justify-content: center;
+      transition: .2s;
+      text-transform: uppercase;
+      border: none;
+      text-decoration: none;
+    }
 
-        .sort-options {
-            display: flex;
-            gap: 8px;
-        }
+    .btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
 
-        .sort-btn {
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-light);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9em;
-        }
+    .btn-yellow {
+      background: var(--Yellow);
+      color: var(--Dark);
+    }
 
-        .sort-btn.active {
-            background: var(--accent-purple);
-            border-color: var(--accent-purple);
-        }
+    .btn-yellow:hover {
+      background: linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);
+    }
 
-        .sort-btn:hover {
-            border-color: var(--accent-purple);
-        }
+    .btn-red {
+      background: var(--Red);
+    }
 
-        /* Mitglieder Liste */
-        .members-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .btn-red:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Red);
+    }
 
-        .member-item {
-            background: var(--bg-darker);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px 20px;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* Main Content */
+    .main-content {
+      margin-top: 100px;
+    }
 
-        .member-item:hover {
-            border-color: var(--accent-purple);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--White);
+      margin-bottom: 30px;
+    }
 
-        .member-info {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
+    /* Table Styles */
+    .table-container {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+    }
 
-        .member-name {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--text-light);
-            margin-bottom: 4px;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
 
-        .member-id {
-            color: var(--text-muted);
-            font-family: monospace;
-            font-size: 0.9em;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            width: fit-content;
-        }
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
 
-        .member-actions {
-            display: flex;
-            gap: 8px;
-        }
+    th {
+      background: rgba(124,91,241,.2);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--Yellow);
+    }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+    tr:hover {
+      background: rgba(124,91,241,.1);
+    }
 
-        .btn-primary {
-            background: var(--accent-purple);
-            color: white;
-        }
+    .amount {
+      font-weight: 700;
+      color: var(--Yellow);
+    }
 
-        .btn-primary:hover {
-            background: var(--accent-purple-light);
-            transform: translateY(-1px);
-        }
+    /* Form Styles */
+    .form-container {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(6px);
+      margin: 20px 0;
+    }
 
-        .btn-secondary {
-            background: var(--bg-darker);
-            color: var(--text-light);
-            border: 1px solid var(--border-color);
-        }
+    .form-group {
+      margin-bottom: 20px;
+    }
 
-        .btn-secondary:hover {
-            background: var(--border-color);
-        }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--White);
+    }
 
-        .btn-icon {
-            padding: 8px;
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-        }
+    input {
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: var(--White);
+      font-size: 16px;
+      width: 100%;
+    }
 
-        .btn-icon:hover {
-            border-color: var(--accent-purple);
-            background: rgba(99, 102, 241, 0.1);
-        }
+    input:focus {
+      outline: 2px solid var(--Primary);
+    }
 
-        .btn-edit:hover {
-            color: var(--accent-purple);
-            border-color: var(--accent-purple);
-        }
+    /* Member Actions */
+    .member-actions {
+      display: flex;
+      gap: 8px;
+    }
 
-        .btn-delete:hover {
-            color: #ef4444;
-            border-color: #ef4444;
-        }
+    .btn-icon {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: .2s;
+    }
 
-        /* Modal Stil */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
+    .btn-edit {
+      background: var(--Primary);
+      color: var(--White);
+    }
 
-        .modal-content {
-            background: var(--bg-card);
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 450px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
+    .btn-edit:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
 
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.2em;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 5px;
-        }
+    .btn-delete {
+      background: var(--Red);
+      color: var(--White);
+    }
 
-        .modal-close:hover {
-            color: var(--text-light);
-        }
+    .btn-delete:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Red);
+    }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
+    /* Search and Sort */
+    .search-sort-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-        .form-group label {
-            font-weight: 500;
-            color: var(--text-light);
-            font-size: 0.9em;
-        }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
 
-        .form-group input {
-            padding: 10px 12px;
-            background: var(--bg-darker);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-light);
-            font-size: 14px;
-        }
+    .search-box input {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px 15px 10px 40px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      color: var(--White);
+      font-size: 14px;
+    }
 
-        .form-group input:focus {
-            border-color: var(--accent-purple);
-            outline: none;
-        }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--Grey);
+    }
 
-        .error-message {
-            color: #ef4444;
-            font-size: 0.85em;
-            margin-top: 5px;
-            display: none;
-        }
+    .sort-options {
+      display: flex;
+      gap: 8px;
+    }
 
-        .id-check {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 5px;
-        }
+    .sort-btn {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 6px;
+      color: var(--White);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9em;
+    }
 
-        .id-status {
-            font-size: 0.8em;
-            padding: 4px 8px;
-            border-radius: 12px;
-            display: none;
-        }
+    .sort-btn.active {
+      background: var(--Primary);
+      border-color: var(--Primary);
+    }
 
-        .id-available {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
+    .sort-btn:hover {
+      border-color: var(--Primary);
+    }
 
-        .id-taken {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
 
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
+    .member-count {
+      color: var(--Yellow);
+      font-weight: 600;
+      background: rgba(124,91,241,.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(124,91,241,.3);
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-actions {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .search-sort-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-box input {
-                max-width: 100%;
-            }
-            
-            .member-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            
-            .member-actions {
-                align-self: flex-end;
-            }
-            
-            .container {
-                padding: 10px;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-        }
-    </style>
+    /* Admin Only */
+    .admin-only { display: none; }
+    body.admin .admin-only { display: block; }
+
+    /* Responsive */
+    @media (max-width: 1040px) {
+      .header__nav { display: none; }
+      .header__text { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .table-container {
+        padding: 16px;
+        overflow-x: auto;
+      }
+      
+      table {
+        min-width: 600px;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .search-sort-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-box input {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="hexenjaeger-symbol">HJ</div>
-            <h1>Mitgliederverwaltung</h1>
-            <p>Verwalte Family Mitglieder</p>
-            <a href="index.html" class="back-btn">← Zurück zur Übersicht</a>
-        </header>
-
-        <div class="card">
-            <div class="header-actions">
-                <h2>Family Mitglieder</h2>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div class="member-count" id="memberCount">0 Mitglieder</div>
-                    <button id="addMemberBtn" class="btn btn-primary">
-                        <span style="margin-right: 6px;">➕</span> Neues Mitglied
-                    </button>
-                </div>
-            </div>
-
-            <div class="search-sort-container">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Mitglieder suchen...">
-                </div>
-                <div class="sort-options">
-                    <button class="sort-btn active" data-sort="name">Nach Name</button>
-                    <button class="sort-btn" data-sort="id">Nach ID</button>
-                </div>
-            </div>
-
-            <div id="memberList" class="members-list">
-                <!-- Mitglieder werden hier geladen -->
-            </div>
-        </div>
-
-        <!-- Modal für neues Mitglied -->
-        <div id="memberModal" class="modal">
-            <div class="modal-content">
-                <button class="modal-close" id="modalClose">×</button>
-                <h3 style="margin-bottom: 20px; color: var(--accent-purple-light);">Neues Mitglied</h3>
-                <div style="display: grid; gap: 16px;">
-                    <div class="form-group">
-                        <label for="memberName">Name</label>
-                        <input type="text" id="memberName" placeholder="Name des Mitglieds">
-                        <div class="error-message" id="nameError">Bitte gib einen Namen ein</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberId">Mitglieds-ID</label>
-                        <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)">
-                        <div class="id-check">
-                            <span class="id-status id-available" id="idAvailable">✓ ID verfügbar</span>
-                            <span class="id-status id-taken" id="idTaken">✗ ID bereits vergeben</span>
-                        </div>
-                        <div class="error-message" id="idError">Bitte gib eine ID ein</div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
-                    <button id="saveMember" class="btn btn-primary">Speichern</button>
-                    <button id="cancelMember" class="btn btn-secondary">Abbrechen</button>
-                </div>
-            </div>
-        </div>
+  <!-- Header mit Logo und Text -->
+  <div class="header">
+    <div class="header__brand" onclick="window.location.href='index.html'">
+      <div class="header__logo">
+        <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="header__text">
+        <div class="header__title">Hexenjäger</div>
+        <div class="header__subtitle">Grand Roleplay<br>GTA5</div>
+      </div>
+    </div>
+    
+    <div class="header__nav">
+      <a href="auszahlung.html">Auszahlungen</a>
+      <a href="statistik.html">Statistik</a>
+      <a href="events.html" class="admin-only">Events</a>
+      <a href="mitglieder.html" class="active admin-only">Mitglieder</a>
     </div>
 
-    <script>
-        // Simulierte Datenbank - ersetzt app.js
-        const db = {
-            getMembers: function() {
-                const members = localStorage.getItem('hexenjaeger-members');
-                return members ? JSON.parse(members) : [];
-            },
-            
-            saveMembers: function(members) {
-                localStorage.setItem('hexenjaeger-members', JSON.stringify(members));
-            },
-            
-            addMember: function(name, id) {
-                const members = this.getMembers();
-                
-                // Prüfe ob ID bereits existiert
-                if (members.some(member => member.id.toUpperCase() === id.toUpperCase())) {
-                    return { success: false, error: 'Diese ID ist bereits vergeben' };
-                }
-                
-                const newMember = {
-                    id: id.toUpperCase(),
-                    name: name,
-                    balance: 0,
-                    joinDate: new Date().toISOString()
-                };
-                
-                members.push(newMember);
-                this.saveMembers(members);
-                return { success: true };
-            },
-            
-            updateMember: function(id, newName) {
-                const members = this.getMembers();
-                const memberIndex = members.findIndex(member => member.id === id);
-                
-                if (memberIndex === -1) {
-                    return { success: false, error: 'Mitglied nicht gefunden' };
-                }
-                
-                members[memberIndex].name = newName;
-                this.saveMembers(members);
-                return { success: true };
-            },
-            
-            deleteMember: function(id) {
-                const members = this.getMembers();
-                const filteredMembers = members.filter(member => member.id !== id);
-                
-                if (filteredMembers.length === members.length) {
-                    return { success: false, error: 'Mitglied nicht gefunden' };
-                }
-                
-                this.saveMembers(filteredMembers);
-                return { success: true };
-            }
-        };
+    <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
+  </div>
 
-        // Utility Funktionen
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+  <div class="container main-content">
+    <h1>👥 Mitgliederverwaltung</h1>
+
+    <div class="header-actions">
+      <h2>Family Mitglieder</h2>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="member-count" id="memberCount">0 Mitglieder</div>
+        <button id="addMemberBtn" class="btn admin-only">
+          ➕ Neues Mitglied
+        </button>
+      </div>
+    </div>
+
+    <div class="search-sort-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Mitglieder suchen...">
+      </div>
+      <div class="sort-options">
+        <button class="sort-btn active" data-sort="name">Nach Name</button>
+        <button class="sort-btn" data-sort="id">Nach ID</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Mitglieds-ID</th>
+            <th>Guthaben</th>
+            <th class="admin-only">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="memberList">
+          <!-- Mitglieder werden hier geladen -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal für neues Mitglied -->
+    <div id="memberModal" class="form-container admin-only" style="display: none;">
+      <h3 style="margin-bottom: 20px; color: var(--Yellow);">Neues Mitglied</h3>
+      <div style="display: grid; gap: 16px;">
+        <div class="form-group">
+          <label for="memberName">Name</label>
+          <input type="text" id="memberName" placeholder="Name des Mitglieds">
+          <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="nameError">Bitte gib einen Namen ein</div>
+        </div>
+        <div class="form-group">
+          <label for="memberId">Mitglieds-ID</label>
+          <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)">
+          <div style="display: flex; gap: 8px; margin-top: 5px;">
+            <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idAvailable" class="id-available">✓ ID verfügbar</span>
+            <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idTaken" class="id-taken">✗ ID bereits vergeben</span>
+          </div>
+          <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="idError">Bitte gib eine ID ein</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+        <button id="saveMember" class="btn">Speichern</button>
+        <button id="cancelMember" class="btn btn-red">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentMembers = [];
+    let currentSort = 'name';
+    let currentSearchTerm = '';
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      document.body.classList.toggle('admin', !!user);
+    });
+
+    // Mitglieder laden
+    db.collection('members').onSnapshot(snap => {
+      currentMembers = [];
+      const memberList = document.getElementById('memberList');
+      memberList.innerHTML = '';
+      
+      snap.forEach(doc => {
+        const member = { id: doc.id, ...doc.data() };
+        currentMembers.push(member);
+      });
+      
+      renderMembers();
+    });
+
+    function renderMembers(members = null) {
+      const memberList = document.getElementById('memberList');
+      const allMembers = members || currentMembers;
+
+      if (allMembers.length === 0) {
+        memberList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine Mitglieder vorhanden</td></tr>';
+        updateMemberCount();
+        return;
+      }
+
+      // Sortiere Mitglieder
+      const sortedMembers = [...allMembers].sort((a, b) => {
+        if (currentSort === 'name') {
+          return (a.name || '').localeCompare(b.name || '');
+        } else {
+          return (a.id || '').localeCompare(b.id || '');
+        }
+      });
+
+      memberList.innerHTML = sortedMembers.map(member => {
+        const escapedName = escapeHtml(member.name || member.id);
+        const escapedId = escapeHtml(member.id);
+        const balance = member.balance || 0;
+        
+        return `
+          <tr>
+            <td>${escapedName}</td>
+            <td>${escapedId}</td>
+            <td class="amount">${balance.toLocaleString('de-DE')} €</td>
+            <td class="admin-only">
+              <div class="member-actions">
+                <button class="btn-icon btn-edit" onclick="editMember('${member.id}')" title="Bearbeiten">
+                  ✏️ Bearbeiten
+                </button>
+                <button class="btn-icon btn-delete" onclick="deleteMember('${member.id}')" title="Löschen">
+                  🗑️ Löschen
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateMemberCount();
+    }
+
+    function updateMemberCount() {
+      const memberCount = document.getElementById('memberCount');
+      const count = currentMembers.length;
+      memberCount.textContent = `${count} Mitglieder`;
+    }
+
+    function searchMembers() {
+      const searchInput = document.getElementById('searchInput');
+      const searchTerm = searchInput.value.toLowerCase();
+      currentSearchTerm = searchTerm;
+      
+      if (searchTerm === '') {
+        renderMembers();
+        return;
+      }
+
+      const filteredMembers = currentMembers.filter(member => 
+        (member.name || '').toLowerCase().includes(searchTerm) || 
+        (member.id || '').toLowerCase().includes(searchTerm)
+      );
+      
+      renderMembers(filteredMembers);
+    }
+
+    function sortMembers(sortBy) {
+      currentSort = sortBy;
+      
+      // Update active button
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      renderMembers();
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        border-radius: 6px;
+        z-index: 1001;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        font-weight: 500;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+
+    function checkIdAvailability() {
+      const memberIdInput = document.getElementById('memberId');
+      const idAvailable = document.getElementById('idAvailable');
+      const idTaken = document.getElementById('idTaken');
+      const id = memberIdInput.value.trim().toUpperCase();
+
+      // Verstecke Status zunächst
+      idAvailable.style.display = 'none';
+      idTaken.style.display = 'none';
+
+      if (id.length === 0) {
+        return;
+      }
+
+      // Prüfe ob ID bereits existiert
+      const idExists = currentMembers.some(member => member.id.toUpperCase() === id);
+
+      if (idExists) {
+        idTaken.style.display = 'inline-block';
+      } else {
+        idAvailable.style.display = 'inline-block';
+      }
+    }
+
+    function validateForm() {
+      const name = document.getElementById('memberName').value.trim();
+      const id = document.getElementById('memberId').value.trim();
+      const nameError = document.getElementById('nameError');
+      const idError = document.getElementById('idError');
+
+      // Zurücksetzen der Fehlermeldungen
+      nameError.style.display = 'none';
+      idError.style.display = 'none';
+
+      let isValid = true;
+
+      // Name validieren
+      if (!name) {
+        nameError.style.display = 'block';
+        isValid = false;
+      }
+
+      // ID validieren
+      if (!id) {
+        idError.style.display = 'block';
+        isValid = false;
+      } else if (currentMembers.some(member => member.id.toUpperCase() === id.toUpperCase())) {
+        idError.textContent = 'Diese ID ist bereits vergeben';
+        idError.style.display = 'block';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    async function saveMember() {
+      if (!validateForm()) {
+        return;
+      }
+      
+      const name = document.getElementById('memberName').value.trim();
+      const id = document.getElementById('memberId').value.trim().toUpperCase();
+      
+      try {
+        // Prüfe ob ID bereits existiert
+        const memberDoc = await db.collection('members').doc(id).get();
+        if (memberDoc.exists) {
+          showNotification('Diese ID ist bereits vergeben', 'error');
+          return;
         }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                background: ${type === 'success' ? '#10b981' : '#ef4444'};
-                color: white;
-                border-radius: 6px;
-                z-index: 1001;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                transition: all 0.3s ease;
-                font-weight: 500;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100px)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        // Haupt-Logik
-        let currentMembers = [];
-        let currentSort = 'name';
-        let currentSearchTerm = '';
-
-        function updateMemberCount() {
-            const memberCount = document.getElementById('memberCount');
-            const count = currentMembers.length;
-            memberCount.textContent = `${count} Mitglieder`;
-        }
-
-        function renderMembers(members = null) {
-            const memberList = document.getElementById('memberList');
-            const allMembers = members || db.getMembers();
-            currentMembers = allMembers;
-
-            if (allMembers.length === 0) {
-                memberList.innerHTML = '<div class="no-data">Noch keine Mitglieder vorhanden</div>';
-                updateMemberCount();
-                return;
-            }
-
-            // Sortiere Mitglieder
-            const sortedMembers = [...allMembers].sort((a, b) => {
-                if (currentSort === 'name') {
-                    return a.name.localeCompare(b.name);
-                } else {
-                    return a.id.localeCompare(b.id);
-                }
-            });
-
-            memberList.innerHTML = sortedMembers.map(member => {
-                return `
-                    <div class="member-item">
-                        <div class="member-info">
-                            <div class="member-name">${escapeHtml(member.name)}</div>
-                            <div class="member-id">${escapeHtml(member.id)}</div>
-                        </div>
-                        <div class="member-actions">
-                            <button class="btn-icon btn-edit" onclick="editMember('${member.id}')" title="Bearbeiten">
-                                ✏️
-                            </button>
-                            <button class="btn-icon btn-delete" onclick="deleteMember('${member.id}')" title="Löschen">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            updateMemberCount();
-        }
-
-        function searchMembers() {
-            const searchInput = document.getElementById('searchInput');
-            const searchTerm = searchInput.value.toLowerCase();
-            currentSearchTerm = searchTerm;
-            const allMembers = db.getMembers();
-            
-            if (searchTerm === '') {
-                renderMembers();
-                return;
-            }
-
-            const filteredMembers = allMembers.filter(member => 
-                member.name.toLowerCase().includes(searchTerm) || 
-                member.id.toLowerCase().includes(searchTerm)
-            );
-            
-            renderMembers(filteredMembers);
-        }
-
-        function sortMembers(sortBy) {
-            currentSort = sortBy;
-            
-            // Update active button
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Neu rendern mit aktuellem Suchfilter
-            if (currentSearchTerm === '') {
-                renderMembers();
-            } else {
-                searchMembers();
-            }
-        }
-
-        function checkIdAvailability() {
-            const memberIdInput = document.getElementById('memberId');
-            const idAvailable = document.getElementById('idAvailable');
-            const idTaken = document.getElementById('idTaken');
-            const id = memberIdInput.value.trim().toUpperCase();
-
-            // Verstecke Status zunächst
-            idAvailable.style.display = 'none';
-            idTaken.style.display = 'none';
-
-            if (id.length === 0) {
-                return;
-            }
-
-            // Prüfe ob ID bereits existiert
-            const members = db.getMembers();
-            const idExists = members.some(member => member.id.toUpperCase() === id);
-
-            if (idExists) {
-                idTaken.style.display = 'inline-block';
-            } else {
-                idAvailable.style.display = 'inline-block';
-            }
-        }
-
-        function validateForm() {
-            const name = document.getElementById('memberName').value.trim();
-            const id = document.getElementById('memberId').value.trim();
-            const nameError = document.getElementById('nameError');
-            const idError = document.getElementById('idError');
-            const members = db.getMembers();
-
-            // Zurücksetzen der Fehlermeldungen
-            nameError.style.display = 'none';
-            idError.style.display = 'none';
-
-            let isValid = true;
-
-            // Name validieren
-            if (!name) {
-                nameError.style.display = 'block';
-                isValid = false;
-            }
-
-            // ID validieren
-            if (!id) {
-                idError.style.display = 'block';
-                isValid = false;
-            } else if (members.some(member => member.id.toUpperCase() === id.toUpperCase())) {
-                idError.textContent = 'Diese ID ist bereits vergeben';
-                idError.style.display = 'block';
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        function saveMember() {
-            if (!validateForm()) {
-                return;
-            }
-            
-            const name = document.getElementById('memberName').value.trim();
-            const id = document.getElementById('memberId').value.trim();
-            
-            const result = db.addMember(name, id);
-            if (result.success) {
-                closeModal();
-                renderMembers();
-                showNotification('Mitglied erfolgreich hinzugefügt!');
-            } else {
-                showNotification(result.error, 'error');
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('memberModal').style.display = 'none';
-            const memberNameInput = document.getElementById('memberName');
-            const memberIdInput = document.getElementById('memberId');
-            
-            memberNameInput.removeEventListener('keydown', handleKeyPress);
-            memberIdInput.removeEventListener('keydown', handleKeyPress);
-        }
-
-        function handleKeyPress(event) {
-            // Enter-Taste (KeyCode 13)
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                saveMember();
-            }
-            
-            // Escape-Taste (KeyCode 27) - Modal schließen
-            if (event.keyCode === 27) {
-                closeModal();
-            }
-        }
-
-        // Globale Funktionen für Event Handler
-        window.editMember = (id) => {
-            const members = db.getMembers();
-            const member = members.find(m => m.id === id);
-            if (member) {
-                const newName = prompt('Neuen Namen eingeben:', member.name);
-                if (newName && newName.trim()) {
-                    const result = db.updateMember(id, newName.trim());
-                    if (result.success) {
-                        renderMembers();
-                        showNotification('Mitglied erfolgreich bearbeitet!');
-                    } else {
-                        showNotification(result.error, 'error');
-                    }
-                }
-            }
-        };
-
-        window.deleteMember = (id) => {
-            if (confirm('Mitglied wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) {
-                const result = db.deleteMember(id);
-                if (result.success) {
-                    renderMembers();
-                    showNotification('Mitglied erfolgreich gelöscht!');
-                } else {
-                    showNotification(result.error, 'error');
-                }
-            }
-        };
-
-        // Event Listeners wenn DOM geladen
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('memberModal');
-            const addMemberBtn = document.getElementById('addMemberBtn');
-            const saveMemberBtn = document.getElementById('saveMember');
-            const cancelBtn = document.getElementById('cancelMember');
-            const modalClose = document.getElementById('modalClose');
-            const memberNameInput = document.getElementById('memberName');
-            const memberIdInput = document.getElementById('memberId');
-            const searchInput = document.getElementById('searchInput');
-            const sortButtons = document.querySelectorAll('.sort-btn');
-
-            // Suchfunktion
-            searchInput.addEventListener('input', searchMembers);
-
-            // Sortierfunktion
-            sortButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    sortMembers(this.dataset.sort);
-                });
-            });
-
-            // ID Verfügbarkeit prüfen
-            memberIdInput.addEventListener('input', checkIdAvailability);
-
-            // Modal öffnen
-            addMemberBtn.addEventListener('click', () => {
-                modal.style.display = 'block';
-                memberNameInput.value = '';
-                memberIdInput.value = '';
-                
-                // Zurücksetzen der Status-Anzeigen
-                document.getElementById('idAvailable').style.display = 'none';
-                document.getElementById('idTaken').style.display = 'none';
-                document.getElementById('nameError').style.display = 'none';
-                document.getElementById('idError').style.display = 'none';
-                
-                // Event Listener für Enter-Taste hinzufügen
-                memberNameInput.addEventListener('keydown', handleKeyPress);
-                memberIdInput.addEventListener('keydown', handleKeyPress);
-                
-                memberNameInput.focus();
-            });
-
-            // Mitglied speichern
-            saveMemberBtn.addEventListener('click', saveMember);
-
-            // Modal schließen
-            cancelBtn.addEventListener('click', closeModal);
-            modalClose.addEventListener('click', closeModal);
-
-            // Klick außerhalb des Modals zum Schließen
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-
-            // Escape-Taste zum Schließen
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && modal.style.display === 'block') {
-                    closeModal();
-                }
-            });
-
-            // Initial rendern
-            renderMembers();
+        // Neues Mitglied erstellen
+        await db.collection('members').doc(id).set({
+          name: name,
+          balance: 0,
+          joinDate: new Date().toISOString(),
+          lastActivity: new Date().toISOString()
         });
-    </script>
+
+        closeModal();
+        showNotification('Mitglied erfolgreich hinzugefügt!');
+      } catch (error) {
+        showNotification('Fehler: ' + error.message, 'error');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('memberModal').style.display = 'none';
+      document.getElementById('memberName').value = '';
+      document.getElementById('memberId').value = '';
+      document.getElementById('idAvailable').style.display = 'none';
+      document.getElementById('idTaken').style.display = 'none';
+      document.getElementById('nameError').style.display = 'none';
+      document.getElementById('idError').style.display = 'none';
+    }
+
+    // Globale Funktionen für Event Handler
+    window.editMember = async (id) => {
+      const member = currentMembers.find(m => m.id === id);
+      if (member) {
+        const newName = prompt('Neuen Namen eingeben:', member.name);
+        if (newName && newName.trim()) {
+          try {
+            await db.collection('members').doc(id).update({
+              name: newName.trim()
+            });
+            showNotification('Mitglied erfolgreich bearbeitet!');
+          } catch (error) {
+            showNotification('Fehler: ' + error.message, 'error');
+          }
+        }
+      }
+    };
+
+    window.deleteMember = async (id) => {
+      if (confirm('Mitglied wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) {
+        try {
+          await db.collection('members').doc(id).delete();
+          showNotification('Mitglied erfolgreich gelöscht!');
+        } catch (error) {
+          showNotification('Fehler: ' + error.message, 'error');
+        }
+      }
+    };
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('memberModal');
+      const addMemberBtn = document.getElementById('addMemberBtn');
+      const saveMemberBtn = document.getElementById('saveMember');
+      const cancelBtn = document.getElementById('cancelMember');
+      const searchInput = document.getElementById('searchInput');
+      const sortButtons = document.querySelectorAll('.sort-btn');
+      const memberIdInput = document.getElementById('memberId');
+
+      // Suchfunktion
+      searchInput.addEventListener('input', searchMembers);
+
+      // Sortierfunktion
+      sortButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          sortMembers(this.dataset.sort);
+        });
+      });
+
+      // ID Verfügbarkeit prüfen
+      memberIdInput.addEventListener('input', checkIdAvailability);
+
+      // Modal öffnen
+      addMemberBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+        document.getElementById('memberName').focus();
+      });
+
+      // Mitglied speichern
+      saveMemberBtn.addEventListener('click', saveMember);
+
+      // Modal schließen
+      cancelBtn.addEventListener('click', closeModal);
+
+      // Enter-Taste für Speichern
+      document.getElementById('memberName').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') saveMember();
+      });
+      document.getElementById('memberId').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') saveMember();
+      });
+
+      // Leaderschaft Button Event
+      document.getElementById('leaderschaftBtn').onclick = () => {
+        const loginModal = document.createElement('div');
+        loginModal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        `;
+        
+        loginModal.innerHTML = `
+          <div style="
+            background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,.1);
+            position: relative;
+          ">
+            <button onclick="this.parentElement.parentElement.remove()" style="
+              position: absolute;
+              top: 20px;
+              right: 20px;
+              background: rgba(124,91,241,.2);
+              border: none;
+              color: var(--White);
+              width: 32px;
+              height: 32px;
+              border-radius: 8px;
+              cursor: pointer;
+            ">✕</button>
+            <h2 style="color: var(--White); text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase;">LEADERSCHAFT LOGIN</h2>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">E-MAIL</label>
+              <input type="email" id="modalEmail" placeholder="admin@hexenjaeger.de" style="
+                width: 100%;
+                border-radius: 6px;
+                background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+                box-shadow: 0 2px 0 0 #7c5bf1;
+                padding: 14px 18px;
+                color: var(--Dark);
+                font-size: 16px;
+                font-weight: 600;
+                border: none;
+              ">
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">PASSWORT</label>
+              <input type="password" id="modalPassword" placeholder="********" style="
+                width: 100%;
+                border-radius: 6px;
+                background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+                box-shadow: 0 2px 0 0 #7c5bf1;
+                padding: 14px 18px;
+                color: var(--Dark);
+                font-size: 16px;
+                font-weight: 600;
+                border: none;
+              ">
+            </div>
+            <button onclick="handleLogin()" style="
+              width: 100%;
+              padding: 16px 28px;
+              background: #7c5bf1;
+              color: var(--White);
+              border: none;
+              border-radius: 16px;
+              font-size: 18px;
+              font-weight: 800;
+              letter-spacing: .72px;
+              text-transform: uppercase;
+              cursor: pointer;
+              margin-top: 16px;
+            ">LOGIN</button>
+            <p id="modalStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+          </div>
+        `;
+        
+        document.body.appendChild(loginModal);
+        
+        // Enter-Taste für Login
+        const handleKeyPress = (e) => {
+          if (e.key === 'Enter') {
+            handleLogin();
+          }
+        };
+        
+        document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
+        document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
+        
+        window.handleLogin = async () => {
+          const email = document.getElementById('modalEmail').value;
+          const password = document.getElementById('modalPassword').value;
+          const status = document.getElementById('modalStatus');
+          
+          try {
+            await auth.signInWithEmailAndPassword(email, password);
+            status.textContent = 'Erfolgreich angemeldet!';
+            setTimeout(() => {
+              loginModal.remove();
+            }, 1000);
+          } catch (error) {
+            status.textContent = 'Login fehlgeschlagen: ' + error.message;
+          }
+        };
+      };
+    });
+  </script>
 </body>
 </html>
