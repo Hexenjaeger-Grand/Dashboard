@@ -609,7 +609,7 @@
   let eventTotals = {};
   let memberTotals = {};
 
-// Für GESAMTE AUSZAHLUNGEN - Summe aller offenen + ausgezahlten Beträge
+// Statistiken berechnen
 let totalPayouts = 0;
 let openPayouts = 0;
 let activeMembers = 0;
@@ -657,21 +657,30 @@ db.collection('members').onSnapshot(() => {
   calculateTotalPayouts();
 });
 
-// Für OFFENE AUSZAHLUNGEN und AKTIVE MITGLIEDER
-db.collection('members').onSnapshot(snap => {
-  openPayouts = 0;
-  activeMembers = 0;
+// Für EVENTS und MITGLIEDER Charts - ALLE Transaktionen
+db.collection('transactions').onSnapshot(snap => {
+  console.log('Alle Transaktionen für Charts:', snap.size, 'Dokumente');
+  
+  eventTotals = {};
+  memberTotals = {};
   
   snap.forEach(doc => {
-    const member = doc.data();
-    if (member.balance > 0) {
-      openPayouts += member.balance;
-      activeMembers++;
+    const transaction = doc.data();
+    
+    // Für Events-Statistik: alle Events außer 'auszahlung'
+    if (transaction.event && transaction.event !== 'auszahlung') {
+      eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
+    }
+    
+    // Für Mitglieder-Statistik: alle Transaktionen (Einzahlungen + Auszahlungen)
+    if (transaction.member) {
+      memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
     }
   });
   
-  console.log('Offene Auszahlungen:', openPayouts, 'Aktive Mitglieder:', activeMembers);
-  updateStats();
+  console.log('Event Totals für Charts:', eventTotals);
+  console.log('Member Totals für Charts:', memberTotals);
+  updateCharts();
 });
 
   function updateStats() {
