@@ -664,87 +664,46 @@
   let eventTotals = {};
   let memberTotals = {};
 
-  // Initialisiere Statistiken
-  function initializeStats() {
-    console.log('Initialisiere Statistiken...');
-    loadOpenPayouts();
-    loadTotalPayouts();
-    loadActiveMembers();
-    loadChartData();
-  }
-
-  // Offene Auszahlungen laden (Summe aller Member Balances)
-  function loadOpenPayouts() {
-    db.collection('members').get().then(snapshot => {
+  // Alle Statistiken in einer Funktion laden
+  function loadAllStats() {
+    console.log('Lade alle Statistiken...');
+    
+    // Zuerst alle Daten sammeln
+    Promise.all([
+      // Offene Auszahlungen (Member Balances)
+      db.collection('members').get(),
+      // Ausgezahlte Beträge
+      db.collection('transactions').where('type', '==', 'auszahlung').get(),
+      // Chart Daten
+      db.collection('transactions').get()
+    ]).then(([membersSnap, payoutSnap, allTransactionsSnap]) => {
+      
+      // 1. Offene Auszahlungen berechnen
       openPayouts = 0;
-      snapshot.forEach(doc => {
-        const member = doc.data();
-        openPayouts += member.balance || 0;
-      });
-      console.log('Offene Auszahlungen:', openPayouts);
-      updateStats();
-    }).catch(error => {
-      console.error('Fehler beim Laden offener Auszahlungen:', error);
-    });
-  }
-
-  // Gesamte Auszahlungen laden (Summe aller ausgezahlten Beträge + offene Beträge)
-  function loadTotalPayouts() {
-    // Zuerst alle ausgezahlten Beträge summieren
-    db.collection('transactions')
-      .where('type', '==', 'auszahlung')
-      .get()
-      .then(snapshot => {
-        let paidOutTotal = 0;
-        snapshot.forEach(doc => {
-          const transaction = doc.data();
-          paidOutTotal += transaction.amount || 0;
-        });
-        console.log('Ausgezahlte Beträge:', paidOutTotal);
-        
-        // Dann offene Beträge addieren
-        db.collection('members').get().then(membersSnap => {
-          let openTotal = 0;
-          membersSnap.forEach(doc => {
-            const member = doc.data();
-            openTotal += member.balance || 0;
-          });
-          
-          // Gesamt = Ausgezahlte + Offene
-          totalPayouts = paidOutTotal + openTotal;
-          console.log('Gesamte Auszahlungen:', totalPayouts, '(Ausgezahlt:', paidOutTotal, '+ Offen:', openTotal, ')');
-          updateStats();
-        });
-      })
-      .catch(error => {
-        console.error('Fehler beim Laden der Gesamtauszahlungen:', error);
-      });
-  }
-
-  // Aktive Mitglieder laden
-  function loadActiveMembers() {
-    db.collection('members').get().then(snapshot => {
       activeMembers = 0;
-      snapshot.forEach(doc => {
+      membersSnap.forEach(doc => {
         const member = doc.data();
-        if ((member.balance || 0) > 0) {
+        const balance = member.balance || 0;
+        openPayouts += balance;
+        if (balance > 0) {
           activeMembers++;
         }
       });
-      updateStats();
-    }).catch(error => {
-      console.error('Fehler beim Laden aktiver Mitglieder:', error);
-    });
-  }
-
-  // Chart Daten laden
-  function loadChartData() {
-    // Events Daten
-    db.collection('transactions').get().then(snapshot => {
+      
+      // 2. Ausgezahlte Beträge berechnen
+      let paidOutTotal = 0;
+      payoutSnap.forEach(doc => {
+        const transaction = doc.data();
+        paidOutTotal += transaction.amount || 0;
+      });
+      
+      // 3. Gesamtauszahlungen = Offene + Ausgezahlte
+      totalPayouts = openPayouts + paidOutTotal;
+      
+      // 4. Chart Daten berechnen
       eventTotals = {};
       memberTotals = {};
-      
-      snapshot.forEach(doc => {
+      allTransactionsSnap.forEach(doc => {
         const transaction = doc.data();
         
         // Events zählen (nicht Auszahlungen)
@@ -752,17 +711,25 @@
           eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
         }
         
-        // Mitglieder zählen - ALLE Transaktionen (Einzahlungen + Auszahlungen)
+        // Mitglieder zählen - ALLE Transaktionen
         if (transaction.member) {
           memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
         }
       });
       
-      console.log('Event Totals:', eventTotals);
-      console.log('Member Totals:', memberTotals);
+      console.log('Berechnete Statistiken:', {
+        offen: openPayouts,
+        ausgezahlt: paidOutTotal,
+        gesamt: totalPayouts,
+        aktiveMitglieder: activeMembers
+      });
+      
+      // UI aktualisieren
+      updateStats();
       updateCharts();
+      
     }).catch(error => {
-      console.error('Fehler beim Laden der Chart-Daten:', error);
+      console.error('Fehler beim Laden der Statistiken:', error);
     });
   }
 
@@ -870,24 +837,20 @@
 
   // Echtzeit-Updates
   function setupRealtimeUpdates() {
-    // Members Collection für offene Auszahlungen und aktive Mitglieder
+    // Bei Änderungen in members oder transactions alle Statistiken neu laden
     db.collection('members').onSnapshot(() => {
-      loadOpenPayouts();
-      loadActiveMembers();
-      loadTotalPayouts(); // Auch Gesamtauszahlungen neu berechnen
+      loadAllStats();
     });
 
-    // Transactions Collection für Gesamtauszahlungen und Charts
     db.collection('transactions').onSnapshot(() => {
-      loadTotalPayouts();
-      loadChartData();
+      loadAllStats();
     });
   }
 
   // Initialisierung wenn DOM geladen
   document.addEventListener('DOMContentLoaded', function() {
     setActiveNav();
-    initializeStats();
+    loadAllStats();
     setupRealtimeUpdates();
   });
 
