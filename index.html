@@ -600,6 +600,12 @@ body.admin .admin-only {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Session Persistence setzen
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch((error) => {
+    console.error('Auth persistence error:', error);
+  });
+
     // Modal Funktionen
     document.getElementById('leaderschaftBtn').onclick = () => {
       document.getElementById('loginModal').classList.add('active');
