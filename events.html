@@ -678,6 +678,12 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // Session Persistence setzen
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch((error) => {
+    console.error('Auth persistence error:', error);
+  });
+
     let selectedMembers = [];
     let currentMembers = [];
 
