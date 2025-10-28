@@ -247,6 +247,10 @@
       font-weight: 600;
     }
 
+    /* Admin Only */
+    .admin-only { display: none; }
+    body.admin .admin-only { display: block; }
+
     /* Responsive */
     @media (max-width: 1040px) {
       .header__nav { display: none; }
@@ -327,6 +331,7 @@
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   
   <script>
@@ -340,7 +345,13 @@
       appId: "1:48507598074:web:d736c118fd74d1968d0543"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      document.body.classList.toggle('admin', !!user);
+    });
 
     // Statistiken berechnen
     let totalPayouts = 0;
@@ -437,7 +448,116 @@
 
     // Leaderschaft Button Event
     document.getElementById('leaderschaftBtn').onclick = () => {
-      alert('Bitte auf dem Dashboard einloggen');
+      const loginModal = document.createElement('div');
+      loginModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      `;
+      
+      loginModal.innerHTML = `
+        <div style="
+          background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
+          border-radius: 24px;
+          padding: 40px;
+          width: 90%;
+          max-width: 400px;
+          border: 1px solid rgba(255,255,255,.1);
+          position: relative;
+        ">
+          <button onclick="this.parentElement.parentElement.remove()" style="
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(124,91,241,.2);
+            border: none;
+            color: var(--White);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+          ">✕</button>
+          <h2 style="color: var(--White); text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase;">LEADERSCHAFT LOGIN</h2>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">E-MAIL</label>
+            <input type="email" id="modalEmail" placeholder="admin@hexenjaeger.de" style="
+              width: 100%;
+              border-radius: 6px;
+              background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+              box-shadow: 0 2px 0 0 #7c5bf1;
+              padding: 14px 18px;
+              color: var(--Dark);
+              font-size: 16px;
+              font-weight: 600;
+              border: none;
+            ">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">PASSWORT</label>
+            <input type="password" id="modalPassword" placeholder="********" style="
+              width: 100%;
+              border-radius: 6px;
+              background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+              box-shadow: 0 2px 0 0 #7c5bf1;
+              padding: 14px 18px;
+              color: var(--Dark);
+              font-size: 16px;
+              font-weight: 600;
+              border: none;
+            ">
+          </div>
+          <button onclick="handleLogin()" style="
+            width: 100%;
+            padding: 16px 28px;
+            background: #7c5bf1;
+            color: var(--White);
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: .72px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 16px;
+          ">LOGIN</button>
+          <p id="modalStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+        </div>
+      `;
+      
+      document.body.appendChild(loginModal);
+      
+      // Enter-Taste für Login
+      const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+          handleLogin();
+        }
+      };
+      
+      document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
+      document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
+      
+      window.handleLogin = async () => {
+        const email = document.getElementById('modalEmail').value;
+        const password = document.getElementById('modalPassword').value;
+        const status = document.getElementById('modalStatus');
+        
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          status.textContent = 'Erfolgreich angemeldet!';
+          setTimeout(() => {
+            loginModal.remove();
+          }, 1000);
+        } catch (error) {
+          status.textContent = 'Login fehlgeschlagen: ' + error.message;
+        }
+      };
     };
   </script>
 </body>
