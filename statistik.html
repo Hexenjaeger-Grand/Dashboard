@@ -307,12 +307,6 @@
         <div class="stat-number" id="activeMembers">0</div>
         <p>Mitglieder mit aktuellen Auszahlungen</p>
       </div>
-      
-      <div class="stat-card">
-        <h3>Events diesen Monat</h3>
-        <div class="stat-number" id="monthlyEvents">0</div>
-        <p>Eingetragene Events im aktuellen Monat</p>
-      </div>
     </div>
 
     <div class="chart-container">
@@ -351,29 +345,16 @@
     let totalPayouts = 0;
     let openPayouts = 0;
     let activeMembers = 0;
-    let monthlyEvents = 0;
     let eventTotals = {};
     let memberTotals = {};
 
-    // Events diesen Monat berechnen
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
     db.collection('transactions').onSnapshot(snap => {
       totalPayouts = 0;
-      monthlyEvents = 0;
       eventTotals = {};
       memberTotals = {};
       
       snap.forEach(doc => {
         const transaction = doc.data();
-        const transactionDate = new Date(transaction.timestamp);
-        
-        // Events diesen Monat zählen
-        if (transactionDate >= startOfMonth && transactionDate <= endOfMonth) {
-          monthlyEvents++;
-        }
         
         if (transaction.type === 'auszahlung') {
           totalPayouts += transaction.amount || 0;
@@ -409,7 +390,6 @@
       document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
       document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
       document.getElementById('activeMembers').textContent = activeMembers;
-      document.getElementById('monthlyEvents').textContent = monthlyEvents;
     }
 
     function updateCharts() {
