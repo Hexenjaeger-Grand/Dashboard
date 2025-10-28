@@ -361,14 +361,14 @@
       color: var(--Yellow);
     }
 
-.chart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  height: 200px;
-  gap: 15px;
-  padding: 20px 10px;
-}
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 200px;
+      gap: 15px;
+      padding: 20px 10px;
+    }
 
     .bar {
       background: var(--Primary);
@@ -602,258 +602,245 @@
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Statistiken berechnen
+  // Statistiken Variablen - EINMAL deklarieren
   let totalPayouts = 0;
   let openPayouts = 0;
   let activeMembers = 0;
   let eventTotals = {};
   let memberTotals = {};
 
-// Statistiken berechnen
-let totalPayouts = 0;
-let openPayouts = 0;
-let activeMembers = 0;
-let eventTotals = {};
-let memberTotals = {};
+  // Initialisiere Statistiken
+  function initializeStats() {
+    console.log('Initialisiere Statistiken...');
+    loadOpenPayouts();
+    loadTotalPayouts();
+    loadActiveMembers();
+    loadChartData();
+  }
 
-// Berechne Gesamtauszahlungen (offene + ausgezahlte)
-function calculateTotalPayouts() {
-  // Summiere alle ausgezahlten Beträge
-  db.collection('transactions')
-    .where('type', '==', 'auszahlung')
-    .get()
-    .then(snap => {
-      let paidOutTotal = 0;
-      snap.forEach(doc => {
+  // Offene Auszahlungen laden
+  function loadOpenPayouts() {
+    db.collection('members').get().then(snapshot => {
+      openPayouts = 0;
+      snapshot.forEach(doc => {
+        const member = doc.data();
+        openPayouts += member.balance || 0;
+      });
+      updateStats();
+    }).catch(error => {
+      console.error('Fehler beim Laden offener Auszahlungen:', error);
+    });
+  }
+
+  // Gesamte Auszahlungen laden
+  function loadTotalPayouts() {
+    db.collection('transactions')
+      .where('type', '==', 'auszahlung')
+      .get()
+      .then(snapshot => {
+        totalPayouts = 0;
+        snapshot.forEach(doc => {
+          const transaction = doc.data();
+          totalPayouts += transaction.amount || 0;
+        });
+        updateStats();
+      })
+      .catch(error => {
+        console.error('Fehler beim Laden der Gesamtauszahlungen:', error);
+      });
+  }
+
+  // Aktive Mitglieder laden
+  function loadActiveMembers() {
+    db.collection('members').get().then(snapshot => {
+      activeMembers = 0;
+      snapshot.forEach(doc => {
+        const member = doc.data();
+        if ((member.balance || 0) > 0) {
+          activeMembers++;
+        }
+      });
+      updateStats();
+    }).catch(error => {
+      console.error('Fehler beim Laden aktiver Mitglieder:', error);
+    });
+  }
+
+  // Chart Daten laden
+  function loadChartData() {
+    // Events Daten
+    db.collection('transactions').get().then(snapshot => {
+      eventTotals = {};
+      memberTotals = {};
+      
+      snapshot.forEach(doc => {
         const transaction = doc.data();
-        paidOutTotal += transaction.amount || 0;
+        
+        // Events zählen (nicht Auszahlungen)
+        if (transaction.event && transaction.type !== 'auszahlung') {
+          eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
+        }
+        
+        // Mitglieder zählen
+        if (transaction.member) {
+          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
+        }
       });
       
-      // Summiere alle offenen Beträge
-      db.collection('members').get().then(membersSnap => {
-        let openTotal = 0;
-        membersSnap.forEach(doc => {
-          const member = doc.data();
-          openTotal += member.balance || 0;
-        });
-        
-        // Gesamt = Ausgezahlte + Offene
-        totalPayouts = paidOutTotal + openTotal;
-        console.log('Gesamte Auszahlungen:', totalPayouts, '(Ausgezahlt:', paidOutTotal, '+ Offen:', openTotal, ')');
-        updateStats();
-      });
+      updateCharts();
+    }).catch(error => {
+      console.error('Fehler beim Laden der Chart-Daten:', error);
     });
-}
+  }
 
-// Initial berechnen und auf Änderungen hören
-calculateTotalPayouts();
-
-// Auf Änderungen in beiden Collections hören
-db.collection('transactions').where('type', '==', 'auszahlung').onSnapshot(() => {
-  calculateTotalPayouts();
-});
-
-db.collection('members').onSnapshot(() => {
-  calculateTotalPayouts();
-});
-
-// Für EVENTS und MITGLIEDER Charts - ALLE Transaktionen
-db.collection('transactions').onSnapshot(snap => {
-  console.log('Alle Transaktionen für Charts:', snap.size, 'Dokumente');
-  
-  eventTotals = {};
-  memberTotals = {};
-  
-  snap.forEach(doc => {
-    const transaction = doc.data();
-    
-    // Für Events-Statistik: alle Events außer 'auszahlung'
-    if (transaction.event && transaction.event !== 'auszahlung') {
-      eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
-    }
-    
-    // Für Mitglieder-Statistik: alle Transaktionen (Einzahlungen + Auszahlungen)
-    if (transaction.member) {
-      memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
-    }
-  });
-  
-  console.log('Event Totals für Charts:', eventTotals);
-  console.log('Member Totals für Charts:', memberTotals);
-  updateCharts();
-});
-
+  // Statistiken aktualisieren
   function updateStats() {
     document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
     document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
     document.getElementById('activeMembers').textContent = activeMembers;
   }
 
-function updateCharts() {
-  console.log('Update Charts aufgerufen');
-  
-  const eventNames = {
-    'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
-    '40er_win': '40er Win', '40er_lose': '40er Lose',
-    'hafen': 'Hafen', 'giesserei': 'Gießerei', 
-    'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
-    'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
-  };
-
-  // Events Chart
-  const eventsChart = document.getElementById('eventsChart');
-  eventsChart.innerHTML = '';
-  
-  const sortedEvents = Object.entries(eventTotals)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6);
-  
-  if (sortedEvents.length === 0) {
-    eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
-  } else {
-    const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+  // Charts aktualisieren
+  function updateCharts() {
+    console.log('Aktualisiere Charts...');
     
-    sortedEvents.forEach(([event, amount]) => {
-      const barContainer = document.createElement('div');
-      barContainer.style.display = 'flex';
-      barContainer.style.flexDirection = 'column';
-      barContainer.style.alignItems = 'center';
-      barContainer.style.flex = '1';
-      barContainer.style.height = '100%';
-      barContainer.style.justifyContent = 'flex-end';
-      barContainer.style.gap = '8px';
+    const eventNames = {
+      'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
+      '40er_win': '40er Win', '40er_lose': '40er Lose',
+      'hafen': 'Hafen', 'giesserei': 'Gießerei', 
+      'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
+      'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
+    };
+
+    // Events Chart
+    const eventsChart = document.getElementById('eventsChart');
+    eventsChart.innerHTML = '';
+    
+    const sortedEvents = Object.entries(eventTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+    
+    if (sortedEvents.length === 0) {
+      eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
+    } else {
+      const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
       
-      // Wert oben
-      const value = document.createElement('div');
-      value.style.fontSize = '12px';
-      value.style.fontWeight = '800';
-      value.style.color = 'var(--Yellow)';
-      value.style.textShadow = '0 0 10px rgba(255, 222, 42, 0.3)';
-      value.textContent = `${(amount/1000).toFixed(0)}k`;
+      sortedEvents.forEach(([event, amount]) => {
+        const barContainer = document.createElement('div');
+        barContainer.style.display = 'flex';
+        barContainer.style.flexDirection = 'column';
+        barContainer.style.alignItems = 'center';
+        barContainer.style.flex = '1';
+        barContainer.style.height = '100%';
+        barContainer.style.justifyContent = 'flex-end';
+        barContainer.style.gap = '8px';
+        
+        // Wert oben
+        const value = document.createElement('div');
+        value.style.fontSize = '12px';
+        value.style.fontWeight = '800';
+        value.style.color = 'var(--Yellow)';
+        value.textContent = `${(amount/1000).toFixed(0)}k`;
+        
+        // Balken
+        const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = height + 'px';
+        bar.style.width = '40px';
+        bar.style.background = 'var(--Primary)';
+        bar.style.borderRadius = '6px 6px 0 0';
+        
+        // Event-Name unten
+        const label = document.createElement('div');
+        label.style.fontSize = '11px';
+        label.style.fontWeight = '700';
+        label.style.color = 'var(--White)';
+        label.style.textAlign = 'center';
+        label.textContent = eventNames[event] || event;
+        
+        barContainer.appendChild(value);
+        barContainer.appendChild(bar);
+        barContainer.appendChild(label);
+        eventsChart.appendChild(barContainer);
+      });
+    }
+
+    // Members Chart
+    const membersChart = document.getElementById('membersChart');
+    membersChart.innerHTML = '';
+    
+    const sortedMembers = Object.entries(memberTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+    
+    if (sortedMembers.length === 0) {
+      membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
+    } else {
+      const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
       
-      // Balken
-      const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      bar.style.height = height + 'px';
-      bar.style.width = '40px';
-      bar.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
-      bar.style.borderRadius = '6px 6px 0 0';
-      bar.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
-      bar.style.transition = 'all 0.3s ease';
-      
-      // Balken Hover-Effekt
-      bar.onmouseover = function() {
-        this.style.background = 'linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%)';
-        this.style.transform = 'translateY(-4px)';
-        this.style.boxShadow = '0 6px 20px rgba(255, 222, 42, 0.4)';
-      };
-      bar.onmouseout = function() {
-        this.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
-      };
-      
-      // Event-Name unten
-      const label = document.createElement('div');
-      label.style.fontSize = '11px';
-      label.style.fontWeight = '700';
-      label.style.color = 'var(--White)';
-      label.style.textAlign = 'center';
-      label.style.maxWidth = '90px';
-      label.style.overflow = 'hidden';
-      label.style.textOverflow = 'ellipsis';
-      label.style.whiteSpace = 'nowrap';
-      label.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
-      label.style.letterSpacing = '0.3px';
-      label.textContent = eventNames[event] || event;
-      
-      barContainer.appendChild(value);
-      barContainer.appendChild(bar);
-      barContainer.appendChild(label);
-      eventsChart.appendChild(barContainer);
+      sortedMembers.forEach(([member, amount]) => {
+        const barContainer = document.createElement('div');
+        barContainer.style.display = 'flex';
+        barContainer.style.flexDirection = 'column';
+        barContainer.style.alignItems = 'center';
+        barContainer.style.flex = '1';
+        barContainer.style.height = '100%';
+        barContainer.style.justifyContent = 'flex-end';
+        barContainer.style.gap = '8px';
+        
+        // Wert oben
+        const value = document.createElement('div');
+        value.style.fontSize = '12px';
+        value.style.fontWeight = '800';
+        value.style.color = 'var(--Yellow)';
+        value.textContent = `${(amount/1000).toFixed(0)}k`;
+        
+        // Balken
+        const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = height + 'px';
+        bar.style.width = '40px';
+        bar.style.background = 'var(--Primary)';
+        bar.style.borderRadius = '6px 6px 0 0';
+        
+        // Mitglieds-Name unten
+        const label = document.createElement('div');
+        label.style.fontSize = '11px';
+        label.style.fontWeight = '700';
+        label.style.color = 'var(--White)';
+        label.style.textAlign = 'center';
+        label.textContent = member;
+        
+        barContainer.appendChild(value);
+        barContainer.appendChild(bar);
+        barContainer.appendChild(label);
+        membersChart.appendChild(barContainer);
+      });
+    }
+  }
+
+  // Echtzeit-Updates
+  function setupRealtimeUpdates() {
+    // Members Collection für offene Auszahlungen und aktive Mitglieder
+    db.collection('members').onSnapshot(() => {
+      loadOpenPayouts();
+      loadActiveMembers();
+    });
+
+    // Transactions Collection für Gesamtauszahlungen und Charts
+    db.collection('transactions').onSnapshot(() => {
+      loadTotalPayouts();
+      loadChartData();
     });
   }
 
-  // Members Chart
-  const membersChart = document.getElementById('membersChart');
-  membersChart.innerHTML = '';
-  
-  const sortedMembers = Object.entries(memberTotals)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6);
-  
-  if (sortedMembers.length === 0) {
-    membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
-  } else {
-    const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
-    
-    sortedMembers.forEach(([member, amount]) => {
-      const barContainer = document.createElement('div');
-      barContainer.style.display = 'flex';
-      barContainer.style.flexDirection = 'column';
-      barContainer.style.alignItems = 'center';
-      barContainer.style.flex = '1';
-      barContainer.style.height = '100%';
-      barContainer.style.justifyContent = 'flex-end';
-      barContainer.style.gap = '8px';
-      
-      // Wert oben
-      const value = document.createElement('div');
-      value.style.fontSize = '12px';
-      value.style.fontWeight = '800';
-      value.style.color = 'var(--Yellow)';
-      value.style.textShadow = '0 0 10px rgba(255, 222, 42, 0.3)';
-      value.textContent = `${(amount/1000).toFixed(0)}k`;
-      
-      // Balken
-      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      bar.style.height = height + 'px';
-      bar.style.width = '40px';
-      bar.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
-      bar.style.borderRadius = '6px 6px 0 0';
-      bar.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
-      bar.style.transition = 'all 0.3s ease';
-      
-      // Balken Hover-Effekt
-      bar.onmouseover = function() {
-        this.style.background = 'linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%)';
-        this.style.transform = 'translateY(-4px)';
-        this.style.boxShadow = '0 6px 20px rgba(255, 222, 42, 0.4)';
-      };
-      bar.onmouseout = function() {
-        this.style.background = 'linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%)';
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 12px rgba(124, 91, 241, 0.3)';
-      };
-      
-      // Mitglieds-Name unten
-      const label = document.createElement('div');
-      label.style.fontSize = '11px';
-      label.style.fontWeight = '700';
-      label.style.color = 'var(--White)';
-      label.style.textAlign = 'center';
-      label.style.maxWidth = '90px';
-      label.style.overflow = 'hidden';
-      label.style.textOverflow = 'ellipsis';
-      label.style.whiteSpace = 'nowrap';
-      label.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
-      label.style.letterSpacing = '0.3px';
-      label.textContent = member;
-      
-      barContainer.appendChild(value);
-      barContainer.appendChild(bar);
-      barContainer.appendChild(label);
-      membersChart.appendChild(barContainer);
-    });
-  }
-}
-  
-  // Aktive Navigation setzen
+  // Initialisierung wenn DOM geladen
   document.addEventListener('DOMContentLoaded', function() {
     setActiveNav();
+    initializeStats();
+    setupRealtimeUpdates();
   });
 
   function setActiveNav() {
