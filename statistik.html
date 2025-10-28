@@ -677,21 +677,22 @@ function updateCharts() {
   console.log('Event Totals:', eventTotals);
   console.log('Member Totals:', memberTotals);
   
-  // Events Chart - Zeige ALLE Events an
-  const eventsChart = document.getElementById('eventsChart');
-  eventsChart.innerHTML = '';
-  
   const eventNames = {
     'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
     '40er_win': '40er Win', '40er_lose': '40er Lose',
     'hafen': 'Hafen', 'giesserei': 'Gießerei', 
     'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
-    'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
+    'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik',
+    'auszahlung': 'Auszahlung'
   };
+
+  // Events Chart
+  const eventsChart = document.getElementById('eventsChart');
+  eventsChart.innerHTML = '';
   
-const sortedEvents = Object.entries(eventTotals)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10); // TOP 10 Events
+  const sortedEvents = Object.entries(eventTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8); // TOP 8 Events
   
   console.log('Sorted Events:', sortedEvents);
   
@@ -701,26 +702,55 @@ const sortedEvents = Object.entries(eventTotals)
     const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
     
     sortedEvents.forEach(([event, amount]) => {
-      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 20;
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 20;
+      const barContainer = document.createElement('div');
+      barContainer.style.display = 'flex';
+      barContainer.style.flexDirection = 'column';
+      barContainer.style.alignItems = 'center';
+      barContainer.style.flex = '1';
+      barContainer.style.gap = '8px';
+      
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.style.minHeight = '20px'; // Mindesthöhe für Sichtbarkeit
-      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
-      bar.title = `${eventNames[event]}: ${amount.toLocaleString('de-DE')} €`;
-      eventsChart.appendChild(bar);
+      bar.style.minHeight = '20px';
+      bar.style.width = '30px';
+      bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
+      
+      const label = document.createElement('div');
+      label.style.fontSize = '10px';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--White)';
+      label.style.textAlign = 'center';
+      label.style.maxWidth = '60px';
+      label.style.overflow = 'hidden';
+      label.style.textOverflow = 'ellipsis';
+      label.style.whiteSpace = 'nowrap';
+      label.textContent = eventNames[event] || event;
+      label.title = eventNames[event] || event;
+      
+      const value = document.createElement('div');
+      value.style.fontSize = '11px';
+      value.style.fontWeight = '700';
+      value.style.color = 'var(--Yellow)';
+      value.textContent = `${(amount/1000).toFixed(0)}k`;
+      
+      barContainer.appendChild(value);
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      eventsChart.appendChild(barContainer);
     });
   }
 
-  // Members Chart - Zeige TOP 10 Mitglieder an
+  // Members Chart
   const membersChart = document.getElementById('membersChart');
   membersChart.innerHTML = '';
   
   const sortedMembers = Object.entries(memberTotals)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10); // TOP 10 Mitglieder
+    .slice(0, 8); // TOP 8 Mitglieder
   
-  console.log('Sorted Members (TOP 10):', sortedMembers);
+  console.log('Sorted Members (TOP 8):', sortedMembers);
   
   if (sortedMembers.length === 0) {
     membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Mitglieder-Daten verfügbar</div>';
@@ -728,14 +758,43 @@ const sortedEvents = Object.entries(eventTotals)
     const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
     
     sortedMembers.forEach(([member, amount]) => {
-      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 20;
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 20;
+      const barContainer = document.createElement('div');
+      barContainer.style.display = 'flex';
+      barContainer.style.flexDirection = 'column';
+      barContainer.style.alignItems = 'center';
+      barContainer.style.flex = '1';
+      barContainer.style.gap = '8px';
+      
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.style.minHeight = '20px'; // Mindesthöhe für Sichtbarkeit
-      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.style.minHeight = '20px';
+      bar.style.width = '30px';
       bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
-      membersChart.appendChild(bar);
+      
+      const label = document.createElement('div');
+      label.style.fontSize = '10px';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--White)';
+      label.style.textAlign = 'center';
+      label.style.maxWidth = '60px';
+      label.style.overflow = 'hidden';
+      label.style.textOverflow = 'ellipsis';
+      label.style.whiteSpace = 'nowrap';
+      label.textContent = member;
+      label.title = member;
+      
+      const value = document.createElement('div');
+      value.style.fontSize = '11px';
+      value.style.fontWeight = '700';
+      value.style.color = 'var(--Yellow)';
+      value.textContent = `${(amount/1000).toFixed(0)}k`;
+      
+      barContainer.appendChild(value);
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      membersChart.appendChild(barContainer);
     });
   }
 }
