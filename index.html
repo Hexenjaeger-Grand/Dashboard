@@ -10,87 +10,89 @@
       --border: #1f2937; --accent: #7c3aed; --accent2: #06b6d4;
       --card: rgba(255,255,255,0.05);
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui;padding:24px 16px;}
-    .wrap{max-width:1200px;margin:0 auto}
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui; padding:20px;}
+    .container{max-width:1200px; margin:0 auto;}
+    .header{text-align:center; margin-bottom:30px;}
+    h1{font-size:2.5em; margin-bottom:10px; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; color:transparent;}
     
-    /* Header */
-    .header{text-align:center;margin-bottom:32px}
-    h1{font-size:clamp(28px,5vw,42px);margin:0;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .subtitle{color:var(--muted);margin-top:8px}
+    .nav{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:20px 0;}
+    .nav a{padding:12px 20px; background:var(--card); border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--text); transition:0.2s;}
+    .nav a:hover{background:var(--accent); transform:translateY(-2px);}
     
-    /* Navigation */
-    .nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:24px 0}
-    .nav a{padding:12px 20px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all 0.2s}
-    .nav a:hover{background:var(--accent);transform:translateY(-2px)}
+    .stats{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; margin:30px 0;}
+    .stat-card{background:var(--card); border:1px solid var(--border); border-radius:15px; padding:20px; text-align:center;}
+    .stat-number{font-size:2em; font-weight:bold; color:var(--accent2);}
     
-    /* Stats Grid */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:16px;margin:24px 0}
-    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center}
-    .stat-number{font-size:32px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .stat-label{color:var(--muted);margin-top:8px}
+    .login-section{text-align:center; margin:30px 0; padding:20px; background:var(--card); border-radius:15px;}
+    .login-inputs{display:inline-flex; gap:10px; margin:15px 0;}
+    input{padding:10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.3); color:var(--text);}
+    button{padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer;}
     
-    /* Aktivitäten */
-    .activity-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:24px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
-    th{color:var(--muted);font-weight:600;font-size:14px}
+    .admin-only{display:none;}
+    body.admin .admin-only{display:block;}
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="container">
     <div class="header">
       <h1>Hexenjäger Dashboard</h1>
-      <p class="subtitle">Familien Management System</p>
+      <p>Familie · Respekt · Gemeinschaft</p>
     </div>
 
     <!-- Navigation -->
     <div class="nav">
       <a href="auszahlung.html">💰 Auszahlungen</a>
       <a href="statistik.html">📊 Statistik</a>
-      <a href="events.html" id="eventsTab">📅 Events</a>
-      <a href="mitglieder.html" id="membersTab">👥 Mitglieder</a>
-      <a href="#" id="loginBtn">🔑 Login</a>
-      <a href="#" id="logoutBtn" style="display:none">🚪 Logout</a>
+      <a href="events.html" class="admin-only">📅 Events</a>
+      <a href="mitglieder.html" class="admin-only">👥 Mitglieder</a>
     </div>
 
-    <!-- Stats Overview -->
-    <div class="stats-grid">
+    <!-- Login Bereich -->
+    <div class="login-section">
+      <h3>Leaderschaft Login</h3>
+      <div class="login-inputs">
+        <input type="email" id="email" placeholder="E-Mail">
+        <input type="password" id="password" placeholder="Passwort">
+        <button onclick="login()">Login</button>
+        <button onclick="logout()" style="display:none; background:#ef4444;" id="logoutBtn">Logout</button>
+      </div>
+      <p id="loginStatus">Nicht eingeloggt</p>
+    </div>
+
+    <!-- Statistik Overview -->
+    <div class="stats">
       <div class="stat-card">
-        <div class="stat-number" id="totalPayouts">0 $</div>
-        <div class="stat-label">Gesamte Auszahlungen</div>
+        <div class="stat-number" id="totalMembers">0</div>
+        <div>Aktive Mitglieder</div>
       </div>
       <div class="stat-card">
-        <div class="stat-number" id="openPayouts">0 $</div>
-        <div class="stat-label">Offene Auszahlungen</div>
+        <div class="stat-number" id="totalPayouts">0 €</div>
+        <div>Gesamte Auszahlungen</div>
       </div>
       <div class="stat-card">
-        <div class="stat-number" id="activeMembers">0</div>
-        <div class="stat-label">Aktive Mitglieder</div>
+        <div class="stat-number" id="openPayouts">0 €</div>
+        <div>Offene Auszahlungen</div>
       </div>
       <div class="stat-card">
-        <div class="stat-number" id="totalEvents">0</div>
-        <div class="stat-label">Events diesen Monat</div>
+        <div class="stat-number" id="recentEvents">0</div>
+        <div>Events (7 Tage)</div>
       </div>
     </div>
 
     <!-- Letzte Aktivitäten -->
-    <div class="activity-card">
-      <h3>📈 Letzte Aktivitäten</h3>
-      <table>
-        <thead>
-          <tr><th>Datum</th><th>Mitglied</th><th>Event</th><th>Betrag</th></tr>
-        </thead>
-        <tbody id="recentActivities"></tbody>
-      </table>
+    <div class="stat-card">
+      <h3>Letzte Aktivitäten</h3>
+      <div id="recentActivities">Lade Aktivitäten...</div>
     </div>
   </div>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
   <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
       authDomain: "hexenjaeger-dashboard.firebaseapp.com",
@@ -103,77 +105,39 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Login System
-    document.getElementById('loginBtn').onclick = () => {
-      const email = prompt('Admin Email:');
-      const password = prompt('Passwort:');
-      if (email && password) {
-        auth.signInWithEmailAndPassword(email, password).catch(error => {
-          alert('Login fehlgeschlagen: ' + error.message);
-        });
+    // Login/Logout
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('Login fehlgeschlagen: ' + error.message);
       }
-    };
+    }
 
-    document.getElementById('logoutBtn').onclick = () => auth.signOut();
+    async function logout() {
+      await auth.signOut();
+    }
 
     auth.onAuthStateChanged(user => {
-      const isLeader = !!user;
-      document.getElementById('loginBtn').style.display = isLeader ? 'none' : 'block';
-      document.getElementById('logoutBtn').style.display = isLeader ? 'block' : 'none';
-      document.getElementById('eventsTab').style.display = isLeader ? 'block' : 'none';
-      document.getElementById('membersTab').style.display = isLeader ? 'block' : 'none';
+      document.body.classList.toggle('admin', !!user);
+      document.getElementById('logoutBtn').style.display = user ? 'inline-block' : 'none';
+      document.getElementById('loginStatus').textContent = user ? 'Eingeloggt als ' + user.email : 'Nicht eingeloggt';
     });
 
     // Daten laden
-    function loadDashboardData() {
-      // Mitglieder zählen
-      db.collection('members').onSnapshot(snap => {
-        document.getElementById('activeMembers').textContent = snap.size;
-      });
+    db.collection('members').onSnapshot(snap => {
+      let total = 0;
+      snap.forEach(doc => total++);
+      document.getElementById('totalMembers').textContent = total;
+    });
 
-      // Transaktionen für Stats
-      db.collection('transactions').onSnapshot(snap => {
-        let totalPayouts = 0;
-        let openPayouts = 0;
-        const recent = [];
-
-        snap.forEach(doc => {
-          const t = doc.data();
-          if (t.type === 'auszahlung') {
-            totalPayouts += t.amount || 0;
-            if (!t.paid) openPayouts += t.amount || 0;
-          }
-          
-          // Letzte 5 Aktivitäten
-          if (recent.length < 5) {
-            recent.push(t);
-          }
-        });
-
-        document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' $';
-        document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' $';
-        
-        // Aktivitäten anzeigen
-        const activitiesTbody = document.getElementById('recentActivities');
-        activitiesTbody.innerHTML = recent.map(t => `
-          <tr>
-            <td>${new Date(t.timestamp).toLocaleDateString('de-DE')}</td>
-            <td>${t.memberName}</td>
-            <td>${t.eventType}</td>
-            <td>${(t.amount || 0).toLocaleString('de-DE')} $</td>
-          </tr>
-        `).join('');
-      });
-
-      // Events zählen (diesen Monat)
-      const thisMonth = new Date().getMonth();
-      db.collection('events').where('timestamp', '>=', new Date(new Date().getFullYear(), thisMonth, 1))
-        .onSnapshot(snap => {
-          document.getElementById('totalEvents').textContent = snap.size;
-        });
-    }
-
-    loadDashboardData();
+    db.collection('transactions').where('type', '==', 'auszahlung').onSnapshot(snap => {
+      let total = 0;
+      snap.forEach(doc => total += doc.data().amount || 0);
+      document.getElementById('totalPayouts').textContent = total.toLocaleString('de-DE') + ' €';
+    });
   </script>
 </body>
 </html>
