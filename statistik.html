@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Statistiken - Hexenjäger</title>
+  <style>
+    :root {
+      --bg: #0f172a; --text: #e5e7eb; --muted: #9ca3af; 
+      --border: #1f2937; --accent: #7c3aed; --card: rgba(255,255,255,0.05);
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui; padding:20px;}
+    .container{max-width:1200px; margin:0 auto;}
+    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
+    .back-btn{padding:10px 20px; background:var(--accent); color:white; text-decoration:none; border-radius:8px;}
+    
+    .stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin:30px 0;}
+    .stat-card{background:var(--card); border:1px solid var(--border); border-radius:15px; padding:20px;}
+    .stat-number{font-size:2em; font-weight:bold; color:var(--accent); margin:10px 0;}
+    
+    .chart{height:200px; background:rgba(0,0,0,0.2); border-radius:10px; margin:20px 0; display:flex; align-items:end; gap:2px; padding:10px;}
+    .bar{background:var(--accent); border-radius:5px 5px 0 0; flex:1; position:relative;}
+    .bar-label{position:absolute; top:-25px; left:0; right:0; text-align:center; font-size:12px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Statistiken</h1>
+      <a href="index.html" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Offene Auszahlungen</h3>
+        <div class="stat-number" id="openPayouts">0 €</div>
+        <p>Noch ausstehende Zahlungen an Mitglieder</p>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Gesamte Auszahlungen</h3>
+        <div class="stat-number" id="totalPayouts">0 €</div>
+        <p>Gesamtsumme aller getätigten Auszahlungen</p>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Aktive Mitglieder</h3>
+        <div class="stat-number" id="activeMembers">0</div>
+        <p>Mitglieder mit aktuellen Auszahlungen</p>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Events diesen Monat</h3>
+        <div class="stat-number" id="monthlyEvents">0</div>
+        <p>Eingetragene Events im aktuellen Monat</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>Top Events (nach Auszahlungen)</h3>
+      <div class="chart" id="eventsChart">
+        <!-- Chart wird mit JavaScript gefüllt -->
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>Top Mitglieder (nach Auszahlungen)</h3>
+      <div class="chart" id="membersChart">
+        <!-- Chart wird mit JavaScript gefüllt -->
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Statistiken berechnen
+    let totalPayouts = 0;
+    let openPayouts = 0;
+    let activeMembers = 0;
+    const eventTotals = {};
+    const memberTotals = {};
+
+    db.collection('transactions').onSnapshot(snap => {
+      totalPayouts = 0;
+      eventTotals = {};
+      memberTotals = {};
+      
+      snap.forEach(doc => {
+        const transaction = doc.data();
+        if (transaction.type === 'auszahlung') {
+          totalPayouts += transaction.amount || 0;
+          
+          // Event-Statistik
+          eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + transaction.amount;
+          
+          // Mitglieder-Statistik  
+          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + transaction.amount;
+        }
+      });
+      
+      updateStats();
+      updateCharts();
+    });
+
+    db.collection('members').onSnapshot(snap => {
+      openPayouts = 0;
+      activeMembers = 0;
+      
+      snap.forEach(doc => {
+        const member = doc.data();
+        if (member.balance > 0) {
+          openPayouts += member.balance;
+          activeMembers++;
+        }
+      });
+      
+      updateStats();
+    });
+
+    function updateStats() {
+      document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
+      document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
+      document.getElementById('activeMembers').textContent = activeMembers;
+    }
+
+    function updateCharts() {
+      // Events Chart
+      const eventsChart = document.getElementById('eventsChart');
+      eventsChart.innerHTML = '';
+      
+      const sortedEvents = Object.entries(eventTotals)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+      
+      const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+      
+      sortedEvents.forEach(([event, amount]) => {
+        const height = (amount / maxEventValue) * 160;
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = height + 'px';
+        bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+        eventsChart.appendChild(bar);
+      });
+    }
+  </script>
+</body>
+</html>
