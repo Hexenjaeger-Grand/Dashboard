@@ -740,100 +740,111 @@
   }
 
   // Charts aktualisieren
-  function updateCharts() {
-    console.log('Aktualisiere Charts...');
-    
-    const eventNames = {
-      'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
-      '40er_win': '40er Win', '40er_lose': '40er Lose',
-      'hafen': 'Hafen', 'giesserei': 'Gießerei', 
-      'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
-      'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
-    };
-
-    // Events Chart - Linksbündig, Top 10 Events
-const eventsChart = document.getElementById('eventsChart');
-eventsChart.innerHTML = '';
-
-const sortedEvents = Object.entries(eventTotals)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10); // Top 10 Events
-
-if (sortedEvents.length === 0) {
-  eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
-} else {
-  const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+// Charts aktualisieren
+function updateCharts() {
+  console.log('Aktualisiere Charts...');
   
-  sortedEvents.forEach(([event, amount]) => {
-    const barContainer = document.createElement('div');
-    barContainer.className = 'bar-container';
-    
-    // Wert oben
-    const value = document.createElement('div');
-    value.className = 'bar-value';
-    value.textContent = `${(amount/1000).toFixed(0)}k`;
-    
-    // Balken
-    const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    bar.style.height = height + 'px';
-    bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
-    
-    // Event-Name unten
-    const label = document.createElement('div');
-    label.className = 'bar-label';
-    label.textContent = eventNames[event] || event;
-    
-    barContainer.appendChild(value);
-    barContainer.appendChild(bar);
-    barContainer.appendChild(label);
-    eventsChart.appendChild(barContainer); // DIESE ZEILE FEHLTE!
-  });
-}
+  const eventNames = {
+    'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
+    '40er_win': '40er Win', '40er_lose': '40er Lose',
+    'hafen': 'Hafen', 'giesserei': 'Gießerei', 
+    'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
+    'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
+  };
 
-    // Members Chart - Linksbündig mit Scrollleiste, ALLE Mitglieder
-    const membersChart = document.getElementById('membersChart');
-    membersChart.innerHTML = '';
-    
-    // ALLE Mitglieder sortiert nach Betrag (absteigend)
-    const sortedMembers = Object.entries(memberTotals)
-      .sort((a, b) => b[1] - a[1]);
-    
-    if (sortedMembers.length === 0) {
-      membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
+  // Formatierung für Beträge
+  function formatAmount(amount) {
+    if (amount >= 1000000) {
+      // Millionen mit einer Nachkommastelle
+      return (amount / 1000000).toFixed(1).replace('.', ',') + ' Mio.';
     } else {
-      const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
-      
-      sortedMembers.forEach(([member, amount]) => {
-        const barContainer = document.createElement('div');
-        barContainer.className = 'bar-container';
-        
-        // Wert oben
-        const value = document.createElement('div');
-        value.className = 'bar-value';
-        value.textContent = `${(amount/1000).toFixed(0)}k`;
-        
-        // Balken
-        const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = height + 'px';
-        bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
-        
-        // Mitglieds-Name unten
-        const label = document.createElement('div');
-        label.className = 'bar-label';
-        label.textContent = member;
-        
-        barContainer.appendChild(value);
-        barContainer.appendChild(bar);
-        barContainer.appendChild(label);
-        membersChart.appendChild(barContainer);
-      });
+      // Tausender mit "k"
+      return (amount / 1000).toFixed(0) + 'k';
     }
   }
 
+  // Events Chart - Linksbündig, Top 10 Events
+  const eventsChart = document.getElementById('eventsChart');
+  eventsChart.innerHTML = '';
+  
+  const sortedEvents = Object.entries(eventTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10); // Top 10 Events
+  
+  if (sortedEvents.length === 0) {
+    eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
+  } else {
+    const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+    
+    sortedEvents.forEach(([event, amount]) => {
+      const barContainer = document.createElement('div');
+      barContainer.className = 'bar-container';
+      
+      // Wert oben - mit automatischer Formatierung
+      const value = document.createElement('div');
+      value.className = 'bar-value';
+      value.textContent = formatAmount(amount);
+      
+      // Balken
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
+      
+      // Event-Name unten
+      const label = document.createElement('div');
+      label.className = 'bar-label';
+      label.textContent = eventNames[event] || event;
+      
+      barContainer.appendChild(value);
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      eventsChart.appendChild(barContainer);
+    });
+  }
+
+  // Members Chart - Linksbündig mit Scrollleiste, ALLE Mitglieder
+  const membersChart = document.getElementById('membersChart');
+  membersChart.innerHTML = '';
+  
+  // ALLE Mitglieder sortiert nach Betrag (absteigend)
+  const sortedMembers = Object.entries(memberTotals)
+    .sort((a, b) => b[1] - a[1]);
+  
+  if (sortedMembers.length === 0) {
+    membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
+  } else {
+    const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
+    
+    sortedMembers.forEach(([member, amount]) => {
+      const barContainer = document.createElement('div');
+      barContainer.className = 'bar-container';
+      
+      // Wert oben - mit automatischer Formatierung
+      const value = document.createElement('div');
+      value.className = 'bar-value';
+      value.textContent = formatAmount(amount);
+      
+      // Balken
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
+      
+      // Mitglieds-Name unten
+      const label = document.createElement('div');
+      label.className = 'bar-label';
+      label.textContent = member;
+      
+      barContainer.appendChild(value);
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      membersChart.appendChild(barContainer);
+    });
+  }
+}
   // Echtzeit-Updates
   function setupRealtimeUpdates() {
     // Bei Änderungen in members oder transactions alle Statistiken neu laden
