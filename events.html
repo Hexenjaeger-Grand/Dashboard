@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Events - Hexenjäger</title>
+  <style>
+    :root {
+      --bg: #0f172a; --text: #e5e7eb; --muted: #9ca3af; 
+      --border: #1f2937; --accent: #7c3aed; --card: rgba(255,255,255,0.05);
+      --success: #22c55e;
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui; padding:20px;}
+    .container{max-width:1200px; margin:0 auto;}
+    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
+    .back-btn{padding:10px 20px; background:var(--accent); color:white; text-decoration:none; border-radius:8px;}
+    
+    .event-form{background:var(--card); border:1px solid var(--border); border-radius:15px; padding:20px; margin-bottom:30px;}
+    .form-group{margin-bottom:15px;}
+    label{display:block; margin-bottom:5px; font-weight:bold;}
+    input, select, button{padding:10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.3); color:var(--text); width:100%;}
+    button{background:var(--accent); color:white; border:none; cursor:pointer; margin-top:10px;}
+    button:hover{background:#6d28d9;}
+    
+    .members-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; margin:10px 0;}
+    .member-checkbox{display:flex; align-items:center; gap:8px; padding:8px; background:rgba(0,0,0,0.2); border-radius:8px;}
+    
+    .calculation{background:var(--success); color:white; padding:15px; border-radius:10px; margin:15px 0; display:none;}
+    .calculation.show{display:block;}
+    
+    .admin-only{display:none;}
+    body.admin .admin-only{display:block;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📅 Events eintragen</h1>
+      <a href="index.html" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="admin-only">
+      <!-- Event Form -->
+      <div class="event-form">
+        <h3>Neues Event</h3>
+        
+        <div class="form-group">
+          <label>Event Typ</label>
+          <select id="eventType" onchange="updateEventFields()">
+            <option value="">-- Event auswählen --</option>
+            <option value="bizwar_win">Bizwar Win</option>
+            <option value="bizwar_lose">Bizwar Lose</option>
+            <option value="40er_win">40er Win</option>
+            <option value="40er_lose">40er Lose</option>
+            <option value="giesserei">Gießerei</option>
+            <option value="waffenfabrik">Waffenfabrik</option>
+            <option value="hafen">Hafen Drop</option>
+            <option value="ekz">Einkaufszentrum</option>
+            <option value="rp_fabrik">RP-Fabrik</option>
+            <option value="cayo">Cayo Perico</option>
+          </select>
+        </div>
+
+        <!-- Dynamische Felder -->
+        <div id="eventFields"></div>
+
+        <!-- Mitglieder Auswahl -->
+        <div class="form-group">
+          <label>Teilnehmende Mitglieder</label>
+          <div class="members-grid" id="membersList">
+            <!-- Wird mit JavaScript gefüllt -->
+          </div>
+        </div>
+
+        <!-- Berechnung anzeigen -->
+        <div class="calculation" id="calculationResult">
+          <h4>💰 Berechnung</h4>
+          <div id="calculationDetails"></div>
+        </div>
+
+        <button onclick="saveEvent()">Event speichern</button>
+        <p id="statusMessage"></p>
+      </div>
+
+      <!-- Letzte Events -->
+      <div class="event-form">
+        <h3>Letzte Events</h3>
+        <div id="recentEvents">
+          <!-- Wird mit JavaScript gefüllt -->
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-only" style="text-align:center; padding:40px; display:none;" id="notAdmin">
+      <h3>🔒 Nur für Leaderschaft zugänglich</h3>
+      <p>Bitte auf dem Dashboard einloggen</p>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+      projectId: "hexenjaeger-dashboard",
+      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+      messagingSenderId: "48507598074",
+      appId: "1:48507598074:web:d736c118fd74d1968d0543"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentMembers = [];
+    let selectedMembers = [];
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      const isAdmin = !!user;
+      document.body.classList.toggle('admin', isAdmin);
+      document.getElementById('notAdmin').style.display = isAdmin ? 'none' : 'block';
+      
+      if (isAdmin) {
+        loadMembers();
+        loadRecentEvents();
+      }
+    });
+
+    // Mitglieder laden
+    function loadMembers() {
+      db.collection('members').onSnapshot(snap => {
+        const container = document.getElementById('membersList');
+        currentMembers = [];
+        container.innerHTML = '';
+        
+        snap.forEach(doc => {
+          const member = doc.data();
+          currentMembers.push(member);
+          
+          const checkbox = document.createElement('div');
+          checkbox.className = 'member-checkbox';
+          checkbox.innerHTML = `
+            <input type="checkbox" id="member_${doc.id}" value="${member.name}" onchange="toggleMember(this)">
+            <label for="member_${doc.id}">${member.name} (${member.id || 'No ID'})</label>
+          `;
+          container.appendChild(checkbox);
+        });
+      });
+    }
+
+    function toggleMember(checkbox) {
+      if (checkbox.checked) {
+        selectedMembers.push(checkbox.value);
+      } else {
+        selectedMembers = selectedMembers.filter(name => name !== checkbox.value);
+      }
+      calculatePayout();
+    }
+
+    // Event Felder aktualisieren
+    function updateEventFields() {
+      const eventType = document.getElementById('eventType').value;
+      const container = document.getElementById('eventFields');
+      
+      const fields = {
+        'bizwar_win': 'Anzahl Kills:',
+        'bizwar_lose': 'Anzahl Kills:', 
+        '40er_win': 'Anzahl Kills:',
+        '40er_lose': 'Anzahl Kills:',
+        'giesserei': 'Anzahl Kills:',
+        'waffenfabrik': 'Anzahl Kills:',
+        'hafen': 'Anzahl Drops:',
+        'ekz': 'Gewonnen?',
+        'rp_fabrik': 'Gewonnen?',
+        'cayo': 'Anzahl Drops:'
+      };
+
+      if (fields[eventType]) {
+        container.innerHTML = `
+          <div class="form-group">
+            <label>${fields[eventType]}</label>
+            <input type="number" id="eventQuantity" min="1" value="1" oninput="calculatePayout()">
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+      }
+      
+      calculatePayout();
+    }
+
+    // Auszahlung berechnen
+    function calculatePayout() {
+      const eventType = document.getElementById('eventType').value;
+      const quantity = parseInt(document.getElementById('eventQuantity')?.value) || 1;
+      const participantCount = selectedMembers.length || 1;
+      
+      if (!eventType || participantCount === 0) {
+        document.getElementById('calculationResult').classList.remove('show');
+        return;
+      }
+
+      const rates = {
+        'bizwar_win': 20000,    // 20k pro Kill bei Win
+        'bizwar_lose': 10000,   // 10k pro Kill bei Lose
+        '40er_win': 40000,      // 40k pro Kill bei Win  
+        '40er_lose': 20000,     // 20k pro Kill bei Lose
+        'giesserei': 10000,     // 10k pro Kill
+        'waffenfabrik': 10000,  // 10k pro Kill
+        'hafen': 40000,         // 40k pro Drop
+        'ekz': 80000,           // 80k pro Person bei Win
+        'rp_fabrik': 8000000,   // 8 Mio gesamt
+        'cayo': 1000000         // 1 Mio pro Drop gesamt
+      };
+
+      let totalAmount = 0;
+      let perPerson = 0;
+      let description = '';
+
+      if (['rp_fabrik', 'cayo'].includes(eventType)) {
+        // Aufteilung auf Teilnehmer
+        totalAmount = rates[eventType] * quantity;
+        perPerson = Math.floor(totalAmount / participantCount);
+        description = `${quantity} Drop(s) = ${totalAmount.toLocaleString('de-DE')} € gesamt<br>
+                      Geteilt durch ${participantCount} Teilnehmer = ${perPerson.toLocaleString('de-DE')} € pro Person`;
+      } 
+      else if (eventType === 'ekz') {
+        // Fixbetrag pro Person
+        perPerson = rates[eventType];
+        totalAmount = perPerson * participantCount;
+        description = `${participantCount} Teilnehmer × ${perPerson.toLocaleString('de-DE')} € = ${totalAmount.toLocaleString('de-DE')} € gesamt`;
+      }
+      else {
+        // Kill/Drop basierte Events
+        perPerson = rates[eventType] * quantity;
+        totalAmount = perPerson * participantCount;
+        description = `${participantCount} Teilnehmer × ${quantity} Kill(s)/Drop(s) × ${rates[eventType].toLocaleString('de-DE')} € = ${totalAmount.toLocaleString('de-DE')} € gesamt`;
+      }
+
+      document.getElementById('calculationDetails').innerHTML = `
+        <strong>${description}</strong><br><br>
+        <strong>Teilnehmer (${participantCount}):</strong><br>
+        ${selectedMembers.map(name => `• ${name}: ${perPerson.toLocaleString('de-DE')} €`).join('<br>')}
+      `;
+      document.getElementById('calculationResult').classList.add('show');
+    }
+
+    // Event speichern
+    async function saveEvent() {
+      const eventType = document.getElementById('eventType').value;
+      const quantity = parseInt(document.getElementById('eventQuantity')?.value) || 1;
+      
+      if (!eventType || selectedMembers.length === 0) {
+        alert('Bitte Event-Typ und Teilnehmer auswählen!');
+        return;
+      }
+
+      // Berechnung wiederholen für aktuelle Werte
+      calculatePayout();
+      const calculationText = document.getElementById('calculationDetails').innerText;
+      const perPerson = parseInt(calculationText.split('pro Person: ')[1]) || 0;
+
+      try {
+        // Für jeden Teilnehmer Transaktion erstellen
+        for (const memberName of selectedMembers) {
+          const memberRef = db.collection('members').doc(memberName);
+          const memberDoc = await memberRef.get();
+          
+          if (memberDoc.exists) {
+            const currentBalance = memberDoc.data().balance || 0;
+            await memberRef.update({
+              balance: currentBalance + perPerson
+            });
+
+            // Transaktion speichern
+            await db.collection('transactions').add({
+              member: memberName,
+              type: 'einzahlung',
+              event: eventType,
+              amount: perPerson,
+              quantity: quantity,
+              participants: selectedMembers.length,
+              timestamp: new Date().toISOString(),
+              calculatedPayout: calculationText
+            });
+          }
+        }
+
+        document.getElementById('statusMessage').innerHTML = '<span style="color:var(--success)">✅ Event erfolgreich gespeichert!</span>';
+        
+        // Formular zurücksetzen
+        setTimeout(() => {
+          document.getElementById('eventType').value = '';
+          document.getElementById('eventFields').innerHTML = '';
+          document.getElementById('calculationResult').classList.remove('show');
+          selectedMembers = [];
+          document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+          document.getElementById('statusMessage').innerHTML = '';
+        }, 2000);
+
+      } catch (error) {
+        document.getElementById('statusMessage').innerHTML = '<span style="color:red">❌ Fehler: ' + error.message + '</span>';
+      }
+    }
+
+    // Letzte Events laden
+    function loadRecentEvents() {
+      db.collection('transactions')
+        .orderBy('timestamp', 'desc')
+        .limit(10)
+        .onSnapshot(snap => {
+          const container = document.getElementById('recentEvents');
+          container.innerHTML = '';
+          
+          snap.forEach(doc => {
+            const transaction = doc.data();
+            const div = document.createElement('div');
+            div.style.padding = '10px';
+            div.style.borderBottom = '1px solid var(--border)';
+            div.innerHTML = `
+              <strong>${transaction.event}</strong> - ${transaction.member}<br>
+              <small>${new Date(transaction.timestamp).toLocaleString('de-DE')} - ${transaction.amount.toLocaleString('de-DE')} €</small>
+            `;
+            container.appendChild(div);
+          });
+        });
+    }
+  </script>
+</body>
+</html>
