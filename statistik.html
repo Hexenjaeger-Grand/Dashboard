@@ -400,7 +400,7 @@
       background: var(--Yellow);
     }
 
-   .bar-container {
+.bar-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -409,7 +409,6 @@
   height: 100%;
   justify-content: flex-end;
   gap: 8px;
-  position: relative;
 }
 
 .bar-value {
@@ -417,22 +416,15 @@
   font-weight: 800;
   color: var(--Yellow);
   text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
 }
 
 .bar {
   background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
   border-radius: 6px 6px 0 0;
   width: 40px;
-  position: relative;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
   min-height: 15px;
-  margin-bottom: 30px;
 }
 
 .bar:hover {
@@ -452,10 +444,6 @@
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   letter-spacing: 0.3px;
-  position: absolute;
-  bottom: -25px;
-  left: 0;
-  right: 0;
 }
 
     .admin-only { 
@@ -764,45 +752,45 @@
     };
 
     // Events Chart - Linksbündig, Top 10 Events
-    const eventsChart = document.getElementById('eventsChart');
-    eventsChart.innerHTML = '';
+const eventsChart = document.getElementById('eventsChart');
+eventsChart.innerHTML = '';
+
+const sortedEvents = Object.entries(eventTotals)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10); // Top 10 Events
+
+if (sortedEvents.length === 0) {
+  eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
+} else {
+  const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+  
+  sortedEvents.forEach(([event, amount]) => {
+    const barContainer = document.createElement('div');
+    barContainer.className = 'bar-container';
     
-    const sortedEvents = Object.entries(eventTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10); // Top 10 Events
+    // Wert oben
+    const value = document.createElement('div');
+    value.className = 'bar-value';
+    value.textContent = `${(amount/1000).toFixed(0)}k`;
     
-    if (sortedEvents.length === 0) {
-      eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
-    } else {
-      const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
-      
-      sortedEvents.forEach(([event, amount]) => {
-// Balken-Container erstellen
-const barContainer = document.createElement('div');
-barContainer.className = 'bar-container';
-
-// Wert oben (absolut positioniert)
-const value = document.createElement('div');
-value.className = 'bar-value';
-value.textContent = `${(amount/1000).toFixed(0)}k`;
-
-// Balken
-const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
-const bar = document.createElement('div');
-bar.className = 'bar';
-bar.style.height = height + 'px';
-bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
-
-// Event-Name unten (absolut positioniert)
-const label = document.createElement('div');
-label.className = 'bar-label';
-label.textContent = eventNames[event] || event;
-
-barContainer.appendChild(value);
-barContainer.appendChild(bar);
-barContainer.appendChild(label);
-      });
-    }
+    // Balken
+    const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = height + 'px';
+    bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
+    
+    // Event-Name unten
+    const label = document.createElement('div');
+    label.className = 'bar-label';
+    label.textContent = eventNames[event] || event;
+    
+    barContainer.appendChild(value);
+    barContainer.appendChild(bar);
+    barContainer.appendChild(label);
+    eventsChart.appendChild(barContainer); // DIESE ZEILE FEHLTE!
+  });
+}
 
     // Members Chart - Linksbündig mit Scrollleiste, ALLE Mitglieder
     const membersChart = document.getElementById('membersChart');
