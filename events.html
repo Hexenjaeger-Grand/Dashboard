@@ -20,53 +20,308 @@
       --Ice: #3581DB;
       --Grey: #6A6373;
       --Primary: #7c5bf1;
-      --bg: #0d0b1b;
-      --card: rgba(255,255,255,0.05);
-      --border: rgba(255,255,255,0.1);
     }
-    
-    *{box-sizing:border-box; margin:0; padding:0;}
-    body{margin:0; background:var(--bg); color:var(--White); font-family:var(--Font); padding:20px;}
-    .container{max-width:1200px; margin:0 auto;}
-    
-    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
-    .back-btn{display:flex; padding:12px 24px; background:var(--Primary); color:white; text-decoration:none; border-radius:8px; font-weight:700; text-transform:uppercase; align-items:center; gap:8px; transition:.2s;}
-    .back-btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
-    
-    .event-form{background:var(--card); padding:24px; border-radius:16px; margin:20px 0; border:1px solid var(--border);}
-    .form-group{margin-bottom:16px;}
-    label{display:block; margin-bottom:8px; font-weight:600; text-transform:uppercase; font-size:14px;}
-    input, select{padding:12px 16px; border-radius:8px; background:rgba(255,255,255,0.1); border:1px solid var(--border); color:var(--White); font-size:16px; width:100%;}
-    input:focus, select:focus{outline:2px solid var(--Primary);}
-    
-    .btn{padding:12px 24px; background:var(--Primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-transform:uppercase; transition:.2s;}
-    .btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
-    .btn-yellow{background:var(--Yellow); color:var(--Dark);}
-    .btn-yellow:hover{background:linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);}
-    .btn-red{background:var(--Red);}
-    .btn-red:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Red);}
-    
-    table{width:100%; border-collapse:collapse; background:var(--card); border-radius:16px; overflow:hidden; margin:20px 0;}
-    th, td{padding:16px; text-align:left; border-bottom:1px solid var(--border);}
-    th{background:rgba(124,91,241,0.2); font-weight:700; text-transform:uppercase; font-size:14px;}
-    tr:hover{background:rgba(124,91,241,0.1);}
-    
-    h1{font-size:36px; font-weight:900; text-transform:uppercase; color:var(--White);}
-    h2{font-size:24px; font-weight:800; margin:20px 0; color:var(--Yellow);}
-    
-    .admin-only{display:none;}
-    body.admin .admin-only{display:block;}
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      vertical-align: baseline;
+      appearance: none;
+      outline: 0;
+      font-family: inherit;
+    }
+
+    body {
+      font-family: var(--Font);
+      background: #0d0b1b;
+      color: var(--White);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 20px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Header mit Logo und Text */
+    .header {
+      background: var(--White);
+      display: flex;
+      padding: 8px 22px;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      box-shadow: 0 12px 100px 0 rgba(0,0,0,.25);
+      height: 80px;
+    }
+
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header__logo img {
+      height: 60px;
+      width: auto;
+    }
+
+    .header__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header__title {
+      color: var(--Primary);
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .header__subtitle {
+      color: var(--Dark);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .header__nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header__nav a {
+      color: var(--Dark);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: .2s;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .header__nav a:hover {
+      background: var(--Yellow);
+    }
+
+    .header__nav a.active {
+      background: var(--Primary);
+      color: var(--White);
+    }
+
+    /* Leaderschaft Button */
+    .leaderschaft-btn {
+      background: var(--Primary);
+      color: var(--White);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .2s;
+      height: 44px;
+    }
+
+    .leaderschaft-btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      padding: 12px 20px;
+      gap: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      border-radius: 8px;
+      background: var(--Primary);
+      color: var(--White);
+      align-items: center;
+      justify-content: center;
+      transition: .2s;
+      text-transform: uppercase;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    .btn-red {
+      background: var(--Red);
+    }
+
+    .btn-red:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Red);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 100px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--White);
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 20px 0;
+      text-transform: uppercase;
+      color: var(--Yellow);
+    }
+
+    /* Form Styles */
+    .form-container {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(6px);
+      margin: 20px 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--White);
+    }
+
+    input, select {
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: var(--White);
+      font-size: 16px;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid var(--Primary);
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    th {
+      background: rgba(124,91,241,.2);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--Yellow);
+    }
+
+    tr:hover {
+      background: rgba(124,91,241,.1);
+    }
+
+    /* Admin Only */
+    .admin-only { display: none; }
+    body.admin .admin-only { display: block; }
+
+    /* Responsive */
+    @media (max-width: 1040px) {
+      .header__nav { display: none; }
+      .header__text { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .table-container {
+        padding: 16px;
+        overflow-x: auto;
+      }
+      
+      table {
+        min-width: 600px;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
+    }
   </style>
 </head>
-<body class="admin">
-  <div class="container">
-    <div class="header">
-      <h1>📅 Events</h1>
-      <a href="index.html" class="back-btn">← Dashboard</a>
+<body>
+  <!-- Header mit Logo und Text -->
+  <div class="header">
+    <div class="header__brand">
+      <div class="header__logo">
+        <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="header__text">
+        <div class="header__title">Hexenjäger</div>
+        <div class="header__subtitle">Grand Roleplay<br>GTA5</div>
+      </div>
+    </div>
+    
+    <div class="header__nav">
+      <a href="auszahlung.html">Auszahlungen</a>
+      <a href="statistik.html">Statistik</a>
+      <a href="events.html" class="active">Events</a>
+      <a href="mitglieder.html" class="admin-only">Mitglieder</a>
     </div>
 
+    <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
+  </div>
+
+  <div class="container main-content">
+    <h1>📅 Events</h1>
+
     <div class="admin-only">
-      <div class="event-form">
+      <div class="form-container">
         <h2>Neues Event erstellen</h2>
         <div class="form-group">
           <label>Event Name</label>
@@ -95,26 +350,31 @@
     </div>
 
     <h2>Letzte Events</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Typ</th>
-          <th>Datum</th>
-          <th>Beschreibung</th>
-          <th class="admin-only">Aktionen</th>
-        </tr>
-      </thead>
-      <tbody id="eventsTable">
-        <!-- Wird mit JavaScript gefüllt -->
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Typ</th>
+            <th>Datum</th>
+            <th>Beschreibung</th>
+            <th class="admin-only">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTable">
+          <!-- Wird mit JavaScript gefüllt -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   
   <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
       authDomain: "hexenjaeger-dashboard.firebaseapp.com",
@@ -124,9 +384,15 @@
       appId: "1:48507598074:web:d736c118fd74d1968d0543"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     let events = [];
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      document.body.classList.toggle('admin', !!user);
+    });
 
     // Events laden
     db.collection('events')
@@ -145,7 +411,7 @@
       table.innerHTML = '';
       
       if (events.length === 0) {
-        table.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">Keine Events gefunden</td></tr>';
+        table.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color: var(--Grey);">Keine Events gefunden</td></tr>';
         return;
       }
       
@@ -219,6 +485,11 @@
 
     // Heutiges Datum als Standard setzen
     document.getElementById('eventDate').valueAsDate = new Date();
+
+    // Leaderschaft Button Event
+    document.getElementById('leaderschaftBtn').onclick = () => {
+      alert('Bitte auf dem Dashboard einloggen');
+    };
   </script>
 </body>
 </html>
