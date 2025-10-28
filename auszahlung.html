@@ -20,76 +20,320 @@
       --Ice: #3581DB;
       --Grey: #6A6373;
       --Primary: #7c5bf1;
-      --bg: #0d0b1b;
-      --card: rgba(255,255,255,0.05);
-      --border: rgba(255,255,255,0.1);
     }
-    
-    *{box-sizing:border-box; margin:0; padding:0;}
-    body{margin:0; background:var(--bg); color:var(--White); font-family:var(--Font); padding:20px;}
-    .container{max-width:1200px; margin:0 auto;}
-    
-    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
-    .back-btn{display:flex; padding:12px 24px; background:var(--Primary); color:white; text-decoration:none; border-radius:8px; font-weight:700; text-transform:uppercase; align-items:center; gap:8px; transition:.2s;}
-    .back-btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
-    
-    table{width:100%; border-collapse:collapse; background:var(--card); border-radius:16px; overflow:hidden;}
-    th, td{padding:16px; text-align:left; border-bottom:1px solid var(--border);}
-    th{background:rgba(124,91,241,0.2); font-weight:700; text-transform:uppercase; font-size:14px;}
-    tr:hover{background:rgba(124,91,241,0.1);}
-    .amount{font-weight:700; color:var(--Yellow);}
-    .paid .amount{color:#4CAF50;}
-    
-    h1{font-size:36px; font-weight:900; text-transform:uppercase; color:var(--White);}
-    .summary{background:var(--card); padding:20px; border-radius:16px; margin:20px 0; border:1px solid var(--border);}
-    .summary h2{font-size:20px; font-weight:700; margin-bottom:10px; color:var(--Yellow);}
-    
-    .btn{padding:12px 24px; background:var(--Primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-transform:uppercase; transition:.2s;}
-    .btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
-    .btn-yellow{background:var(--Yellow); color:var(--Dark);}
-    .btn-yellow:hover{background:linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);}
-    
-    .admin-only{display:none;}
-    body.admin .admin-only{display:block;}
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      vertical-align: baseline;
+      appearance: none;
+      outline: 0;
+      font-family: inherit;
+    }
+
+    body {
+      font-family: var(--Font);
+      background: #0d0b1b;
+      color: var(--White);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 20px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Header mit Logo und Text */
+    .header {
+      background: var(--White);
+      display: flex;
+      padding: 8px 22px;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      box-shadow: 0 12px 100px 0 rgba(0,0,0,.25);
+      height: 80px;
+    }
+
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header__logo img {
+      height: 60px;
+      width: auto;
+    }
+
+    .header__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header__title {
+      color: var(--Primary);
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .header__subtitle {
+      color: var(--Dark);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .header__nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header__nav a {
+      color: var(--Dark);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: .2s;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .header__nav a:hover {
+      background: var(--Yellow);
+    }
+
+    .header__nav a.active {
+      background: var(--Primary);
+      color: var(--White);
+    }
+
+    /* Leaderschaft Button */
+    .leaderschaft-btn {
+      background: var(--Primary);
+      color: var(--White);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: .2s;
+      height: 44px;
+    }
+
+    .leaderschaft-btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      padding: 12px 20px;
+      gap: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      border-radius: 8px;
+      background: var(--Primary);
+      color: var(--White);
+      align-items: center;
+      justify-content: center;
+      transition: .2s;
+      text-transform: uppercase;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    .btn-yellow {
+      background: var(--Yellow);
+      color: var(--Dark);
+    }
+
+    .btn-yellow:hover {
+      background: linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 100px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--White);
+      margin-bottom: 30px;
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    th {
+      background: rgba(124,91,241,.2);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: var(--Yellow);
+    }
+
+    tr:hover {
+      background: rgba(124,91,241,.1);
+    }
+
+    .amount {
+      font-weight: 700;
+      color: var(--Yellow);
+    }
+
+    /* Summary Card */
+    .summary-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+      margin-bottom: 24px;
+    }
+
+    .summary-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--Yellow);
+      text-transform: uppercase;
+    }
+
+    /* Admin Only */
+    .admin-only { display: none; }
+    body.admin .admin-only { display: block; }
+
+    /* Responsive */
+    @media (max-width: 1040px) {
+      .header__nav { display: none; }
+      .header__text { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .table-container {
+        padding: 16px;
+        overflow-x: auto;
+      }
+      
+      table {
+        min-width: 600px;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>💰 Offene Auszahlungen</h1>
-      <a href="index.html" class="back-btn">← Dashboard</a>
+  <!-- Header mit Logo und Text -->
+  <div class="header">
+    <div class="header__brand">
+      <div class="header__logo">
+        <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
+      </div>
+      <div class="header__text">
+        <div class="header__title">Hexenjäger</div>
+        <div class="header__subtitle">Grand Roleplay<br>GTA5</div>
+      </div>
+    </div>
+    
+    <div class="header__nav">
+      <a href="auszahlung.html" class="active">Auszahlungen</a>
+      <a href="statistik.html">Statistik</a>
+      <a href="events.html" class="admin-only">Events</a>
+      <a href="mitglieder.html" class="admin-only">Mitglieder</a>
     </div>
 
-    <div class="summary">
+    <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
+  </div>
+
+  <div class="container main-content">
+    <h1>💰 Offene Auszahlungen</h1>
+
+    <div class="summary-card">
       <h2>📊 Zusammenfassung</h2>
-      <p>Gesamtsumme offener Auszahlungen: <strong id="totalOpenAmount">0 €</strong></p>
-      <p>Anzahl der Mitglieder mit offenen Auszahlungen: <strong id="membersWithOpen">0</strong></p>
+      <p>Gesamtsumme offener Auszahlungen: <strong id="totalOpenAmount" style="color: var(--Yellow);">0 €</strong></p>
+      <p>Anzahl der Mitglieder mit offenen Auszahlungen: <strong id="membersWithOpen" style="color: var(--Yellow);">0</strong></p>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Mitglied</th>
-          <th>Offener Betrag</th>
-          <th>Letzte Aktivität</th>
-          <th class="admin-only">Aktionen</th>
-        </tr>
-      </thead>
-      <tbody id="payoutsTable">
-        <!-- Wird mit JavaScript gefüllt -->
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Mitglied</th>
+            <th>Offener Betrag</th>
+            <th>Letzte Aktivität</th>
+            <th class="admin-only">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="payoutsTable">
+          <!-- Wird mit JavaScript gefüllt -->
+        </tbody>
+      </table>
+    </div>
 
-    <div style="margin-top:20px; display:flex; gap:10px;">
+    <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
       <button class="btn admin-only" onclick="markAllAsPaid()">Alle als bezahlt markieren</button>
       <button class="btn btn-yellow admin-only" onclick="exportToCSV()">📥 Als CSV exportieren</button>
     </div>
   </div>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   
   <script>
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
       authDomain: "hexenjaeger-dashboard.firebaseapp.com",
@@ -99,9 +343,15 @@
       appId: "1:48507598074:web:d736c118fd74d1968d0543"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     let members = [];
+
+    // Auth Check
+    auth.onAuthStateChanged(user => {
+      document.body.classList.toggle('admin', !!user);
+    });
 
     // Mitglieder mit offenen Auszahlungen laden
     db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
@@ -124,7 +374,7 @@
       table.innerHTML = '';
       
       if (members.length === 0) {
-        table.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">Keine offenen Auszahlungen</td></tr>';
+        table.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine offenen Auszahlungen</td></tr>';
         return;
       }
       
@@ -177,6 +427,11 @@
       a.click();
       window.URL.revokeObjectURL(url);
     }
+
+    // Leaderschaft Button Event
+    document.getElementById('leaderschaftBtn').onclick = () => {
+      alert('Bitte auf dem Dashboard einloggen');
+    };
   </script>
 </body>
 </html>
