@@ -623,7 +623,6 @@ db.collection('transactions')
     updateStats();
   });
 
-// Für EVENTS und MITGLIEDER Charts - ALLE Transaktionen (Einzahlungen + Auszahlungen)
 db.collection('transactions').onSnapshot(snap => {
   console.log('Alle Transaktionen für Charts:', snap.size, 'Dokumente');
   
@@ -634,8 +633,8 @@ db.collection('transactions').onSnapshot(snap => {
     const transaction = doc.data();
     console.log('Transaktion für Chart:', transaction);
     
-    // Für Events-Statistik: alle Events außer 'auszahlung'
-    if (transaction.event && transaction.event !== 'auszahlung') {
+    // Für Events-Statistik: ALLE Events (auch 'auszahlung' Events)
+    if (transaction.event) {
       eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
     }
     
@@ -690,9 +689,9 @@ function updateCharts() {
     'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
   };
   
-  const sortedEvents = Object.entries(eventTotals)
-    .filter(([event]) => event in eventNames) // Nur bekannte Events
-    .sort((a, b) => b[1] - a[1]);
+const sortedEvents = Object.entries(eventTotals)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10); // TOP 10 Events
   
   console.log('Sorted Events:', sortedEvents);
   
