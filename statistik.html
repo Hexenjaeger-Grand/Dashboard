@@ -125,38 +125,38 @@
     }
 
     /* Login Status Indicator */
-.login-status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+    .login-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.login-status-indicator.logged-in {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
+    .login-status-indicator.logged-in {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
 
-.login-status-indicator.logged-out {
-  background: rgba(107, 114, 128, 0.2);
-  color: #6b7280;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-}
+    .login-status-indicator.logged-out {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
 
-.user-email {
-  font-size: 11px;
-  opacity: 0.9;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .user-email {
+      font-size: 11px;
+      opacity: 0.9;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* Leaderschaft Button */
     .leaderschaft-btn {
@@ -175,6 +175,119 @@
     }
 
     .leaderschaft-btn:hover {
+      background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
+      border-radius: 24px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .modal h2 {
+      color: var(--White);
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(124,91,241,.2);
+      border: none;
+      color: var(--White);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(124,91,241,.4);
+    }
+
+    /* Input Groups im Modal */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .48px;
+      text-transform: uppercase;
+      color: var(--White);
+    }
+
+    .input-group input {
+      border-radius: 6px;
+      background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1;
+      padding: 14px 18px;
+      color: var(--Dark);
+      font-size: 16px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .input-group input:focus {
+      background: var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1, 0 1px 0 3px #7c5bf1;
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      padding: 12px 20px;
+      gap: 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .64px;
+      border-radius: 8px;
+      background: var(--Primary);
+      color: var(--White);
+      align-items: center;
+      justify-content: center;
+      transition: .2s;
+      text-transform: uppercase;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn:hover {
       background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
     }
 
@@ -271,41 +384,35 @@
       transform: translateY(-2px);
     }
 
-.bar-label {
-  position: absolute;
-  top: -30px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
-}
+    .bar-label {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
 
-/* Admin Only - KORRIGIERT */
-.admin-only { 
-  display: none; 
-  visibility: hidden; 
-  opacity: 0; 
-  transition: opacity 0.3s ease;
-}
-body.admin .admin-only { 
-  display: block; 
-  visibility: visible; 
-  opacity: 1; 
-}
+    .admin-only { 
+      display: none; 
+      visibility: hidden; 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    body.admin .admin-only { 
+      display: block; 
+      visibility: visible; 
+      opacity: 1; 
+    }
 
-/* Responsive */
-@media (max-width: 1040px) {
-  .header__nav { display: none; }
-  .header__text { display: none; }
-}
+    /* Responsive */
+    @media (max-width: 1040px) {
+      .header__nav { display: none; }
+      .header__text { display: none; }
+    }
 
-@media (max-width: 768px) {
-  .stats-grid {
-    /* responsive styles... */
-  }
-}
-      
+    @media (max-width: 768px) {
       .chart {
         height: 150px;
       }
@@ -324,12 +431,12 @@ body.admin .admin-only {
     </div>
   </div>
   
-<div class="header__nav">
-  <a href="auszahlung.html">Auszahlungen</a>
-  <a href="statistik.html">Statistik</a>  <!-- active WEGLASSEN -->
-  <a href="events.html" class="admin-only">Events</a>
-  <a href="mitglieder.html" class="admin-only">Mitglieder</a>
-</div>
+  <div class="header__nav">
+    <a href="auszahlung.html">Auszahlungen</a>
+    <a href="statistik.html">Statistik</a>
+    <a href="events.html" class="admin-only">Events</a>
+    <a href="mitglieder.html" class="admin-only">Mitglieder</a>
+  </div>
 
   <div style="display: flex; align-items: center; gap: 12px;">
     <div id="loginStatusIndicator" class="login-status-indicator logged-out">
@@ -339,316 +446,276 @@ body.admin .admin-only {
   </div>
 </div>
 
-  <div class="container main-content">
-    <h1>📊 Statistiken</h1>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Offene Auszahlungen</h3>
-        <div class="stat-number" id="openPayouts">0 €</div>
-        <p>Noch ausstehende Zahlungen an Mitglieder</p>
-      </div>
-      
-      <div class="stat-card">
-        <h3>Gesamte Auszahlungen</h3>
-        <div class="stat-number" id="totalPayouts">0 €</div>
-        <p>Gesamtsumme aller getätigten Auszahlungen</p>
-      </div>
-      
-      <div class="stat-card">
-        <h3>Aktive Mitglieder</h3>
-        <div class="stat-number" id="activeMembers">0</div>
-        <p>Mitglieder mit aktuellen Auszahlungen</p>
-      </div>
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2>LEADERSCHAFT LOGIN</h2>
+    
+    <div class="input-group">
+      <label>E-MAIL</label>
+      <input type="email" id="email" placeholder="admin@hexenjaeger.de">
     </div>
-
-    <div class="chart-container">
-      <h2>Top Events (nach Auszahlungen)</h2>
-      <div class="chart" id="eventsChart">
-        <!-- Chart wird mit JavaScript gefüllt -->
-      </div>
+    
+    <div class="input-group">
+      <label>PASSWORT</label>
+      <input type="password" id="password" placeholder="********">
     </div>
+    
+    <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
+    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+  </div>
+</div>
 
-    <div class="chart-container">
-      <h2>Top Mitglieder (nach Auszahlungen)</h2>
-      <div class="chart" id="membersChart">
-        <!-- Chart wird mit JavaScript gefüllt -->
-      </div>
+<div class="container main-content">
+  <h1>📊 Statistiken</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Offene Auszahlungen</h3>
+      <div class="stat-number" id="openPayouts">0 €</div>
+      <p>Noch ausstehende Zahlungen an Mitglieder</p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Gesamte Auszahlungen</h3>
+      <div class="stat-number" id="totalPayouts">0 €</div>
+      <p>Gesamtsumme aller getätigten Auszahlungen</p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Aktive Mitglieder</h3>
+      <div class="stat-number" id="activeMembers">0</div>
+      <p>Mitglieder mit aktuellen Auszahlungen</p>
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-      projectId: "hexenjaeger-dashboard",
-      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-      messagingSenderId: "48507598074",
-      appId: "1:48507598074:web:d736c118fd74d1968d0543"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  <div class="chart-container">
+    <h2>Top Events (nach Auszahlungen)</h2>
+    <div class="chart" id="eventsChart">
+      <!-- Chart wird mit JavaScript gefüllt -->
+    </div>
+  </div>
 
-    // Session Persistence setzen
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch((error) => {
-    console.error('Auth persistence error:', error);
-  });
+  <div class="chart-container">
+    <h2>Top Mitglieder (nach Auszahlungen)</h2>
+    <div class="chart" id="membersChart">
+      <!-- Chart wird mit JavaScript gefüllt -->
+    </div>
+  </div>
+</div>
 
-    // Auth Check
-    auth.onAuthStateChanged(user => {
-      document.body.classList.toggle('admin', !!user);
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+    projectId: "hexenjaeger-dashboard",
+    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+    messagingSenderId: "48507598074",
+    appId: "1:48507598074:web:d736c118fd74d1968d0543"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Session Persistence setzen
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+      console.error('Auth persistence error:', error);
     });
 
-    // Statistiken berechnen
-    let totalPayouts = 0;
-    let openPayouts = 0;
-    let activeMembers = 0;
-    let eventTotals = {};
-    let memberTotals = {};
+  // Modal Funktionen
+  document.getElementById('leaderschaftBtn').onclick = () => {
+    document.getElementById('loginModal').classList.add('active');
+  };
 
-    db.collection('transactions').onSnapshot(snap => {
-      totalPayouts = 0;
-      eventTotals = {};
-      memberTotals = {};
-      
-      snap.forEach(doc => {
-        const transaction = doc.data();
-        
-        if (transaction.type === 'auszahlung') {
-          totalPayouts += transaction.amount || 0;
-          
-          // Event-Statistik
-          eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + transaction.amount;
-          
-          // Mitglieder-Statistik  
-          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + transaction.amount;
-        }
-      });
-      
-      updateStats();
-      updateCharts();
-    });
+  document.getElementById('modalClose').onclick = () => {
+    document.getElementById('loginModal').classList.remove('active');
+  };
 
-    db.collection('members').onSnapshot(snap => {
-      openPayouts = 0;
-      activeMembers = 0;
-      
-      snap.forEach(doc => {
-        const member = doc.data();
-        if (member.balance > 0) {
-          openPayouts += member.balance;
-          activeMembers++;
-        }
-      });
-      
-      updateStats();
-    });
-
-    // Auth Check mit Status-Indicator
-auth.onAuthStateChanged(user => {
-  const isAdmin = !!user;
-  document.body.classList.toggle('admin', isAdmin);
-  
-  const statusIndicator = document.getElementById('loginStatusIndicator');
-  if (user) {
-    statusIndicator.className = 'login-status-indicator logged-in';
-    statusIndicator.innerHTML = `
-      <span>🔐 Eingeloggt</span>
-      <div class="user-email" title="${user.email}">${user.email}</div>
-    `;
-  } else {
-    statusIndicator.className = 'login-status-indicator logged-out';
-    statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
-  }
-});
-
-    function updateStats() {
-      document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
-      document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
-      document.getElementById('activeMembers').textContent = activeMembers;
+  // Klick außerhalb des Modals schließt es
+  document.getElementById('loginModal').onclick = (e) => {
+    if (e.target === document.getElementById('loginModal')) {
+      document.getElementById('loginModal').classList.remove('active');
     }
+  };
 
-    function updateCharts() {
-      // Events Chart
-      const eventsChart = document.getElementById('eventsChart');
-      eventsChart.innerHTML = '';
-      
-      const sortedEvents = Object.entries(eventTotals)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6);
-      
-      const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
-      
-      sortedEvents.forEach(([event, amount]) => {
-        const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 0;
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = height + 'px';
-        bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
-        bar.title = `${event}: ${amount.toLocaleString('de-DE')} €`;
-        eventsChart.appendChild(bar);
-      });
-
-      // Members Chart
-      const membersChart = document.getElementById('membersChart');
-      membersChart.innerHTML = '';
-      
-      const sortedMembers = Object.entries(memberTotals)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6);
-      
-      const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
-      
-      sortedMembers.forEach(([member, amount]) => {
-        const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 0;
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = height + 'px';
-        bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
-        bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
-        membersChart.appendChild(bar);
-      });
+  // Login/Logout
+  document.getElementById('btnLogin').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const status = document.getElementById('loginStatus');
+    
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      status.textContent = 'Erfolgreich angemeldet!';
+      setTimeout(() => {
+        document.getElementById('loginModal').classList.remove('active');
+      }, 1000);
+    } catch (error) {
+      status.textContent = 'Login fehlgeschlagen: ' + error.message;
     }
+  };
 
-    // Leaderschaft Button Event
-    document.getElementById('leaderschaftBtn').onclick = () => {
-      const loginModal = document.createElement('div');
-      loginModal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
+  document.getElementById('btnLogout').onclick = async () => {
+    await auth.signOut();
+  };
+
+  // Auth Check mit Status-Indicator
+  auth.onAuthStateChanged(user => {
+    const isAdmin = !!user;
+    document.body.classList.toggle('admin', isAdmin);
+    
+    const statusIndicator = document.getElementById('loginStatusIndicator');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    
+    if (user) {
+      statusIndicator.className = 'login-status-indicator logged-in';
+      statusIndicator.innerHTML = `
+        <span>🔐 Eingeloggt</span>
+        <div class="user-email" title="${user.email}">${user.email}</div>
       `;
-      
-      loginModal.innerHTML = `
-        <div style="
-          background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
-          border-radius: 24px;
-          padding: 40px;
-          width: 90%;
-          max-width: 400px;
-          border: 1px solid rgba(255,255,255,.1);
-          position: relative;
-        ">
-          <button onclick="this.parentElement.parentElement.remove()" style="
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(124,91,241,.2);
-            border: none;
-            color: var(--White);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-          ">✕</button>
-          <h2 style="color: var(--White); text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase;">LEADERSCHAFT LOGIN</h2>
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">E-MAIL</label>
-            <input type="email" id="modalEmail" placeholder="admin@hexenjaeger.de" style="
-              width: 100%;
-              border-radius: 6px;
-              background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
-              box-shadow: 0 2px 0 0 #7c5bf1;
-              padding: 14px 18px;
-              color: var(--Dark);
-              font-size: 16px;
-              font-weight: 600;
-              border: none;
-            ">
-          </div>
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">PASSWORT</label>
-            <input type="password" id="modalPassword" placeholder="********" style="
-              width: 100%;
-              border-radius: 6px;
-              background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
-              box-shadow: 0 2px 0 0 #7c5bf1;
-              padding: 14px 18px;
-              color: var(--Dark);
-              font-size: 16px;
-              font-weight: 600;
-              border: none;
-            ">
-          </div>
-          <button onclick="handleLogin()" style="
-            width: 100%;
-            padding: 16px 28px;
-            background: #7c5bf1;
-            color: var(--White);
-            border: none;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: .72px;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 16px;
-          ">LOGIN</button>
-          <p id="modalStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
-        </div>
-      `;
-      
-      document.body.appendChild(loginModal);
-      
-      // Enter-Taste für Login
-      const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-          handleLogin();
-        }
-      };
-      
-      document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
-      document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
-      
-      window.handleLogin = async () => {
-        const email = document.getElementById('modalEmail').value;
-        const password = document.getElementById('modalPassword').value;
-        const status = document.getElementById('modalStatus');
-        
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          status.textContent = 'Erfolgreich angemeldet!';
-          setTimeout(() => {
-            loginModal.remove();
-          }, 1000);
-        } catch (error) {
-          status.textContent = 'Login fehlgeschlagen: ' + error.message;
-        }
-      };
-    };
-    // Aktive Navigation setzen
-function setActiveNav() {
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const navLinks = document.querySelectorAll('.header__nav a');
-  
-  navLinks.forEach(link => {
-    const linkPage = link.getAttribute('href');
-    if (linkPage === currentPage) {
-      link.classList.add('active');
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (btnLogout) btnLogout.style.display = 'block';
     } else {
-      link.classList.remove('active');
+      statusIndicator.className = 'login-status-indicator logged-out';
+      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+      if (btnLogin) btnLogin.style.display = 'block';
+      if (btnLogout) btnLogout.style.display = 'none';
     }
   });
-}
 
-// Beim Laden und bei Navigation
-document.addEventListener('DOMContentLoaded', setActiveNav);
-window.addEventListener('popstate', setActiveNav);
-  </script>
+  // Enter-Taste für Login
+  document.getElementById('email')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  document.getElementById('password')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  // Statistiken berechnen
+  let totalPayouts = 0;
+  let openPayouts = 0;
+  let activeMembers = 0;
+  let eventTotals = {};
+  let memberTotals = {};
+
+  db.collection('transactions').onSnapshot(snap => {
+    totalPayouts = 0;
+    eventTotals = {};
+    memberTotals = {};
+    
+    snap.forEach(doc => {
+      const transaction = doc.data();
+      
+      if (transaction.type === 'auszahlung') {
+        totalPayouts += transaction.amount || 0;
+        
+        // Event-Statistik
+        eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + transaction.amount;
+        
+        // Mitglieder-Statistik  
+        memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + transaction.amount;
+      }
+    });
+    
+    updateStats();
+    updateCharts();
+  });
+
+  db.collection('members').onSnapshot(snap => {
+    openPayouts = 0;
+    activeMembers = 0;
+    
+    snap.forEach(doc => {
+      const member = doc.data();
+      if (member.balance > 0) {
+        openPayouts += member.balance;
+        activeMembers++;
+      }
+    });
+    
+    updateStats();
+  });
+
+  function updateStats() {
+    document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
+    document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
+    document.getElementById('activeMembers').textContent = activeMembers;
+  }
+
+  function updateCharts() {
+    // Events Chart
+    const eventsChart = document.getElementById('eventsChart');
+    eventsChart.innerHTML = '';
+    
+    const sortedEvents = Object.entries(eventTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+    
+    const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+    
+    sortedEvents.forEach(([event, amount]) => {
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 0;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.title = `${event}: ${amount.toLocaleString('de-DE')} €`;
+      eventsChart.appendChild(bar);
+    });
+
+    // Members Chart
+    const membersChart = document.getElementById('membersChart');
+    membersChart.innerHTML = '';
+    
+    const sortedMembers = Object.entries(memberTotals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+    
+    const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
+    
+    sortedMembers.forEach(([member, amount]) => {
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 0;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
+      membersChart.appendChild(bar);
+    });
+  }
+
+  // Aktive Navigation setzen
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
+  });
+
+  function setActiveNav() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.header__nav a');
+    
+    navLinks.forEach(link => {
+      const linkPage = link.getAttribute('href');
+      if (linkPage === currentPage) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('popstate', setActiveNav);
+</script>
 </body>
 </html>
