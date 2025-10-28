@@ -49,38 +49,38 @@
     }
 
     /* Login Status Indicator */
-.login-status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+    .login-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.login-status-indicator.logged-in {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
+    .login-status-indicator.logged-in {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
 
-.login-status-indicator.logged-out {
-  background: rgba(107, 114, 128, 0.2);
-  color: #6b7280;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-}
+    .login-status-indicator.logged-out {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
 
-.user-email {
-  font-size: 11px;
-  opacity: 0.9;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .user-email {
+      font-size: 11px;
+      opacity: 0.9;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* Header mit Logo und Text */
     .header {
@@ -102,6 +102,7 @@
       display: flex;
       align-items: center;
       gap: 15px;
+      cursor: pointer;
     }
 
     .header__logo img {
@@ -157,14 +158,14 @@
       color: var(--White);
     }
 
-body.dashboard .header__logo img {
-  border-radius: 50%;
-  box-shadow: 
-    0 0 8px 1px var(--Primary),   /* Sehr enger Abstand */
-    0 0 15px 2px var(--Primary);
-  transform: scale(1.02);
-  transition: all 0.3s ease;
-}
+    body.dashboard .header__logo img {
+      border-radius: 50%;
+      box-shadow: 
+        0 0 8px 1px var(--Primary),
+        0 0 15px 2px var(--Primary);
+      transform: scale(1.02);
+      transition: all 0.3s ease;
+    }
 
     /* Leaderschaft Button */
     .leaderschaft-btn {
@@ -418,17 +419,17 @@ body.dashboard .header__logo img {
       font-weight: 600;
     }
 
-.admin-only { 
-  display: none; 
-  visibility: hidden; 
-  opacity: 0; 
-  transition: opacity 0.3s ease;
-}
-body.admin .admin-only { 
-  display: block; 
-  visibility: visible; 
-  opacity: 1; 
-}
+    .admin-only { 
+      display: none; 
+      visibility: hidden; 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    body.admin .admin-only { 
+      display: block; 
+      visibility: visible; 
+      opacity: 1; 
+    }
 
     /* Login Status Card */
     .login-status {
@@ -466,7 +467,7 @@ body.admin .admin-only {
 </head>
 <body>
 <div class="header">
-  <div class="header__brand">
+  <div class="header__brand" onclick="window.location.href='index.html'">
     <div class="header__logo">
       <img src="logo.png" alt="Hexenjäger Logo" onerror="this.style.display='none'">
     </div>
@@ -491,221 +492,246 @@ body.admin .admin-only {
   </div>
 </div>
 
-  <!-- Login Modal -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal">
-      <button class="modal-close" id="modalClose">✕</button>
-      <h2>LEADERSCHAFT LOGIN</h2>
-      
-      <div class="input-group">
-        <label>E-MAIL</label>
-        <input type="email" id="email" placeholder="admin@hexenjaeger.de">
-      </div>
-      
-      <div class="input-group">
-        <label>PASSWORT</label>
-        <input type="password" id="password" placeholder="********">
-      </div>
-      
-      <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
-      <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
-      
-      <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2>LEADERSCHAFT LOGIN</h2>
+    
+    <div class="input-group">
+      <label>E-MAIL</label>
+      <input type="email" id="email" placeholder="admin@hexenjaeger.de">
     </div>
-  </div>
-
-  <!-- Hero Section -->
-  <div class="hero">
-    <div class="container">
-      <h1>HEXENJÄGER DASHBOARD</h1>
-      <p class="hero__desc">FAMILIE · RESPEKT · GEMEINSCHAFT</p>
-      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <a href="auszahlung.html" class="btn btn-yellow">💰 AUSZAHLUNGEN</a>
-        <a href="statistik.html" class="btn">📊 STATISTIK</a>
-      </div>
+    
+    <div class="input-group">
+      <label>PASSWORT</label>
+      <input type="password" id="password" placeholder="********">
     </div>
+    
+    <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
+    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
   </div>
+</div>
 
+<!-- Hero Section -->
+<div class="hero">
   <div class="container">
-    <!-- Stats Overview -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-number" id="totalMembers">0</div>
-        <div class="stat-label">AKTIVE MITGLIEDER</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="totalPayouts">0€</div>
-        <div class="stat-label">GESAMTE AUSZAHLUNGEN</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="openPayouts">0€</div>
-        <div class="stat-label">OFFENE AUSZAHLUNGEN</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="recentEvents">0</div>
-        <div class="stat-label">EVENTS (7 TAGE)</div>
-      </div>
+    <h1>HEXENJÄGER DASHBOARD</h1>
+    <p class="hero__desc">FAMILIE · RESPEKT · GEMEINSCHAFT</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="auszahlung.html" class="btn btn-yellow">💰 AUSZAHLUNGEN</a>
+      <a href="statistik.html" class="btn">📊 STATISTIK</a>
     </div>
+  </div>
+</div>
 
-    <!-- Navigation Cards -->
-    <div class="nav-cards">
-      <a href="auszahlung.html" class="nav-card">
-        <h3>💰 AUSZAHLUNGEN</h3>
-        <p>Offene Auszahlungen und Transaktionen einsehen</p>
-      </a>
-      
-      <a href="statistik.html" class="nav-card">
-        <h3>📊 STATISTIK</h3>
-        <p>Übersicht aller Statistiken und Charts</p>
-      </a>
-      
-      <a href="events.html" class="nav-card admin-only">
-        <h3>📅 EVENTS</h3>
-        <p>Events eintragen und verwalten (Nur Leaderschaft)</p>
-      </a>
-      
-      <a href="mitglieder.html" class="nav-card admin-only">
-        <h3>👥 MITGLIEDER</h3>
-        <p>Mitglieder verwalten (Nur Leaderschaft)</p>
-      </a>
+<div class="container">
+  <!-- Stats Overview -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number" id="totalMembers">0</div>
+      <div class="stat-label">AKTIVE MITGLIEDER</div>
     </div>
-
-    <!-- Login Status -->
-    <div class="login-status">
-      <h3>🔐 LOGIN STATUS</h3>
-      <p id="statusText">ÖFFENTLICHER MODUS - EINGESCHRÄNKTE ANSICHT</p>
-      <div class="admin-only">
-        <p style="color: var(--Yellow); margin-top: 10px; font-weight: 700;">🛡️ LEADERSCHAFT MODUS AKTIV - VOLLZUGRIFF</p>
-      </div>
+    <div class="stat-card">
+      <div class="stat-number" id="totalPayouts">0€</div>
+      <div class="stat-label">GESAMTE AUSZAHLUNGEN</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="openPayouts">0€</div>
+      <div class="stat-label">OFFENE AUSZAHLUNGEN</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="recentEvents">0</div>
+      <div class="stat-label">EVENTS (7 TAGE)</div>
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-      projectId: "hexenjaeger-dashboard",
-      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-      messagingSenderId: "48507598074",
-      appId: "1:48507598074:web:d736c118fd74d1968d0543"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  <!-- Navigation Cards -->
+  <div class="nav-cards">
+    <a href="auszahlung.html" class="nav-card">
+      <h3>💰 AUSZAHLUNGEN</h3>
+      <p>Offene Auszahlungen und Transaktionen einsehen</p>
+    </a>
+    
+    <a href="statistik.html" class="nav-card">
+      <h3>📊 STATISTIK</h3>
+      <p>Übersicht aller Statistiken und Charts</p>
+    </a>
+    
+    <a href="events.html" class="nav-card admin-only">
+      <h3>📅 EVENTS</h3>
+      <p>Events eintragen und verwalten (Nur Leaderschaft)</p>
+    </a>
+    
+    <a href="mitglieder.html" class="nav-card admin-only">
+      <h3>👥 MITGLIEDER</h3>
+      <p>Mitglieder verwalten (Nur Leaderschaft)</p>
+    </a>
+  </div>
 
-    // Session Persistence setzen
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch((error) => {
-    console.error('Auth persistence error:', error);
+  <!-- Login Status -->
+  <div class="login-status">
+    <h3>🔐 LOGIN STATUS</h3>
+    <p id="statusText">ÖFFENTLICHER MODUS - EINGESCHRÄNKTE ANSICHT</p>
+    <div class="admin-only">
+      <p style="color: var(--Yellow); margin-top: 10px; font-weight: 700;">🛡️ LEADERSCHAFT MODUS AKTIV - VOLLZUGRIFF</p>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+    projectId: "hexenjaeger-dashboard",
+    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+    messagingSenderId: "48507598074",
+    appId: "1:48507598074:web:d736c118fd74d1968d0543"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Session Persistence setzen
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+      console.error('Auth persistence error:', error);
+    });
+
+  // Modal Funktionen
+  document.getElementById('leaderschaftBtn').onclick = () => {
+    document.getElementById('loginModal').classList.add('active');
+  };
+
+  document.getElementById('modalClose').onclick = () => {
+    document.getElementById('loginModal').classList.remove('active');
+  };
+
+  // Klick außerhalb des Modals schließt es
+  document.getElementById('loginModal').onclick = (e) => {
+    if (e.target === document.getElementById('loginModal')) {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+  };
+
+  // Login/Logout
+  document.getElementById('btnLogin').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const status = document.getElementById('loginStatus');
+    
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      status.textContent = 'Erfolgreich angemeldet!';
+      setTimeout(() => {
+        document.getElementById('loginModal').classList.remove('active');
+      }, 1000);
+    } catch (error) {
+      status.textContent = 'Login fehlgeschlagen: ' + error.message;
+    }
+  };
+
+  document.getElementById('btnLogout').onclick = async () => {
+    await auth.signOut();
+  };
+
+  // Auth Check mit Status-Indicator
+  auth.onAuthStateChanged(user => {
+    const isAdmin = !!user;
+    document.body.classList.toggle('admin', isAdmin);
+    
+    const statusIndicator = document.getElementById('loginStatusIndicator');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    
+    if (user) {
+      statusIndicator.className = 'login-status-indicator logged-in';
+      statusIndicator.innerHTML = `
+        <span>🔐 Eingeloggt</span>
+        <div class="user-email" title="${user.email}">${user.email}</div>
+      `;
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (btnLogout) btnLogout.style.display = 'block';
+    } else {
+      statusIndicator.className = 'login-status-indicator logged-out';
+      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+      if (btnLogin) btnLogin.style.display = 'block';
+      if (btnLogout) btnLogout.style.display = 'none';
+    }
+    
+    // Update status text in login card
+    document.getElementById('statusText').textContent = isAdmin ? 
+      'EINGELOGGT ALS ' + user.email.toUpperCase() : 'ÖFFENTLICHER MODUS - EINGESCHRÄNKTE ANSICHT';
   });
 
-    // Modal Funktionen
-    document.getElementById('leaderschaftBtn').onclick = () => {
-      document.getElementById('loginModal').classList.add('active');
-    };
+  // Enter-Taste für Login
+  document.getElementById('email')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
 
-    document.getElementById('modalClose').onclick = () => {
-      document.getElementById('loginModal').classList.remove('active');
-    };
+  document.getElementById('password')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
 
-    // Klick außerhalb des Modals schließt es
-    document.getElementById('loginModal').onclick = (e) => {
-      if (e.target === document.getElementById('loginModal')) {
-        document.getElementById('loginModal').classList.remove('active');
-      }
-    };
+  // Stats laden
+  db.collection('members').onSnapshot(snap => {
+    let total = 0;
+    snap.forEach(doc => total++);
+    document.getElementById('totalMembers').textContent = total;
+  });
 
-    // Login/Logout
-    document.getElementById('btnLogin').onclick = async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const status = document.getElementById('loginStatus');
-      
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        status.textContent = 'Erfolgreich angemeldet!';
-        setTimeout(() => {
-          document.getElementById('loginModal').classList.remove('active');
-        }, 1000);
-      } catch (error) {
-        status.textContent = 'Login fehlgeschlagen: ' + error.message;
-      }
-    };
+  db.collection('transactions').where('type', '==', 'auszahlung').onSnapshot(snap => {
+    let total = 0;
+    snap.forEach(doc => total += doc.data().amount || 0);
+    document.getElementById('totalPayouts').textContent = total.toLocaleString('de-DE') + '€';
+  });
 
-    document.getElementById('btnLogout').onclick = async () => {
-      await auth.signOut();
-    };
+  db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
+    let total = 0;
+    snap.forEach(doc => total += doc.data().balance || 0);
+    document.getElementById('openPayouts').textContent = total.toLocaleString('de-DE') + '€';
+  });
 
-    auth.onAuthStateChanged(user => {
-      const isAdmin = !!user;
-      document.body.classList.toggle('admin', isAdmin);
-      document.getElementById('btnLogin').style.display = isAdmin ? 'none' : 'block';
-      document.getElementById('btnLogout').style.display = isAdmin ? 'block' : 'none';
-      document.getElementById('statusText').textContent = isAdmin ? 
-        'EINGELOGGT ALS ' + user.email.toUpperCase() : 'ÖFFENTLICHER MODUS - EINGESCHRÄNKTE ANSICHT';
-    });
-
-    // Auth Check mit Status-Indicator
-auth.onAuthStateChanged(user => {
-  const isAdmin = !!user;
-  document.body.classList.toggle('admin', isAdmin);
+  // Events der letzten 7 Tage
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
   
-  const statusIndicator = document.getElementById('loginStatusIndicator');
-  if (user) {
-    statusIndicator.className = 'login-status-indicator logged-in';
-    statusIndicator.innerHTML = `
-      <span>🔐 Eingeloggt</span>
-      <div class="user-email" title="${user.email}">${user.email}</div>
-    `;
-  } else {
-    statusIndicator.className = 'login-status-indicator logged-out';
-    statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
-  }
-  
-  // Update status text in login card
-  document.getElementById('statusText').textContent = isAdmin ? 
-    'EINGELOGGT ALS ' + user.email.toUpperCase() : 'ÖFFENTLICHER MODUS - EINGESCHRÄNKTE ANSICHT';
-});
-
-    // Stats laden
-    db.collection('members').onSnapshot(snap => {
-      let total = 0;
-      snap.forEach(doc => total++);
-      document.getElementById('totalMembers').textContent = total;
+  db.collection('transactions')
+    .where('timestamp', '>=', weekAgo.toISOString())
+    .onSnapshot(snap => {
+      document.getElementById('recentEvents').textContent = snap.size;
     });
 
-    db.collection('transactions').where('type', '==', 'auszahlung').onSnapshot(snap => {
-      let total = 0;
-      snap.forEach(doc => total += doc.data().amount || 0);
-      document.getElementById('totalPayouts').textContent = total.toLocaleString('de-DE') + '€';
-    });
+  // Dashboard-Klasse für Logo-Glow setzen
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('dashboard');
+    setActiveNav();
+  });
 
-    db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
-      let total = 0;
-      snap.forEach(doc => total += doc.data().balance || 0);
-      document.getElementById('openPayouts').textContent = total.toLocaleString('de-DE') + '€';
-    });
-
-    // Events der letzten 7 Tage
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+  // Aktive Navigation setzen
+  function setActiveNav() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.header__nav a');
     
-    db.collection('transactions')
-      .where('timestamp', '>=', weekAgo.toISOString())
-      .onSnapshot(snap => {
-        document.getElementById('recentEvents').textContent = snap.size;
-      });
+    navLinks.forEach(link => {
+      const linkPage = link.getAttribute('href');
+      if (linkPage === currentPage) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
 
-    // Dashboard-Klasse für Logo-Glow setzen
-document.addEventListener('DOMContentLoaded', function() {
-  document.body.classList.add('dashboard');
-});
-  </script>
+  window.addEventListener('popstate', setActiveNav);
+</script>
 </body>
 </html>
