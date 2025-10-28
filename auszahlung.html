@@ -622,25 +622,73 @@
     });
   }
 
-  function markAsPaid(memberId) {
-    if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
+async function markAsPaid(memberId) {
+  if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
+  
+  try {
+    const memberDoc = await db.collection('members').doc(memberId).get();
+    if (!memberDoc.exists) return;
     
-    db.collection('members').doc(memberId).update({
-      balance: 0,
-      lastPayout: new Date().toISOString()
-    });
-  }
-
-  function markAllAsPaid() {
-    if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
+    const member = memberDoc.data();
+    const payoutAmount = member.balance || 0;
     
-    members.forEach(member => {
-      db.collection('members').doc(member.id).update({
+    if (payoutAmount > 0) {
+      // Balance auf 0 setzen
+      await db.collection('members').doc(memberId).update({
         balance: 0,
         lastPayout: new Date().toISOString()
       });
-    });
+      
+      // Transaktion für die Auszahlung erstellen
+      await db.collection('transactions').add({
+        member: member.name || memberId,
+        type: 'auszahlung',
+        event: 'auszahlung',
+        amount: payoutAmount,
+        timestamp: new Date().toISOString(),
+        description: `Auszahlung an ${member.name || memberId}`
+      });
+      
+      console.log(`Auszahlung von ${payoutAmount}€ an ${member.name || memberId} erfasst`);
+    }
+  } catch (error) {
+    console.error('Fehler beim Auszahlen:', error);
+    alert('Fehler beim Auszahlen: ' + error.message);
   }
+}
+
+async function markAllAsPaid() {
+  if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
+  
+  try {
+    for (const member of members) {
+      const payoutAmount = member.balance || 0;
+      
+      if (payoutAmount > 0) {
+        // Balance auf 0 setzen
+        await db.collection('members').doc(member.id).update({
+          balance: 0,
+          lastPayout: new Date().toISOString()
+        });
+        
+        // Transaktion für die Auszahlung erstellen
+        await db.collection('transactions').add({
+          member: member.name || member.id,
+          type: 'auszahlung',
+          event: 'auszahlung',
+          amount: payoutAmount,
+          timestamp: new Date().toISOString(),
+          description: `Auszahlung an ${member.name || member.id}`
+        });
+      }
+    }
+    
+    console.log('Alle Auszahlungen erfasst');
+  } catch (error) {
+    console.error('Fehler beim Auszahlen aller Mitglieder:', error);
+    alert('Fehler beim Auszahlen: ' + error.message);
+  }
+}
 
   function exportToCSV() {
     let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
