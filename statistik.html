@@ -665,73 +665,77 @@
   let memberTotals = {};
 
   // Alle Statistiken in einer Funktion laden
-  function loadAllStats() {
-    console.log('Lade alle Statistiken...');
+// Alle Statistiken in einer Funktion laden
+function loadAllStats() {
+  console.log('Lade alle Statistiken...');
+  
+  // Zuerst alle Daten sammeln
+  Promise.all([
+    // Offene Auszahlungen (Member Balances)
+    db.collection('members').get(),
+    // Ausgezahlte Beträge - Transaktionen mit type "auszahlung"
+    db.collection('transactions').where('type', '==', 'auszahlung').get(),
+    // Chart Daten - ALLE Transaktionen
+    db.collection('transactions').get()
+  ]).then(([membersSnap, payoutSnap, allTransactionsSnap]) => {
     
-    // Zuerst alle Daten sammeln
-    Promise.all([
-      // Offene Auszahlungen (Member Balances)
-      db.collection('members').get(),
-      // Ausgezahlte Beträge
-      db.collection('transactions').where('type', '==', 'auszahlung').get(),
-      // Chart Daten
-      db.collection('transactions').get()
-    ]).then(([membersSnap, payoutSnap, allTransactionsSnap]) => {
-      
-      // 1. Offene Auszahlungen berechnen
-      openPayouts = 0;
-      activeMembers = 0;
-      membersSnap.forEach(doc => {
-        const member = doc.data();
-        const balance = member.balance || 0;
-        openPayouts += balance;
-        if (balance > 0) {
-          activeMembers++;
-        }
-      });
-      
-      // 2. Ausgezahlte Beträge berechnen
-      let paidOutTotal = 0;
-      payoutSnap.forEach(doc => {
-        const transaction = doc.data();
-        paidOutTotal += transaction.amount || 0;
-      });
-      
-      // 3. Gesamtauszahlungen = Offene + Ausgezahlte
-      totalPayouts = openPayouts + paidOutTotal;
-      
-      // 4. Chart Daten berechnen
-      eventTotals = {};
-      memberTotals = {};
-      allTransactionsSnap.forEach(doc => {
-        const transaction = doc.data();
-        
-        // Events zählen (nicht Auszahlungen)
-        if (transaction.event && transaction.type !== 'auszahlung') {
-          eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
-        }
-        
-        // Mitglieder zählen - ALLE Transaktionen
-        if (transaction.member) {
-          memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
-        }
-      });
-      
-      console.log('Berechnete Statistiken:', {
-        offen: openPayouts,
-        ausgezahlt: paidOutTotal,
-        gesamt: totalPayouts,
-        aktiveMitglieder: activeMembers
-      });
-      
-      // UI aktualisieren
-      updateStats();
-      updateCharts();
-      
-    }).catch(error => {
-      console.error('Fehler beim Laden der Statistiken:', error);
+    // DEBUG: Zeige alle Auszahlungs-Transaktionen an
+    console.log('Auszahlungs-Transaktionen:', payoutSnap.docs.map(doc => doc.data()));
+    
+    // 1. Offene Auszahlungen berechnen
+    openPayouts = 0;
+    activeMembers = 0;
+    membersSnap.forEach(doc => {
+      const member = doc.data();
+      const balance = member.balance || 0;
+      openPayouts += balance;
+      if (balance > 0) {
+        activeMembers++;
+      }
     });
-  }
+    
+    // 2. Ausgezahlte Beträge berechnen
+    let paidOutTotal = 0;
+    payoutSnap.forEach(doc => {
+      const transaction = doc.data();
+      paidOutTotal += transaction.amount || 0;
+    });
+    
+    // 3. Gesamtauszahlungen = Offene + Ausgezahlte
+    totalPayouts = openPayouts + paidOutTotal;
+    
+    // 4. Chart Daten berechnen - für Charts zählen wir ALLE Einzahlungen
+    eventTotals = {};
+    memberTotals = {};
+    allTransactionsSnap.forEach(doc => {
+      const transaction = doc.data();
+      
+      // Events zählen (nur Einzahlungen, da Auszahlungen keine Events sind)
+      if (transaction.event && transaction.type === 'einzahlung') {
+        eventTotals[transaction.event] = (eventTotals[transaction.event] || 0) + (transaction.amount || 0);
+      }
+      
+      // Mitglieder zählen - ALLE Einzahlungen (verdientes Geld)
+      if (transaction.member && transaction.type === 'einzahlung') {
+        memberTotals[transaction.member] = (memberTotals[transaction.member] || 0) + (transaction.amount || 0);
+      }
+    });
+    
+    console.log('Berechnete Statistiken:', {
+      offen: openPayouts,
+      ausgezahlt: paidOutTotal,
+      gesamt: totalPayouts,
+      aktiveMitglieder: activeMembers
+    });
+    
+    // UI aktualisieren
+    updateStats();
+    updateCharts();
+    
+  }).catch(error => {
+    console.error('Fehler beim Laden der Statistiken:', error);
+  });
+}
 
   // Statistiken aktualisieren
   function updateStats() {
