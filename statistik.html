@@ -361,15 +361,14 @@
       color: var(--Yellow);
     }
 
-    .chart {
-      height: 200px;
-      border-radius: 16px;
-      margin: 20px 0;
-      display: flex;
-      align-items: end;
-      gap: 4px;
-      padding: 10px;
-    }
+.chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 200px;
+  gap: 15px;
+  padding: 20px 10px;
+}
 
     .bar {
       background: var(--Primary);
@@ -697,15 +696,36 @@ function updateCharts() {
     const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
     
     sortedEvents.forEach(([event, amount]) => {
-      const height = maxEventValue > 0 ? (amount / maxEventValue) * 150 : 10;
+      const barContainer = document.createElement('div');
+      barContainer.style.display = 'flex';
+      barContainer.style.flexDirection = 'column';
+      barContainer.style.alignItems = 'center';
+      barContainer.style.flex = '1';
+      barContainer.style.height = '100%';
+      barContainer.style.justifyContent = 'flex-end';
+      
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 10;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
+      bar.style.width = '100%';
       bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
       
-      const eventName = eventNames[event] || event;
-      bar.title = `${eventName}: ${amount.toLocaleString('de-DE')} €`;
-      eventsChart.appendChild(bar);
+      const label = document.createElement('div');
+      label.style.marginTop = '8px';
+      label.style.fontSize = '11px';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--White)';
+      label.style.textAlign = 'center';
+      label.style.maxWidth = '80px';
+      label.style.overflow = 'hidden';
+      label.style.textOverflow = 'ellipsis';
+      label.style.whiteSpace = 'nowrap';
+      label.textContent = eventNames[event] || event;
+      
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      eventsChart.appendChild(barContainer);
     });
   }
 
@@ -723,13 +743,36 @@ function updateCharts() {
     const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
     
     sortedMembers.forEach(([member, amount]) => {
-      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 150 : 10;
+      const barContainer = document.createElement('div');
+      barContainer.style.display = 'flex';
+      barContainer.style.flexDirection = 'column';
+      barContainer.style.alignItems = 'center';
+      barContainer.style.flex = '1';
+      barContainer.style.height = '100%';
+      barContainer.style.justifyContent = 'flex-end';
+      
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 10;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
+      bar.style.width = '100%';
       bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
-      bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
-      membersChart.appendChild(bar);
+      
+      const label = document.createElement('div');
+      label.style.marginTop = '8px';
+      label.style.fontSize = '11px';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--White)';
+      label.style.textAlign = 'center';
+      label.style.maxWidth = '80px';
+      label.style.overflow = 'hidden';
+      label.style.textOverflow = 'ellipsis';
+      label.style.whiteSpace = 'nowrap';
+      label.textContent = member;
+      
+      barContainer.appendChild(bar);
+      barContainer.appendChild(label);
+      membersChart.appendChild(barContainer);
     });
   }
 }
