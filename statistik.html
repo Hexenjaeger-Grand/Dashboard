@@ -741,6 +741,7 @@
 
   // Charts aktualisieren
 // Charts aktualisieren
+// Charts aktualisieren
 function updateCharts() {
   console.log('Aktualisiere Charts...');
   
@@ -790,7 +791,7 @@ function updateCharts() {
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
+      bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} $`;
       
       // Event-Name unten
       const label = document.createElement('div');
@@ -831,7 +832,7 @@ function updateCharts() {
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
-      bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
+      bar.title = `${member}: ${amount.toLocaleString('de-DE')} $`;
       
       // Mitglieds-Name unten
       const label = document.createElement('div');
