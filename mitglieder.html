@@ -49,38 +49,38 @@
     }
 
     /* Login Status Indicator */
-.login-status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+    .login-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.login-status-indicator.logged-in {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
+    .login-status-indicator.logged-in {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
 
-.login-status-indicator.logged-out {
-  background: rgba(107, 114, 128, 0.2);
-  color: #6b7280;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-}
+    .login-status-indicator.logged-out {
+      background: rgba(107, 114, 128, 0.2);
+      color: #6b7280;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
 
-.user-email {
-  font-size: 11px;
-  opacity: 0.9;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .user-email {
+      font-size: 11px;
+      opacity: 0.9;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* Header mit Logo und Text */
     .header {
@@ -176,6 +176,94 @@
 
     .leaderschaft-btn:hover {
       background: linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
+      border-radius: 24px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .modal h2 {
+      color: var(--White);
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(124,91,241,.2);
+      border: none;
+      color: var(--White);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(124,91,241,.4);
+    }
+
+    /* Input Groups im Modal */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .48px;
+      text-transform: uppercase;
+      color: var(--White);
+    }
+
+    .input-group input {
+      border-radius: 6px;
+      background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1;
+      padding: 14px 18px;
+      color: var(--Dark);
+      font-size: 16px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .input-group input:focus {
+      background: var(--White);
+      box-shadow: 0 2px 0 0 #7c5bf1, 0 1px 0 3px #7c5bf1;
     }
 
     /* Buttons */
@@ -420,30 +508,29 @@
       border: 1px solid rgba(124,91,241,.3);
     }
 
-/* Admin Only - KORRIGIERT */
-.admin-only { 
-  display: none; 
-  visibility: hidden; 
-  opacity: 0; 
-  transition: opacity 0.3s ease;
-}
-body.admin .admin-only { 
-  display: block; 
-  visibility: visible; 
-  opacity: 1; 
-}
+    .admin-only { 
+      display: none; 
+      visibility: hidden; 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    body.admin .admin-only { 
+      display: block; 
+      visibility: visible; 
+      opacity: 1; 
+    }
 
-/* Responsive */
-@media (max-width: 1040px) {
-  .header__nav { display: none; }
-  .header__text { display: none; }
-}
+    /* Responsive */
+    @media (max-width: 1040px) {
+      .header__nav { display: none; }
+      .header__text { display: none; }
+    }
 
-@media (max-width: 768px) {
-  .stats-grid {
-    /* responsive styles... */
-  }
-}
+    @media (max-width: 768px) {
+      .table-container {
+        padding: 16px;
+        overflow-x: auto;
+      }
       
       table {
         min-width: 600px;
@@ -481,12 +568,12 @@ body.admin .admin-only {
     </div>
   </div>
   
-<div class="header__nav">
-  <a href="auszahlung.html">Auszahlungen</a>
-  <a href="statistik.html">Statistik</a>  <!-- active WEGLASSEN -->
-  <a href="events.html" class="admin-only">Events</a>
-  <a href="mitglieder.html" class="admin-only">Mitglieder</a>
-</div>
+  <div class="header__nav">
+    <a href="auszahlung.html">Auszahlungen</a>
+    <a href="statistik.html">Statistik</a>
+    <a href="events.html" class="admin-only">Events</a>
+    <a href="mitglieder.html" class="admin-only">Mitglieder</a>
+  </div>
 
   <div style="display: flex; align-items: center; gap: 12px;">
     <div id="loginStatusIndicator" class="login-status-indicator logged-out">
@@ -496,107 +583,200 @@ body.admin .admin-only {
   </div>
 </div>
 
-  <div class="container main-content">
-    <h1>👥 Mitgliederverwaltung</h1>
-
-    <div class="header-actions">
-      <h2>Family Mitglieder</h2>
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <div class="member-count" id="memberCount">0 Mitglieder</div>
-        <button id="addMemberBtn" class="btn admin-only">
-          ➕ Neues Mitglied
-        </button>
-      </div>
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2>LEADERSCHAFT LOGIN</h2>
+    
+    <div class="input-group">
+      <label>E-MAIL</label>
+      <input type="email" id="email" placeholder="admin@hexenjaeger.de">
     </div>
-
-    <div class="search-sort-container">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Mitglieder suchen...">
-      </div>
-      <div class="sort-options">
-        <button class="sort-btn active" data-sort="name">Nach Name</button>
-        <button class="sort-btn" data-sort="id">Nach ID</button>
-      </div>
+    
+    <div class="input-group">
+      <label>PASSWORT</label>
+      <input type="password" id="password" placeholder="********">
     </div>
+    
+    <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
+    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
+  </div>
+</div>
 
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Mitglieds-ID</th>
-            <th>Guthaben</th>
-            <th class="admin-only">Aktionen</th>
-          </tr>
-        </thead>
-        <tbody id="memberList">
-          <!-- Mitglieder werden hier geladen -->
-        </tbody>
-      </table>
-    </div>
+<div class="container main-content">
+  <h1>👥 Mitgliederverwaltung</h1>
 
-    <!-- Modal für neues Mitglied -->
-    <div id="memberModal" class="form-container admin-only" style="display: none;">
-      <h3 style="margin-bottom: 20px; color: var(--Yellow);">Neues Mitglied</h3>
-      <div style="display: grid; gap: 16px;">
-        <div class="form-group">
-          <label for="memberName">Name</label>
-          <input type="text" id="memberName" placeholder="Name des Mitglieds">
-          <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="nameError">Bitte gib einen Namen ein</div>
-        </div>
-        <div class="form-group">
-          <label for="memberId">Mitglieds-ID</label>
-          <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)">
-          <div style="display: flex; gap: 8px; margin-top: 5px;">
-            <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idAvailable" class="id-available">✓ ID verfügbar</span>
-            <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idTaken" class="id-taken">✗ ID bereits vergeben</span>
-          </div>
-          <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="idError">Bitte gib eine ID ein</div>
-        </div>
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
-        <button id="saveMember" class="btn">Speichern</button>
-        <button id="cancelMember" class="btn btn-red">Abbrechen</button>
-      </div>
+  <div class="header-actions">
+    <h2>Family Mitglieder</h2>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <div class="member-count" id="memberCount">0 Mitglieder</div>
+      <button id="addMemberBtn" class="btn admin-only">
+        ➕ Neues Mitglied
+      </button>
     </div>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-      authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-      projectId: "hexenjaeger-dashboard",
-      storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-      messagingSenderId: "48507598074",
-      appId: "1:48507598074:web:d736c118fd74d1968d0543"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  <div class="search-sort-container">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Mitglieder suchen...">
+    </div>
+    <div class="sort-options">
+      <button class="sort-btn active" data-sort="name">Nach Name</button>
+      <button class="sort-btn" data-sort="id">Nach ID</button>
+    </div>
+  </div>
 
-    // Session Persistence setzen
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .catch((error) => {
-    console.error('Auth persistence error:', error);
-  });
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Mitglieds-ID</th>
+          <th>Guthaben</th>
+          <th class="admin-only">Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="memberList">
+        <!-- Mitglieder werden hier geladen -->
+      </tbody>
+    </table>
+  </div>
 
-    let currentMembers = [];
-    let currentSort = 'name';
-    let currentSearchTerm = '';
+  <!-- Modal für neues Mitglied -->
+  <div id="memberModal" class="form-container admin-only" style="display: none;">
+    <h3 style="margin-bottom: 20px; color: var(--Yellow);">Neues Mitglied</h3>
+    <div style="display: grid; gap: 16px;">
+      <div class="form-group">
+        <label for="memberName">Name</label>
+        <input type="text" id="memberName" placeholder="Name des Mitglieds">
+        <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="nameError">Bitte gib einen Namen ein</div>
+      </div>
+      <div class="form-group">
+        <label for="memberId">Mitglieds-ID</label>
+        <input type="text" id="memberId" placeholder="Eindeutige ID (z.B. HJ001)">
+        <div style="display: flex; gap: 8px; margin-top: 5px;">
+          <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idAvailable" class="id-available">✓ ID verfügbar</span>
+          <span style="font-size: 0.8em; padding: 4px 8px; border-radius: 12px; display: none;" id="idTaken" class="id-taken">✗ ID bereits vergeben</span>
+        </div>
+        <div style="color: var(--Red); font-size: 12px; margin-top: 5px; display: none;" id="idError">Bitte gib eine ID ein</div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+      <button id="saveMember" class="btn">Speichern</button>
+      <button id="cancelMember" class="btn btn-red">Abbrechen</button>
+    </div>
+  </div>
+</div>
 
-    // Auth Check
-    auth.onAuthStateChanged(user => {
-      document.body.classList.toggle('admin', !!user);
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
+    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
+    projectId: "hexenjaeger-dashboard",
+    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
+    messagingSenderId: "48507598074",
+    appId: "1:48507598074:web:d736c118fd74d1968d0543"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Session Persistence setzen
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+      console.error('Auth persistence error:', error);
     });
 
-    // Mitglieder laden
+  let currentMembers = [];
+  let currentSort = 'name';
+  let currentSearchTerm = '';
+
+  // Modal Funktionen
+  document.getElementById('leaderschaftBtn').onclick = () => {
+    document.getElementById('loginModal').classList.add('active');
+  };
+
+  document.getElementById('modalClose').onclick = () => {
+    document.getElementById('loginModal').classList.remove('active');
+  };
+
+  // Klick außerhalb des Modals schließt es
+  document.getElementById('loginModal').onclick = (e) => {
+    if (e.target === document.getElementById('loginModal')) {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+  };
+
+  // Login/Logout
+  document.getElementById('btnLogin').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const status = document.getElementById('loginStatus');
+    
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      status.textContent = 'Erfolgreich angemeldet!';
+      setTimeout(() => {
+        document.getElementById('loginModal').classList.remove('active');
+      }, 1000);
+    } catch (error) {
+      status.textContent = 'Login fehlgeschlagen: ' + error.message;
+    }
+  };
+
+  document.getElementById('btnLogout').onclick = async () => {
+    await auth.signOut();
+  };
+
+  // Auth Check mit Status-Indicator
+  auth.onAuthStateChanged(user => {
+    const isAdmin = !!user;
+    document.body.classList.toggle('admin', isAdmin);
+    
+    const statusIndicator = document.getElementById('loginStatusIndicator');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    
+    if (user) {
+      statusIndicator.className = 'login-status-indicator logged-in';
+      statusIndicator.innerHTML = `
+        <span>🔐 Eingeloggt</span>
+        <div class="user-email" title="${user.email}">${user.email}</div>
+      `;
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (btnLogout) btnLogout.style.display = 'block';
+      
+      // Daten laden wenn eingeloggt
+      loadMembers();
+    } else {
+      statusIndicator.className = 'login-status-indicator logged-out';
+      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
+      if (btnLogin) btnLogin.style.display = 'block';
+      if (btnLogout) btnLogout.style.display = 'none';
+    }
+  });
+
+  // Enter-Taste für Login
+  document.getElementById('email')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  document.getElementById('password')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  // Mitglieder laden
+  function loadMembers() {
     db.collection('members').onSnapshot(snap => {
       currentMembers = [];
       const memberList = document.getElementById('memberList');
@@ -609,466 +789,313 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
       
       renderMembers();
     });
-
-    function renderMembers(members = null) {
-      const memberList = document.getElementById('memberList');
-      const allMembers = members || currentMembers;
-
-      if (allMembers.length === 0) {
-        memberList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine Mitglieder vorhanden</td></tr>';
-        updateMemberCount();
-        return;
-      }
-
-      // Sortiere Mitglieder
-      const sortedMembers = [...allMembers].sort((a, b) => {
-        if (currentSort === 'name') {
-          return (a.name || '').localeCompare(b.name || '');
-        } else {
-          return (a.id || '').localeCompare(b.id || '');
-        }
-      });
-
-      memberList.innerHTML = sortedMembers.map(member => {
-        const escapedName = escapeHtml(member.name || member.id);
-        const escapedId = escapeHtml(member.id);
-        const balance = member.balance || 0;
-        
-        return `
-          <tr>
-            <td>${escapedName}</td>
-            <td>${escapedId}</td>
-            <td class="amount">${balance.toLocaleString('de-DE')} €</td>
-            <td class="admin-only">
-              <div class="member-actions">
-                <button class="btn-icon btn-edit" onclick="editMember('${member.id}')" title="Bearbeiten">
-                  ✏️ Bearbeiten
-                </button>
-                <button class="btn-icon btn-delete" onclick="deleteMember('${member.id}')" title="Löschen">
-                  🗑️ Löschen
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      updateMemberCount();
-    }
-
-    function updateMemberCount() {
-      const memberCount = document.getElementById('memberCount');
-      const count = currentMembers.length;
-      memberCount.textContent = `${count} Mitglieder`;
-    }
-
-    function searchMembers() {
-      const searchInput = document.getElementById('searchInput');
-      const searchTerm = searchInput.value.toLowerCase();
-      currentSearchTerm = searchTerm;
-      
-      if (searchTerm === '') {
-        renderMembers();
-        return;
-      }
-
-      const filteredMembers = currentMembers.filter(member => 
-        (member.name || '').toLowerCase().includes(searchTerm) || 
-        (member.id || '').toLowerCase().includes(searchTerm)
-      );
-      
-      renderMembers(filteredMembers);
-    }
-
-    function sortMembers(sortBy) {
-      currentSort = sortBy;
-      
-      // Update active button
-      document.querySelectorAll('.sort-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
-      renderMembers();
-    }
-
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function showNotification(message, type = 'success') {
-      const notification = document.createElement('div');
-      notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: ${type === 'success' ? '#10b981' : '#ef4444'};
-        color: white;
-        border-radius: 6px;
-        z-index: 1001;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-        font-weight: 500;
-      `;
-      notification.textContent = message;
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100px)';
-        setTimeout(() => {
-          document.body.removeChild(notification);
-        }, 300);
-      }, 3000);
-    }
-
-    function checkIdAvailability() {
-      const memberIdInput = document.getElementById('memberId');
-      const idAvailable = document.getElementById('idAvailable');
-      const idTaken = document.getElementById('idTaken');
-      const id = memberIdInput.value.trim().toUpperCase();
-
-      // Verstecke Status zunächst
-      idAvailable.style.display = 'none';
-      idTaken.style.display = 'none';
-
-      if (id.length === 0) {
-        return;
-      }
-
-      // Prüfe ob ID bereits existiert
-      const idExists = currentMembers.some(member => member.id.toUpperCase() === id);
-
-      if (idExists) {
-        idTaken.style.display = 'inline-block';
-      } else {
-        idAvailable.style.display = 'inline-block';
-      }
-    }
-
-    function validateForm() {
-      const name = document.getElementById('memberName').value.trim();
-      const id = document.getElementById('memberId').value.trim();
-      const nameError = document.getElementById('nameError');
-      const idError = document.getElementById('idError');
-
-      // Zurücksetzen der Fehlermeldungen
-      nameError.style.display = 'none';
-      idError.style.display = 'none';
-
-      let isValid = true;
-
-      // Name validieren
-      if (!name) {
-        nameError.style.display = 'block';
-        isValid = false;
-      }
-
-      // ID validieren
-      if (!id) {
-        idError.style.display = 'block';
-        isValid = false;
-      } else if (currentMembers.some(member => member.id.toUpperCase() === id.toUpperCase())) {
-        idError.textContent = 'Diese ID ist bereits vergeben';
-        idError.style.display = 'block';
-        isValid = false;
-      }
-
-      return isValid;
-    }
-
-    async function saveMember() {
-      if (!validateForm()) {
-        return;
-      }
-      
-      const name = document.getElementById('memberName').value.trim();
-      const id = document.getElementById('memberId').value.trim().toUpperCase();
-      
-      try {
-        // Prüfe ob ID bereits existiert
-        const memberDoc = await db.collection('members').doc(id).get();
-        if (memberDoc.exists) {
-          showNotification('Diese ID ist bereits vergeben', 'error');
-          return;
-        }
-
-        // Neues Mitglied erstellen
-        await db.collection('members').doc(id).set({
-          name: name,
-          balance: 0,
-          joinDate: new Date().toISOString(),
-          lastActivity: new Date().toISOString()
-        });
-
-        closeModal();
-        showNotification('Mitglied erfolgreich hinzugefügt!');
-      } catch (error) {
-        showNotification('Fehler: ' + error.message, 'error');
-      }
-    }
-
-    // Auth Check mit Status-Indicator
-auth.onAuthStateChanged(user => {
-  const isAdmin = !!user;
-  document.body.classList.toggle('admin', isAdmin);
-  
-  const statusIndicator = document.getElementById('loginStatusIndicator');
-  if (user) {
-    statusIndicator.className = 'login-status-indicator logged-in';
-    statusIndicator.innerHTML = `
-      <span>🔐 Eingeloggt</span>
-      <div class="user-email" title="${user.email}">${user.email}</div>
-    `;
-  } else {
-    statusIndicator.className = 'login-status-indicator logged-out';
-    statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
   }
-});
 
-    function closeModal() {
-      document.getElementById('memberModal').style.display = 'none';
-      document.getElementById('memberName').value = '';
-      document.getElementById('memberId').value = '';
-      document.getElementById('idAvailable').style.display = 'none';
-      document.getElementById('idTaken').style.display = 'none';
-      document.getElementById('nameError').style.display = 'none';
-      document.getElementById('idError').style.display = 'none';
+  function renderMembers(members = null) {
+    const memberList = document.getElementById('memberList');
+    const allMembers = members || currentMembers;
+
+    if (allMembers.length === 0) {
+      memberList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--Grey);">Keine Mitglieder vorhanden</td></tr>';
+      updateMemberCount();
+      return;
     }
 
-    // Globale Funktionen für Event Handler
-    window.editMember = async (id) => {
-      const member = currentMembers.find(m => m.id === id);
-      if (member) {
-        const newName = prompt('Neuen Namen eingeben:', member.name);
-        if (newName && newName.trim()) {
-          try {
-            await db.collection('members').doc(id).update({
-              name: newName.trim()
-            });
-            showNotification('Mitglied erfolgreich bearbeitet!');
-          } catch (error) {
-            showNotification('Fehler: ' + error.message, 'error');
-          }
-        }
+    // Sortiere Mitglieder
+    const sortedMembers = [...allMembers].sort((a, b) => {
+      if (currentSort === 'name') {
+        return (a.name || '').localeCompare(b.name || '');
+      } else {
+        return (a.id || '').localeCompare(b.id || '');
       }
-    };
+    });
 
-    window.deleteMember = async (id) => {
-      if (confirm('Mitglied wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) {
+    memberList.innerHTML = sortedMembers.map(member => {
+      const escapedName = escapeHtml(member.name || member.id);
+      const escapedId = escapeHtml(member.id);
+      const balance = member.balance || 0;
+      
+      return `
+        <tr>
+          <td>${escapedName}</td>
+          <td>${escapedId}</td>
+          <td class="amount">${balance.toLocaleString('de-DE')} €</td>
+          <td class="admin-only">
+            <div class="member-actions">
+              <button class="btn-icon btn-edit" onclick="editMember('${member.id}')" title="Bearbeiten">
+                ✏️ Bearbeiten
+              </button>
+              <button class="btn-icon btn-delete" onclick="deleteMember('${member.id}')" title="Löschen">
+                🗑️ Löschen
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    updateMemberCount();
+  }
+
+  function updateMemberCount() {
+    const memberCount = document.getElementById('memberCount');
+    const count = currentMembers.length;
+    memberCount.textContent = `${count} Mitglieder`;
+  }
+
+  function searchMembers() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.toLowerCase();
+    currentSearchTerm = searchTerm;
+    
+    if (searchTerm === '') {
+      renderMembers();
+      return;
+    }
+
+    const filteredMembers = currentMembers.filter(member => 
+      (member.name || '').toLowerCase().includes(searchTerm) || 
+      (member.id || '').toLowerCase().includes(searchTerm)
+    );
+    
+    renderMembers(filteredMembers);
+  }
+
+  function sortMembers(sortBy) {
+    currentSort = sortBy;
+    
+    // Update active button
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    renderMembers();
+  }
+
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: ${type === 'success' ? '#10b981' : '#ef4444'};
+      color: white;
+      border-radius: 6px;
+      z-index: 1001;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      font-weight: 500;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100px)';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+
+  function checkIdAvailability() {
+    const memberIdInput = document.getElementById('memberId');
+    const idAvailable = document.getElementById('idAvailable');
+    const idTaken = document.getElementById('idTaken');
+    const id = memberIdInput.value.trim().toUpperCase();
+
+    // Verstecke Status zunächst
+    idAvailable.style.display = 'none';
+    idTaken.style.display = 'none';
+
+    if (id.length === 0) {
+      return;
+    }
+
+    // Prüfe ob ID bereits existiert
+    const idExists = currentMembers.some(member => member.id.toUpperCase() === id);
+
+    if (idExists) {
+      idTaken.style.display = 'inline-block';
+    } else {
+      idAvailable.style.display = 'inline-block';
+    }
+  }
+
+  function validateForm() {
+    const name = document.getElementById('memberName').value.trim();
+    const id = document.getElementById('memberId').value.trim();
+    const nameError = document.getElementById('nameError');
+    const idError = document.getElementById('idError');
+
+    // Zurücksetzen der Fehlermeldungen
+    nameError.style.display = 'none';
+    idError.style.display = 'none';
+
+    let isValid = true;
+
+    // Name validieren
+    if (!name) {
+      nameError.style.display = 'block';
+      isValid = false;
+    }
+
+    // ID validieren
+    if (!id) {
+      idError.style.display = 'block';
+      isValid = false;
+    } else if (currentMembers.some(member => member.id.toUpperCase() === id.toUpperCase())) {
+      idError.textContent = 'Diese ID ist bereits vergeben';
+      idError.style.display = 'block';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  async function saveMember() {
+    if (!validateForm()) {
+      return;
+    }
+    
+    const name = document.getElementById('memberName').value.trim();
+    const id = document.getElementById('memberId').value.trim().toUpperCase();
+    
+    try {
+      // Prüfe ob ID bereits existiert
+      const memberDoc = await db.collection('members').doc(id).get();
+      if (memberDoc.exists) {
+        showNotification('Diese ID ist bereits vergeben', 'error');
+        return;
+      }
+
+      // Neues Mitglied erstellen
+      await db.collection('members').doc(id).set({
+        name: name,
+        balance: 0,
+        joinDate: new Date().toISOString(),
+        lastActivity: new Date().toISOString()
+      });
+
+      closeModal();
+      showNotification('Mitglied erfolgreich hinzugefügt!');
+    } catch (error) {
+      showNotification('Fehler: ' + error.message, 'error');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('memberModal').style.display = 'none';
+    document.getElementById('memberName').value = '';
+    document.getElementById('memberId').value = '';
+    document.getElementById('idAvailable').style.display = 'none';
+    document.getElementById('idTaken').style.display = 'none';
+    document.getElementById('nameError').style.display = 'none';
+    document.getElementById('idError').style.display = 'none';
+  }
+
+  // Globale Funktionen für Event Handler
+  window.editMember = async (id) => {
+    const member = currentMembers.find(m => m.id === id);
+    if (member) {
+      const newName = prompt('Neuen Namen eingeben:', member.name);
+      if (newName && newName.trim()) {
         try {
-          await db.collection('members').doc(id).delete();
-          showNotification('Mitglied erfolgreich gelöscht!');
+          await db.collection('members').doc(id).update({
+            name: newName.trim()
+          });
+          showNotification('Mitglied erfolgreich bearbeitet!');
         } catch (error) {
           showNotification('Fehler: ' + error.message, 'error');
         }
       }
-    };
-
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('memberModal');
-      const addMemberBtn = document.getElementById('addMemberBtn');
-      const saveMemberBtn = document.getElementById('saveMember');
-      const cancelBtn = document.getElementById('cancelMember');
-      const searchInput = document.getElementById('searchInput');
-      const sortButtons = document.querySelectorAll('.sort-btn');
-      const memberIdInput = document.getElementById('memberId');
-
-      // Suchfunktion
-      searchInput.addEventListener('input', searchMembers);
-
-      // Sortierfunktion
-      sortButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-          sortMembers(this.dataset.sort);
-        });
-      });
-
-      // ID Verfügbarkeit prüfen
-      memberIdInput.addEventListener('input', checkIdAvailability);
-
-      // Modal öffnen
-      addMemberBtn.addEventListener('click', () => {
-        modal.style.display = 'block';
-        document.getElementById('memberName').focus();
-      });
-
-      // Mitglied speichern
-      saveMemberBtn.addEventListener('click', saveMember);
-
-      // Modal schließen
-      cancelBtn.addEventListener('click', closeModal);
-
-      // Enter-Taste für Speichern
-      document.getElementById('memberName').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') saveMember();
-      });
-      document.getElementById('memberId').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') saveMember();
-      });
-
-      // Leaderschaft Button Event
-      document.getElementById('leaderschaftBtn').onclick = () => {
-        const loginModal = document.createElement('div');
-        loginModal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0,0,0,.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        `;
-        
-        loginModal.innerHTML = `
-          <div style="
-            background: radial-gradient(80.56% 128.89% at 50% 0, #3f3681 0, #0d0b1b 100%);
-            border-radius: 24px;
-            padding: 40px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(255,255,255,.1);
-            position: relative;
-          ">
-            <button onclick="this.parentElement.parentElement.remove()" style="
-              position: absolute;
-              top: 20px;
-              right: 20px;
-              background: rgba(124,91,241,.2);
-              border: none;
-              color: var(--White);
-              width: 32px;
-              height: 32px;
-              border-radius: 8px;
-              cursor: pointer;
-            ">✕</button>
-            <h2 style="color: var(--White); text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase;">LEADERSCHAFT LOGIN</h2>
-            <div style="margin-bottom: 16px;">
-              <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">E-MAIL</label>
-              <input type="email" id="modalEmail" placeholder="admin@hexenjaeger.de" style="
-                width: 100%;
-                border-radius: 6px;
-                background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
-                box-shadow: 0 2px 0 0 #7c5bf1;
-                padding: 14px 18px;
-                color: var(--Dark);
-                font-size: 16px;
-                font-weight: 600;
-                border: none;
-              ">
-            </div>
-            <div style="margin-bottom: 16px;">
-              <label style="display: block; font-size: 12px; font-weight: 700; letter-spacing: .48px; text-transform: uppercase; color: var(--White); margin-bottom: 8px;">PASSWORT</label>
-              <input type="password" id="modalPassword" placeholder="********" style="
-                width: 100%;
-                border-radius: 6px;
-                background: linear-gradient(0deg, rgba(124,91,241,.2) 0%, rgba(124,91,241,.2) 100%), var(--White);
-                box-shadow: 0 2px 0 0 #7c5bf1;
-                padding: 14px 18px;
-                color: var(--Dark);
-                font-size: 16px;
-                font-weight: 600;
-                border: none;
-              ">
-            </div>
-            <button onclick="handleLogin()" style="
-              width: 100%;
-              padding: 16px 28px;
-              background: #7c5bf1;
-              color: var(--White);
-              border: none;
-              border-radius: 16px;
-              font-size: 18px;
-              font-weight: 800;
-              letter-spacing: .72px;
-              text-transform: uppercase;
-              cursor: pointer;
-              margin-top: 16px;
-            ">LOGIN</button>
-            <p id="modalStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
-          </div>
-        `;
-        
-        document.body.appendChild(loginModal);
-        
-        // Enter-Taste für Login
-        const handleKeyPress = (e) => {
-          if (e.key === 'Enter') {
-            handleLogin();
-          }
-        };
-        
-        document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
-        document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
-        
-        window.handleLogin = async () => {
-          const email = document.getElementById('modalEmail').value;
-          const password = document.getElementById('modalPassword').value;
-          const status = document.getElementById('modalStatus');
-          
-          try {
-            await auth.signInWithEmailAndPassword(email, password);
-            status.textContent = 'Erfolgreich angemeldet!';
-            setTimeout(() => {
-              loginModal.remove();
-            }, 1000);
-          } catch (error) {
-            status.textContent = 'Login fehlgeschlagen: ' + error.message;
-          }
-        };
-      };
-    });
-        document.getElementById('modalEmail').addEventListener('keypress', handleKeyPress);
-      document.getElementById('modalPassword').addEventListener('keypress', handleKeyPress);
-      
-      window.handleLogin = async () => {
-        const email = document.getElementById('modalEmail').value;
-        const password = document.getElementById('modalPassword').value;
-        const status = document.getElementById('modalStatus');
-        
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          status.textContent = 'Erfolgreich angemeldet!';
-          setTimeout(() => {
-            loginModal.remove();
-          }, 1000);
-        } catch (error) {
-          status.textContent = 'Login fehlgeschlagen: ' + error.message;
-        }
-      };
-    };
-    // Aktive Navigation setzen
-function setActiveNav() {
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const navLinks = document.querySelectorAll('.header__nav a');
-  
-  navLinks.forEach(link => {
-    const linkPage = link.getAttribute('href');
-    if (linkPage === currentPage) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
     }
+  };
+
+  window.deleteMember = async (id) => {
+    if (confirm('Mitglied wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) {
+      try {
+        await db.collection('members').doc(id).delete();
+        showNotification('Mitglied erfolgreich gelöscht!');
+      } catch (error) {
+        showNotification('Fehler: ' + error.message, 'error');
+      }
+    }
+  };
+
+  // Event Listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('memberModal');
+    const addMemberBtn = document.getElementById('addMemberBtn');
+    const saveMemberBtn = document.getElementById('saveMember');
+    const cancelBtn = document.getElementById('cancelMember');
+    const searchInput = document.getElementById('searchInput');
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    const memberIdInput = document.getElementById('memberId');
+
+    // Suchfunktion
+    searchInput.addEventListener('input', searchMembers);
+
+    // Sortierfunktion
+    sortButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        sortMembers(this.dataset.sort);
+      });
+    });
+
+    // ID Verfügbarkeit prüfen
+    memberIdInput.addEventListener('input', checkIdAvailability);
+
+    // Modal öffnen
+    addMemberBtn.addEventListener('click', () => {
+      modal.style.display = 'block';
+      document.getElementById('memberName').focus();
+    });
+
+    // Mitglied speichern
+    saveMemberBtn.addEventListener('click', saveMember);
+
+    // Modal schließen
+    cancelBtn.addEventListener('click', closeModal);
+
+    // Enter-Taste für Speichern
+    document.getElementById('memberName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') saveMember();
+    });
+    document.getElementById('memberId').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') saveMember();
+    });
+
+    setActiveNav();
   });
-}
 
-// Beim Laden und bei Navigation
-document.addEventListener('DOMContentLoaded', setActiveNav);
-window.addEventListener('popstate', setActiveNav);
-  </script>
-</body>
-</html>
+  // Aktive Navigation setzen
+  function setActiveNav() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.header__nav a');
+    
+    navLinks.forEach(link => {
+      const linkPage = link.getAttribute('href');
+      if (linkPage === currentPage) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
 
-  </script>
+  window.addEventListener('popstate', setActiveNav);
+</script>
 </body>
 </html>
