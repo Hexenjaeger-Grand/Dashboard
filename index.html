@@ -160,10 +160,11 @@
 
 body.dashboard .header__logo img {
   border-radius: 50%;
+  outline: 2px solid var(--Primary); /* Direkte Umrandung ohne Lücke */
+  outline-offset: -1px; /* Umrandung nach innen verschieben */
   box-shadow: 
-    0 0 0 1px var(--Primary),           /* Sehr enge innere Umrandung */
-    0 0 6px 2px var(--Primary),         /* Direkter Glow */
-    0 0 12px 3px var(--Primary);        /* Weicher äußerer Glow */
+    0 0 8px 2px var(--Primary),
+    0 0 15px 4px var(--Primary);
   transform: scale(1.02);
   transition: all 0.3s ease;
 }
