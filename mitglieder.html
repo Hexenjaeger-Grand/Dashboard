@@ -386,6 +386,7 @@
       border: 1px solid rgba(124,91,241,.3);
     }
 
+/* Admin Only - KORRIGIERT */
 .admin-only { 
   display: none; 
   visibility: hidden; 
@@ -398,17 +399,17 @@ body.admin .admin-only {
   opacity: 1; 
 }
 
-    /* Responsive */
-    @media (max-width: 1040px) {
-      .header__nav { display: none; }
-      .header__text { display: none; }
-    }
+/* Responsive */
+@media (max-width: 1040px) {
+  .header__nav { display: none; }
+  .header__text { display: none; }
+}
 
-    @media (max-width: 768px) {
-      .table-container {
-        padding: 16px;
-        overflow-x: auto;
-      }
+@media (max-width: 768px) {
+  .stats-grid {
+    /* responsive styles... */
+  }
+}
       
       table {
         min-width: 600px;
