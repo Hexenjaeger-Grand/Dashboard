@@ -573,6 +573,24 @@
       opacity: 1; 
     }
 
+    /* Dropdown Styles für bessere Lesbarkeit */
+select {
+  background: rgba(0, 0, 0, 0.7) !important;
+  color: var(--White) !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+}
+
+select option {
+  background: #1a1a2e !important;
+  color: var(--White) !important;
+  padding: 12px !important;
+}
+
+select:focus {
+  border-color: var(--Primary) !important;
+  outline: 2px solid var(--Primary) !important;
+}
+
     /* Responsive */
     @media (max-width: 1040px) {
       .header__nav { display: none; }
