@@ -158,14 +158,15 @@
       color: var(--White);
     }
 
-    body.dashboard .header__logo img {
-      border-radius: 50%;
-      box-shadow: 
-        0 0 8px 1px var(--Primary),
-        0 0 15px 2px var(--Primary);
-      transform: scale(1.02);
-      transition: all 0.3s ease;
-    }
+body.dashboard .header__logo img {
+  border-radius: 50%;
+  box-shadow: 
+    0 0 0 1px var(--Primary),           /* Sehr enge innere Umrandung */
+    0 0 6px 2px var(--Primary),         /* Direkter Glow */
+    0 0 12px 3px var(--Primary);        /* Weicher äußerer Glow */
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
 
     /* Leaderschaft Button */
     .leaderschaft-btn {
