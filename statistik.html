@@ -683,73 +683,53 @@ function updateCharts() {
     'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
   };
 
-  // Events Chart - Einfache Liste
+  // Events Chart
   const eventsChart = document.getElementById('eventsChart');
   eventsChart.innerHTML = '';
   
   const sortedEvents = Object.entries(eventTotals)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
+    .slice(0, 6);
   
   if (sortedEvents.length === 0) {
     eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Event-Daten verfügbar</div>';
   } else {
+    const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+    
     sortedEvents.forEach(([event, amount]) => {
-      const eventItem = document.createElement('div');
-      eventItem.style.display = 'flex';
-      eventItem.style.justifyContent = 'space-between';
-      eventItem.style.alignItems = 'center';
-      eventItem.style.padding = '12px 16px';
-      eventItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 150 : 10;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
       
-      const eventName = document.createElement('div');
-      eventName.style.color = 'var(--White)';
-      eventName.style.fontWeight = '600';
-      eventName.textContent = eventNames[event] || event;
-      
-      const eventAmount = document.createElement('div');
-      eventAmount.style.color = 'var(--Yellow)';
-      eventAmount.style.fontWeight = '700';
-      eventAmount.textContent = amount.toLocaleString('de-DE') + ' €';
-      
-      eventItem.appendChild(eventName);
-      eventItem.appendChild(eventAmount);
-      eventsChart.appendChild(eventItem);
+      const eventName = eventNames[event] || event;
+      bar.title = `${eventName}: ${amount.toLocaleString('de-DE')} €`;
+      eventsChart.appendChild(bar);
     });
   }
 
-  // Members Chart - Einfache Liste
+  // Members Chart
   const membersChart = document.getElementById('membersChart');
   membersChart.innerHTML = '';
   
   const sortedMembers = Object.entries(memberTotals)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
+    .slice(0, 6);
   
   if (sortedMembers.length === 0) {
     membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Mitglieder-Daten verfügbar</div>';
   } else {
+    const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
+    
     sortedMembers.forEach(([member, amount]) => {
-      const memberItem = document.createElement('div');
-      memberItem.style.display = 'flex';
-      memberItem.style.justifyContent = 'space-between';
-      memberItem.style.alignItems = 'center';
-      memberItem.style.padding = '12px 16px';
-      memberItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-      
-      const memberName = document.createElement('div');
-      memberName.style.color = 'var(--White)';
-      memberName.style.fontWeight = '600';
-      memberName.textContent = member;
-      
-      const memberAmount = document.createElement('div');
-      memberAmount.style.color = 'var(--Yellow)';
-      memberAmount.style.fontWeight = '700';
-      memberAmount.textContent = amount.toLocaleString('de-DE') + ' €';
-      
-      memberItem.appendChild(memberName);
-      memberItem.appendChild(memberAmount);
-      membersChart.appendChild(memberItem);
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 150 : 10;
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = height + 'px';
+      bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
+      bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
+      membersChart.appendChild(bar);
     });
   }
 }
