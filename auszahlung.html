@@ -4,23 +4,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Offene Auszahlungen - Hexenjäger</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg: #0f172a; --text: #e5e7eb; --muted: #9ca3af; 
-      --border: #1f2937; --accent: #7c3aed; --card: rgba(255,255,255,0.05);
+      --Font: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --White: #F1F1F1;
+      --Dark: #151617;
+      --Neutral: #F9F3DE;
+      --Firmcolor: #EE2759;
+      --Red: #FF4848;
+      --Yellow: #FFDE2A;
+      --Ice: #3581DB;
+      --Grey: #6A6373;
+      --Primary: #7c5bf1;
+      --bg: #0d0b1b;
+      --card: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.1);
     }
-    *{box-sizing:border-box; margin:0; padding:0;}
-    body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui; padding:20px;}
-    .container{max-width:1200px; margin:0 auto;}
-    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
-    .back-btn{padding:10px 20px; background:var(--accent); color:white; text-decoration:none; border-radius:8px;}
     
-    table{width:100%; border-collapse:collapse; background:var(--card); border-radius:10px; overflow:hidden;}
-    th, td{padding:12px; text-align:left; border-bottom:1px solid var(--border);}
-    th{background:rgba(0,0,0,0.3);}
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{margin:0; background:var(--bg); color:var(--White); font-family:var(--Font); padding:20px;}
+    .container{max-width:1200px; margin:0 auto;}
+    
+    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:20px;}
+    .back-btn{display:flex; padding:12px 24px; background:var(--Primary); color:white; text-decoration:none; border-radius:8px; font-weight:700; text-transform:uppercase; align-items:center; gap:8px; transition:.2s;}
+    .back-btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
+    
+    table{width:100%; border-collapse:collapse; background:var(--card); border-radius:16px; overflow:hidden;}
+    th, td{padding:16px; text-align:left; border-bottom:1px solid var(--border);}
+    th{background:rgba(124,91,241,0.2); font-weight:700; text-transform:uppercase; font-size:14px;}
+    tr:hover{background:rgba(124,91,241,0.1);}
+    .amount{font-weight:700; color:var(--Yellow);}
+    .paid .amount{color:#4CAF50;}
+    
+    h1{font-size:36px; font-weight:900; text-transform:uppercase; color:var(--White);}
+    .summary{background:var(--card); padding:20px; border-radius:16px; margin:20px 0; border:1px solid var(--border);}
+    .summary h2{font-size:20px; font-weight:700; margin-bottom:10px; color:var(--Yellow);}
+    
+    .btn{padding:12px 24px; background:var(--Primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; text-transform:uppercase; transition:.2s;}
+    .btn:hover{background:linear-gradient(0deg, rgba(0,0,0,.2) 0, rgba(0,0,0,.2) 100%), var(--Primary);}
+    .btn-yellow{background:var(--Yellow); color:var(--Dark);}
+    .btn-yellow:hover{background:linear-gradient(0deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,.4) 100%), var(--Yellow);}
     
     .admin-only{display:none;}
-    body.admin .admin-only{display:table-cell;}
+    body.admin .admin-only{display:block;}
   </style>
 </head>
 <body>
@@ -30,24 +60,33 @@
       <a href="index.html" class="back-btn">← Dashboard</a>
     </div>
 
+    <div class="summary">
+      <h2>📊 Zusammenfassung</h2>
+      <p>Gesamtsumme offener Auszahlungen: <strong id="totalOpenAmount">0 €</strong></p>
+      <p>Anzahl der Mitglieder mit offenen Auszahlungen: <strong id="membersWithOpen">0</strong></p>
+    </div>
+
     <table>
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Offene Auszahlung</th>
-          <th>Events</th>
-          <th class="admin-only">Aktion</th>
+          <th>Mitglied</th>
+          <th>Offener Betrag</th>
+          <th>Letzte Aktivität</th>
+          <th class="admin-only">Aktionen</th>
         </tr>
       </thead>
       <tbody id="payoutsTable">
         <!-- Wird mit JavaScript gefüllt -->
       </tbody>
     </table>
+
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button class="btn admin-only" onclick="markAllAsPaid()">Alle als bezahlt markieren</button>
+      <button class="btn btn-yellow admin-only" onclick="exportToCSV()">📥 Als CSV exportieren</button>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   
   <script>
@@ -60,37 +99,83 @@
       appId: "1:48507598074:web:d736c118fd74d1968d0543"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    auth.onAuthStateChanged(user => {
-      document.body.classList.toggle('admin', !!user);
-    });
+    let members = [];
 
-    // Offene Auszahlungen laden
+    // Mitglieder mit offenen Auszahlungen laden
     db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
-      const tbody = document.getElementById('payoutsTable');
-      tbody.innerHTML = '';
+      members = [];
+      let totalOpen = 0;
       
       snap.forEach(doc => {
-        const member = doc.data();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${member.id || '-'}</td>
-          <td>${member.name}</td>
-          <td>${(member.balance || 0).toLocaleString('de-DE')} €</td>
-          <td>${member.eventCount || 0}</td>
-          <td class="admin-only">
-            <button onclick="markAsPaid('${doc.id}')">✅ Als bezahlt markieren</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
+        const member = { id: doc.id, ...doc.data() };
+        members.push(member);
+        totalOpen += member.balance || 0;
       });
+      
+      updateTable();
+      document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
+      document.getElementById('membersWithOpen').textContent = members.length;
     });
 
+    function updateTable() {
+      const table = document.getElementById('payoutsTable');
+      table.innerHTML = '';
+      
+      if (members.length === 0) {
+        table.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">Keine offenen Auszahlungen</td></tr>';
+        return;
+      }
+      
+      members.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${member.name || member.id}</td>
+          <td class="amount">${(member.balance || 0).toLocaleString('de-DE')} €</td>
+          <td>${member.lastActivity || 'Unbekannt'}</td>
+          <td class="admin-only">
+            <button class="btn" onclick="markAsPaid('${member.id}')">Als bezahlt markieren</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
     function markAsPaid(memberId) {
-      // Hier kommt die Logik zum Markieren als bezahlt
-      alert('Als bezahlt markieren für: ' + memberId);
+      if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
+      
+      db.collection('members').doc(memberId).update({
+        balance: 0,
+        lastPayout: new Date().toISOString()
+      });
+    }
+
+    function markAllAsPaid() {
+      if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
+      
+      members.forEach(member => {
+        db.collection('members').doc(member.id).update({
+          balance: 0,
+          lastPayout: new Date().toISOString()
+        });
+      });
+    }
+
+    function exportToCSV() {
+      let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
+      
+      members.forEach(member => {
+        csv += `"${member.name || member.id}",${member.balance || 0},"${member.lastActivity || 'Unbekannt'}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `auszahlungen_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
     }
   </script>
 </body>
