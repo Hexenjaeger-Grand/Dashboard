@@ -654,39 +654,63 @@
     document.getElementById('activeMembers').textContent = activeMembers;
   }
 
-  function updateCharts() {
-    // Events Chart
-    const eventsChart = document.getElementById('eventsChart');
-    eventsChart.innerHTML = '';
-    
-    const sortedEvents = Object.entries(eventTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
-    
+function updateCharts() {
+  console.log('Update Charts aufgerufen');
+  console.log('Event Totals:', eventTotals);
+  console.log('Member Totals:', memberTotals);
+  
+  // Events Chart
+  const eventsChart = document.getElementById('eventsChart');
+  eventsChart.innerHTML = '';
+  
+  const sortedEvents = Object.entries(eventTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+  
+  console.log('Sorted Events:', sortedEvents);
+  
+  if (sortedEvents.length === 0) {
+    eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Event-Daten verfügbar</div>';
+  } else {
     const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
     
     sortedEvents.forEach(([event, amount]) => {
-      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 0;
+      const height = maxEventValue > 0 ? (amount / maxEventValue) * 160 : 10;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
       bar.innerHTML = `<div class="bar-label">${(amount/1000).toFixed(0)}k</div>`;
-      bar.title = `${event}: ${amount.toLocaleString('de-DE')} €`;
+      
+      const eventNames = {
+        'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
+        '40er_win': '40er Win', '40er_lose': '40er Lose',
+        'hafen': 'Hafen', 'giesserei': 'Gießerei', 
+        'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
+        'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
+      };
+      
+      bar.title = `${eventNames[event] || event}: ${amount.toLocaleString('de-DE')} €`;
       eventsChart.appendChild(bar);
     });
+  }
 
-    // Members Chart
-    const membersChart = document.getElementById('membersChart');
-    membersChart.innerHTML = '';
-    
-    const sortedMembers = Object.entries(memberTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
-    
+  // Members Chart
+  const membersChart = document.getElementById('membersChart');
+  membersChart.innerHTML = '';
+  
+  const sortedMembers = Object.entries(memberTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+  
+  console.log('Sorted Members:', sortedMembers);
+  
+  if (sortedMembers.length === 0) {
+    membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey);">Keine Mitglieder-Daten verfügbar</div>';
+  } else {
     const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
     
     sortedMembers.forEach(([member, amount]) => {
-      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 0;
+      const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 160 : 10;
       const bar = document.createElement('div');
       bar.className = 'bar';
       bar.style.height = height + 'px';
@@ -695,6 +719,7 @@
       membersChart.appendChild(bar);
     });
   }
+}
 
   // Aktive Navigation setzen
   document.addEventListener('DOMContentLoaded', function() {
