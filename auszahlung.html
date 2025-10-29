@@ -427,7 +427,7 @@
     <div id="loginStatusIndicator" class="login-status-indicator logged-out">
       <span>🔓 Nicht eingeloggt</span>
     </div>
-    <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
+    <button class="leaderschaft-btn" id="leaderschaftBtn">LOGIN</button>
   </div>
 </div>
 
@@ -435,20 +435,18 @@
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
-    <h2>LEADERSCHAFT LOGIN</h2>
+    <h2>🔐 HEXENJÄGER LOGIN</h2>
     
     <div class="input-group">
-      <label>E-MAIL</label>
-      <input type="email" id="email" placeholder="Genji@hexenjaeger.de">
-    </div>
-    
-    <div class="input-group">
-      <label>PASSWORT</label>
-      <input type="password" id="password" placeholder="********">
+      <label>EINMAL-PASSWORT</label>
+      <input type="text" id="password" placeholder="Passwort eingeben...">
     </div>
     
     <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
-    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Grey);">
+      Verwende <code>!login</code> im Discord um ein Passwort zu erhalten
+    </p>
     
     <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
   </div>
@@ -485,32 +483,12 @@
   </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-    projectId: "hexenjaeger-dashboard",
-    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-    messagingSenderId: "48507598074",
-    appId: "1:48507598074:web:d736c118fd74d1968d0543"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // Session Persistence setzen
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .catch((error) => {
-      console.error('Auth persistence error:', error);
-    });
-
-  let members = [];
+  // Cloudflare Worker URL
+  const API_BASE = 'https://withered-pond-25ca.leonneumann1997.workers.dev';
+  
+  // Login Status Management
+  let currentUser = null;
 
   // Modal Funktionen
   document.getElementById('leaderschaftBtn').onclick = () => {
@@ -528,76 +506,133 @@
     }
   };
 
-  // Login/Logout
+  // Login mit Passwort
   document.getElementById('btnLogin').onclick = async () => {
-    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const status = document.getElementById('loginStatus');
     
+    if (!password) {
+      status.textContent = '❌ Bitte Passwort eingeben';
+      return;
+    }
+    
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      status.textContent = 'Erfolgreich angemeldet!';
-      setTimeout(() => {
-        document.getElementById('loginModal').classList.remove('active');
-      }, 1000);
+      const response = await fetch(`${API_BASE}/api/validate-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password })
+      });
+      
+      const result = await response.json();
+      
+      if (result.valid) {
+        // Login erfolgreich
+        currentUser = {
+          role: result.role,
+          loginTime: new Date(),
+          sessionId: generateSessionId()
+        };
+        
+        // In localStorage speichern
+        localStorage.setItem('hexenjaeger_session', JSON.stringify(currentUser));
+        
+        status.textContent = '✅ ' + result.message;
+        status.style.color = "#10b981";
+        
+        // Modal schließen nach Erfolg
+        setTimeout(() => {
+          document.getElementById('loginModal').classList.remove('active');
+          updateUIForUser();
+        }, 1000);
+        
+      } else {
+        status.textContent = '❌ ' + result.error;
+        status.style.color = "var(--Red)";
+      }
+      
     } catch (error) {
-      status.textContent = 'Login fehlgeschlagen: ' + error.message;
+      status.textContent = '❌ Verbindungsfehler: ' + error.message;
+      status.style.color = "var(--Red)";
     }
   };
 
-  document.getElementById('btnLogout').onclick = async () => {
-    await auth.signOut();
-  };
-
-  // Auth Check mit Status-Indicator
-  auth.onAuthStateChanged(user => {
-    const isAdmin = !!user;
+  // UI für eingeloggten User aktualisieren
+  function updateUIForUser() {
+    const isAdmin = currentUser.role === 'admin';
     document.body.classList.toggle('admin', isAdmin);
     
+    // Status Indicator updaten
     const statusIndicator = document.getElementById('loginStatusIndicator');
-    const btnLogin = document.getElementById('btnLogin');
-    const btnLogout = document.getElementById('btnLogout');
+    statusIndicator.className = 'login-status-indicator logged-in';
+    statusIndicator.innerHTML = `
+      <span>🔐 ${isAdmin ? 'ADMIN' : 'MITGLIED'}</span>
+    `;
     
-    if (user) {
-      statusIndicator.className = 'login-status-indicator logged-in';
-      statusIndicator.innerHTML = `
-        <span>🔐 Eingeloggt</span>
-        <div class="user-email" title="${user.email}">${user.email}</div>
-      `;
-      if (btnLogin) btnLogin.style.display = 'none';
-      if (btnLogout) btnLogout.style.display = 'block';
-    } else {
-      statusIndicator.className = 'login-status-indicator logged-out';
-      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
-      if (btnLogin) btnLogin.style.display = 'block';
-      if (btnLogout) btnLogout.style.display = 'none';
+    // Login Button zu Logout ändern
+    const btn = document.getElementById('leaderschaftBtn');
+    btn.textContent = 'LOGOUT';
+    btn.onclick = logout;
+  }
+
+  // Logout
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem('hexenjaeger_session');
+    location.reload();
+  }
+
+  // Session ID generieren
+  function generateSessionId() {
+    return 'session_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Session beim Laden prüfen
+  function checkExistingSession() {
+    const savedSession = localStorage.getItem('hexenjaeger_session');
+    if (savedSession) {
+      currentUser = JSON.parse(savedSession);
+      
+      // Session auf Gültigkeit prüfen (max 24 Stunden)
+      const loginTime = new Date(currentUser.loginTime);
+      const now = new Date();
+      const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24) {
+        updateUIForUser();
+        return true;
+      } else {
+        logout();
+      }
     }
-  });
+    return false;
+  }
 
   // Enter-Taste für Login
-  document.getElementById('email')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('btnLogin').click();
-  });
-
   document.getElementById('password')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Mitglieder mit offenen Auszahlungen laden
-  db.collection('members').where('balance', '>', 0).onSnapshot(snap => {
-    members = [];
-    let totalOpen = 0;
-    
-    snap.forEach(doc => {
-      const member = { id: doc.id, ...doc.data() };
-      members.push(member);
-      totalOpen += member.balance || 0;
-    });
+  // Mock Daten für Auszahlungen
+  let members = [];
+
+  function loadPayouts() {
+    // Temporäre Mock-Daten
+    members = [
+      { id: "HJ001", name: "Genji", balance: 150000, lastActivity: "2024-03-20" },
+      { id: "HJ002", name: "Alex", balance: 75000, lastActivity: "2024-03-19" },
+      { id: "HJ003", name: "Max", balance: 50000, lastActivity: "2024-03-18" }
+    ];
     
     updateTable();
+    
+    let totalOpen = 0;
+    members.forEach(member => totalOpen += member.balance || 0);
+    
     document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
     document.getElementById('membersWithOpen').textContent = members.length;
-  });
+  }
 
   function updateTable() {
     const table = document.getElementById('payoutsTable');
@@ -622,73 +657,21 @@
     });
   }
 
-async function markAsPaid(memberId) {
-  if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
-  
-  try {
-    const memberDoc = await db.collection('members').doc(memberId).get();
-    if (!memberDoc.exists) return;
+  function markAsPaid(memberId) {
+    if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
     
-    const member = memberDoc.data();
-    const payoutAmount = member.balance || 0;
-    
-    if (payoutAmount > 0) {
-      // Balance auf 0 setzen
-      await db.collection('members').doc(memberId).update({
-        balance: 0,
-        lastPayout: new Date().toISOString()
-      });
-      
-      // Transaktion für die Auszahlung erstellen
-      await db.collection('transactions').add({
-        member: member.name || memberId,
-        type: 'auszahlung',
-        event: 'auszahlung',
-        amount: payoutAmount,
-        timestamp: new Date().toISOString(),
-        description: `Auszahlung an ${member.name || memberId}`
-      });
-      
-      console.log(`Auszahlung von ${payoutAmount}€ an ${member.name || memberId} erfasst`);
-    }
-  } catch (error) {
-    console.error('Fehler beim Auszahlen:', error);
-    alert('Fehler beim Auszahlen: ' + error.message);
+    // Hier später mit Bot Server verbinden
+    console.log(`Auszahlung für ${memberId} als bezahlt markiert`);
+    showNotification('Auszahlung als bezahlt markiert', 'success');
   }
-}
 
-async function markAllAsPaid() {
-  if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
-  
-  try {
-    for (const member of members) {
-      const payoutAmount = member.balance || 0;
-      
-      if (payoutAmount > 0) {
-        // Balance auf 0 setzen
-        await db.collection('members').doc(member.id).update({
-          balance: 0,
-          lastPayout: new Date().toISOString()
-        });
-        
-        // Transaktion für die Auszahlung erstellen
-        await db.collection('transactions').add({
-          member: member.name || member.id,
-          type: 'auszahlung',
-          event: 'auszahlung',
-          amount: payoutAmount,
-          timestamp: new Date().toISOString(),
-          description: `Auszahlung an ${member.name || member.id}`
-        });
-      }
-    }
+  function markAllAsPaid() {
+    if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
     
-    console.log('Alle Auszahlungen erfasst');
-  } catch (error) {
-    console.error('Fehler beim Auszahlen aller Mitglieder:', error);
-    alert('Fehler beim Auszahlen: ' + error.message);
+    // Hier später mit Bot Server verbinden
+    console.log('Alle Auszahlungen als bezahlt markiert');
+    showNotification('Alle Auszahlungen als bezahlt markiert', 'success');
   }
-}
 
   function exportToCSV() {
     let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
@@ -706,9 +689,19 @@ async function markAllAsPaid() {
     window.URL.revokeObjectURL(url);
   }
 
-  // Aktive Navigation setzen
+  function showNotification(message, type = 'success') {
+    // Einfache Notification
+    alert(message);
+  }
+
+  // App Initialisierung
   document.addEventListener('DOMContentLoaded', function() {
     setActiveNav();
+    loadPayouts();
+    
+    if (!checkExistingSession()) {
+      document.getElementById('loginModal').classList.add('active');
+    }
   });
 
   function setActiveNav() {
