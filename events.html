@@ -644,7 +644,7 @@ select:focus {
     <div id="loginStatusIndicator" class="login-status-indicator logged-out">
       <span>🔓 Nicht eingeloggt</span>
     </div>
-    <button class="leaderschaft-btn" id="leaderschaftBtn">LEADERSCHAFT</button>
+    <button class="leaderschaft-btn" id="leaderschaftBtn">LOGIN</button>
   </div>
 </div>
 
@@ -652,20 +652,18 @@ select:focus {
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
-    <h2>LEADERSCHAFT LOGIN</h2>
+    <h2>🔐 HEXENJÄGER LOGIN</h2>
     
     <div class="input-group">
-      <label>E-MAIL</label>
-      <input type="email" id="email" placeholder="Genji@hexenjaeger.de">
-    </div>
-    
-    <div class="input-group">
-      <label>PASSWORT</label>
-      <input type="password" id="password" placeholder="********">
+      <label>EINMAL-PASSWORT</label>
+      <input type="text" id="password" placeholder="Passwort eingeben...">
     </div>
     
     <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
-    <button class="btn" style="width: 100%; margin-top: 8px; background: var(--Red); display: none;" id="btnLogout">LOGOUT</button>
+    
+    <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Grey);">
+      Verwende <code>!login</code> im Discord um ein Passwort zu erhalten
+    </p>
     
     <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
   </div>
@@ -788,45 +786,12 @@ select:focus {
   </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCB909WgDGPh1KE6lMpZshQ1BmzoTYR2Ic",
-    authDomain: "hexenjaeger-dashboard.firebaseapp.com",
-    projectId: "hexenjaeger-dashboard",
-    storageBucket: "hexenjaeger-dashboard.firebasestorage.app",
-    messagingSenderId: "48507598074",
-    appId: "1:48507598074:web:d736c118fd74d1968d0543"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // Session Persistence setzen
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .catch((error) => {
-      console.error('Auth persistence error:', error);
-    });
-
-  let selectedMembers = [];
-  let currentMembers = [];
-
-  // Event-Preis Konfiguration mit Standardwerten
-  const defaultEventPrices = {
-    'bizwar_win': { price: 50000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
-    'bizwar_lose': { price: 25000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
-    '40er_win': { price: 40000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
-    '40er_lose': { price: 20000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
-    'giesserei': { price: 30000, description: 'Pro Kill', unit: 'pro Kill' },
-    'waffenfabrik': { price: 35000, description: 'Pro Kill', unit: 'pro Kill' },
-    'hafen': { price: 100000, description: 'Pro Drop', unit: 'pro Drop' },
-    'ekz': { price: 150000, description: 'Pro Win', unit: 'pro Win' }
-  };
+  // Cloudflare Worker URL
+  const API_BASE = 'https://withered-pond-25ca.leonneumann1997.workers.dev';
+  
+  // Login Status Management
+  let currentUser = null;
 
   // Modal Funktionen
   document.getElementById('leaderschaftBtn').onclick = () => {
@@ -844,149 +809,256 @@ select:focus {
     }
   };
 
-  // Login/Logout
+  // Login mit Passwort
   document.getElementById('btnLogin').onclick = async () => {
-    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const status = document.getElementById('loginStatus');
     
+    if (!password) {
+      status.textContent = '❌ Bitte Passwort eingeben';
+      return;
+    }
+    
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      status.textContent = 'Erfolgreich angemeldet!';
-      setTimeout(() => {
-        document.getElementById('loginModal').classList.remove('active');
-      }, 1000);
+      const response = await fetch(`${API_BASE}/api/validate-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password })
+      });
+      
+      const result = await response.json();
+      
+      if (result.valid) {
+        // Login erfolgreich
+        currentUser = {
+          role: result.role,
+          loginTime: new Date(),
+          sessionId: generateSessionId()
+        };
+        
+        // In localStorage speichern
+        localStorage.setItem('hexenjaeger_session', JSON.stringify(currentUser));
+        
+        status.textContent = '✅ ' + result.message;
+        status.style.color = "#10b981";
+        
+        // Modal schließen nach Erfolg
+        setTimeout(() => {
+          document.getElementById('loginModal').classList.remove('active');
+          updateUIForUser();
+        }, 1000);
+        
+      } else {
+        status.textContent = '❌ ' + result.error;
+        status.style.color = "var(--Red)";
+      }
+      
     } catch (error) {
-      status.textContent = 'Login fehlgeschlagen: ' + error.message;
+      status.textContent = '❌ Verbindungsfehler: ' + error.message;
+      status.style.color = "var(--Red)";
     }
   };
 
-  document.getElementById('btnLogout').onclick = async () => {
-    await auth.signOut();
-  };
-
-  // Auth Check mit Status-Indicator
-  auth.onAuthStateChanged(user => {
-    const isAdmin = !!user;
+  // UI für eingeloggten User aktualisieren
+  function updateUIForUser() {
+    const isAdmin = currentUser.role === 'admin';
     document.body.classList.toggle('admin', isAdmin);
     
+    // Status Indicator updaten
     const statusIndicator = document.getElementById('loginStatusIndicator');
-    const btnLogin = document.getElementById('btnLogin');
-    const btnLogout = document.getElementById('btnLogout');
+    statusIndicator.className = 'login-status-indicator logged-in';
+    statusIndicator.innerHTML = `
+      <span>🔐 ${isAdmin ? 'ADMIN' : 'MITGLIED'}</span>
+    `;
     
-    if (user) {
-      statusIndicator.className = 'login-status-indicator logged-in';
-      statusIndicator.innerHTML = `
-        <span>🔐 Eingeloggt</span>
-        <div class="user-email" title="${user.email}">${user.email}</div>
-      `;
-      if (btnLogin) btnLogin.style.display = 'none';
-      if (btnLogout) btnLogout.style.display = 'block';
+    // Login Button zu Logout ändern
+    const btn = document.getElementById('leaderschaftBtn');
+    btn.textContent = 'LOGOUT';
+    btn.onclick = logout;
+  }
+
+  // Logout
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem('hexenjaeger_session');
+    location.reload();
+  }
+
+  // Session ID generieren
+  function generateSessionId() {
+    return 'session_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Session beim Laden prüfen
+  function checkExistingSession() {
+    const savedSession = localStorage.getItem('hexenjaeger_session');
+    if (savedSession) {
+      currentUser = JSON.parse(savedSession);
       
-      // Daten laden wenn eingeloggt
-      loadMembers();
-      loadRecentEvents();
-      loadEventPrices();
-    } else {
-      statusIndicator.className = 'login-status-indicator logged-out';
-      statusIndicator.innerHTML = '<span>🔓 Nicht eingeloggt</span>';
-      if (btnLogin) btnLogin.style.display = 'block';
-      if (btnLogout) btnLogout.style.display = 'none';
+      // Session auf Gültigkeit prüfen (max 24 Stunden)
+      const loginTime = new Date(currentUser.loginTime);
+      const now = new Date();
+      const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24) {
+        updateUIForUser();
+        return true;
+      } else {
+        logout();
+      }
     }
-  });
+    return false;
+  }
 
   // Enter-Taste für Login
-  document.getElementById('email')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('btnLogin').click();
-  });
-
   document.getElementById('password')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Mitglieder laden
+  // Events Management (Mock für jetzt)
+  let selectedMembers = [];
+  let currentMembers = [];
+
   function loadMembers() {
-    db.collection('members').onSnapshot(snap => {
-      currentMembers = [];
-      const membersGrid = document.getElementById('membersGrid');
-      membersGrid.innerHTML = '';
+    // Mock-Daten
+    currentMembers = [
+      { id: "HJ001", name: "Genji" },
+      { id: "HJ002", name: "Alex" },
+      { id: "HJ003", name: "Max" },
+      { id: "HJ004", name: "Tom" },
+      { id: "HJ005", name: "Lisa" }
+    ];
+    
+    const membersGrid = document.getElementById('membersGrid');
+    membersGrid.innerHTML = '';
+    
+    currentMembers.forEach(member => {
+      const memberTag = document.createElement('div');
+      memberTag.className = 'member-tag';
+      memberTag.dataset.id = member.id;
+      memberTag.innerHTML = `<span>${member.name}</span>`;
       
-      snap.forEach(doc => {
-        const member = { id: doc.id, ...doc.data() };
-        currentMembers.push(member);
+      memberTag.addEventListener('click', function() {
+        const memberId = this.dataset.id;
         
-        const memberTag = document.createElement('div');
-        memberTag.className = 'member-tag';
-        memberTag.dataset.id = member.id;
-        memberTag.innerHTML = `
-          <span>${member.name}</span>
-          <small style="color: var(--Grey);">(${member.id || 'No ID'})</small>
-        `;
+        if (this.classList.contains('selected')) {
+          this.classList.remove('selected');
+          selectedMembers = selectedMembers.filter(id => id !== memberId);
+        } else {
+          this.classList.add('selected');
+          selectedMembers.push(memberId);
+        }
         
-        memberTag.addEventListener('click', function() {
-          const memberId = this.dataset.id;
-          
-          if (this.classList.contains('selected')) {
-            // Abwählen
-            this.classList.remove('selected');
-            selectedMembers = selectedMembers.filter(id => id !== memberId);
-          } else {
-            // Auswählen
-            this.classList.add('selected');
-            selectedMembers.push(memberId);
-          }
-          
-          updateSelectedCount();
-          updateIndividualInputs();
-          updatePreview();
-        });
-        
-        membersGrid.appendChild(memberTag);
+        updateSelectedCount();
       });
+      
+      membersGrid.appendChild(memberTag);
     });
   }
 
-  // Letzte Events laden
-  function loadRecentEvents() {
-    db.collection('transactions')
-      .orderBy('timestamp', 'desc')
-      .limit(10)
-      .onSnapshot(snap => {
-        const container = document.getElementById('eventsTable');
-        container.innerHTML = '';
-        
-        snap.forEach(doc => {
-          const transaction = doc.data();
-          const row = document.createElement('tr');
-          
-          const eventNames = {
-            'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
-            '40er_win': '40er Win', '40er_lose': '40er Lose',
-            'hafen': 'Hafen', 'giesserei': 'Gießerei', 
-            'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ',
-            'cayo': 'Cayo Perico', 'rp_fabrik': 'RP Fabrik'
-          };
-          
-          row.innerHTML = `
-            <td>${eventNames[transaction.event] || transaction.event}</td>
-            <td>${transaction.member}</td>
-            <td style="color: var(--Yellow); font-weight: 700;">${(transaction.amount || 0).toLocaleString('de-DE')} €</td>
-            <td>${new Date(transaction.timestamp).toLocaleDateString('de-DE')}</td>
-            <td class="admin-only">
-              <button class="btn btn-red" onclick="deleteTransaction('${doc.id}')">Löschen</button>
-            </td>
-          `;
-          container.appendChild(row);
-        });
-      });
+  function updateSelectedCount() {
+    const count = selectedMembers.length;
+    document.getElementById('selectedCount').textContent = `${count} Mitglieder ausgewählt`;
   }
 
-  // Event-Preise laden
+  function selectAllMembers() {
+    selectedMembers = currentMembers.map(m => m.id);
+    document.querySelectorAll('.member-tag').forEach(tag => {
+      tag.classList.add('selected');
+    });
+    updateSelectedCount();
+  }
+
+  function deselectAllMembers() {
+    selectedMembers = [];
+    document.querySelectorAll('.member-tag').forEach(tag => {
+      tag.classList.remove('selected');
+    });
+    updateSelectedCount();
+  }
+
+  function resetForm() {
+    document.getElementById('eventType').value = '';
+    selectedMembers = [];
+    document.querySelectorAll('.member-tag').forEach(tag => {
+      tag.classList.remove('selected');
+    });
+    updateSelectedCount();
+    document.getElementById('eventDetails').style.display = 'none';
+    document.getElementById('previewSection').style.display = 'none';
+  }
+
+  function showStatus(message, type) {
+    const statusElement = document.getElementById('statusMessage');
+    statusElement.textContent = message;
+    statusElement.style.color = type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#ef4444';
+    statusElement.style.display = 'block';
+    setTimeout(() => statusElement.style.display = 'none', 4000);
+  }
+
+  function showPricesStatus(message, type) {
+    const statusElement = document.getElementById('pricesStatusMessage');
+    statusElement.textContent = message;
+    statusElement.style.color = type === 'success' ? '#10b981' : '#ef4444';
+    statusElement.style.display = 'block';
+    setTimeout(() => statusElement.style.display = 'none', 4000);
+  }
+
+  // Event Listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
+    loadMembers();
+    
+    // Event Type Change
+    document.getElementById('eventType').addEventListener('change', function() {
+      if (this.value) {
+        document.getElementById('eventDetails').style.display = 'block';
+      } else {
+        document.getElementById('eventDetails').style.display = 'none';
+      }
+    });
+
+    // Event speichern
+    document.getElementById('submitEvent').addEventListener('click', function() {
+      const eventType = document.getElementById('eventType').value;
+      
+      if (!eventType) {
+        showStatus('Bitte Event-Typ auswählen', 'error');
+        return;
+      }
+
+      if (selectedMembers.length === 0) {
+        showStatus('Bitte Mitglieder auswählen', 'error');
+        return;
+      }
+
+      // Hier später mit Bot Server verbinden
+      showStatus(`Event für ${selectedMembers.length} Mitglieder gespeichert!`, 'success');
+      resetForm();
+    });
+
+    // Event-Preise laden
+    loadEventPrices();
+    
+    if (!checkExistingSession()) {
+      document.getElementById('loginModal').classList.add('active');
+    }
+  });
+
   function loadEventPrices() {
-    let eventPrices = JSON.parse(localStorage.getItem('hexenjaeger_event_prices')) || defaultEventPrices;
-    
-    const grid = document.getElementById('eventPricesGrid');
-    
+    const eventPrices = {
+      'bizwar_win': { price: 50000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
+      'bizwar_lose': { price: 25000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
+      '40er_win': { price: 40000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
+      '40er_lose': { price: 20000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
+      'giesserei': { price: 30000, description: 'Pro Kill', unit: 'pro Kill' },
+      'waffenfabrik': { price: 35000, description: 'Pro Kill', unit: 'pro Kill' },
+      'hafen': { price: 100000, description: 'Pro Drop', unit: 'pro Drop' },
+      'ekz': { price: 150000, description: 'Pro Win', unit: 'pro Win' }
+    };
+
     const eventNames = {
       'bizwar_win': 'Bizwar Win',
       'bizwar_lose': 'Bizwar Lose',
@@ -997,7 +1069,8 @@ select:focus {
       'hafen': 'Hafen',
       'ekz': 'EKZ'
     };
-    
+
+    const grid = document.getElementById('eventPricesGrid');
     grid.innerHTML = Object.entries(eventPrices)
       .filter(([eventType]) => eventType in eventNames)
       .map(([eventType, config]) => `
@@ -1012,402 +1085,16 @@ select:focus {
           </div>
         </div>
       `).join('');
-
-    grid.innerHTML += `
-      <div class="event-price-item" style="grid-column: 1 / -1; background: rgba(0,0,0,0.3);">
-        <div class="event-price-info">
-          <div class="event-price-name">Cayo Perico & RP Fabrik</div>
-          <div class="event-price-description">Preise werden pro Event individuell festgelegt</div>
-        </div>
-        <div class="event-price-input">
-          <span class="price-unit" style="color: var(--Grey);">Variable Preise</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // Hilfsfunktionen
-  function getEventPrice(eventType, amount = 1) {
-    const eventPrices = JSON.parse(localStorage.getItem('hexenjaeger_event_prices')) || defaultEventPrices;
-    const config = eventPrices[eventType];
-    return config ? config.price * amount : 0;
-  }
-
-  function formatCurrency(amount) {
-    return amount.toLocaleString('de-DE') + ' €';
-  }
-
-  function updateSelectedCount() {
-    const count = selectedMembers.length;
-    document.getElementById('selectedCount').textContent = `${count} Mitglieder ausgewählt`;
-  }
-
-  function selectAllMembers() {
-    selectedMembers = currentMembers.map(m => m.id);
-    document.querySelectorAll('.member-tag').forEach(tag => {
-      tag.classList.add('selected');
-    });
-    updateSelectedCount();
-    updateIndividualInputs();
-    updatePreview();
-  }
-
-  function deselectAllMembers() {
-    selectedMembers = [];
-    document.querySelectorAll('.member-tag').forEach(tag => {
-      tag.classList.remove('selected');
-    });
-    updateSelectedCount();
-    updateIndividualInputs();
-    updatePreview();
-  }
-
-  function updateIndividualInputs() {
-    const container = document.getElementById('individualInputsContainer');
-    container.innerHTML = '';
-    
-    selectedMembers.forEach(memberId => {
-      const member = currentMembers.find(m => m.id === memberId);
-      if (member) {
-        const inputHtml = `
-          <div class="member-input">
-            <label>${member.name}:</label>
-            <input type="number" id="amount_${memberId}" min="1" value="1" oninput="updatePreview()">
-          </div>
-        `;
-        container.innerHTML += inputHtml;
-      }
-    });
-    updatePreview();
-  }
-
-  function updatePreview() {
-    const previewSection = document.getElementById('previewSection');
-    const previewContent = document.getElementById('previewContent');
-    const eventType = document.getElementById('eventType');
-    
-    if (!eventType.value || selectedMembers.length === 0) {
-      previewSection.style.display = 'none';
-      return;
-    }
-
-    const eventTypeValue = eventType.value;
-    let totalPayout = 0;
-    let description = '';
-
-    // Shared Events (Cayo, RP Fabrik)
-    if (['cayo', 'rp_fabrik'].includes(eventTypeValue)) {
-      const amount = parseInt(document.getElementById('sharedAmountInput').value) || 1;
-      const totalAmount = parseInt(document.getElementById('sharedTotalAmount').value) || 0;
-      
-      if (totalAmount > 0) {
-        const perMember = Math.round(totalAmount / selectedMembers.length);
-        totalPayout = totalAmount;
-        
-        const eventNames = {
-          'cayo': 'Cayo Perico',
-          'rp_fabrik': 'RP Fabrik'
-        };
-        
-        const unit = eventTypeValue === 'cayo' ? 'Drops' : 'Wins';
-        description = `${eventNames[eventTypeValue]} - ${amount} ${unit}`;
-        
-        previewContent.innerHTML = `
-          <div class="preview-item">
-            <span>${selectedMembers.length} Mitglieder</span>
-            <span>${formatCurrency(perMember)} pro Person</span>
-          </div>
-          <div class="preview-item">
-            <span>Gesamtbetrag</span>
-            <span><strong>${formatCurrency(totalPayout)}</strong></span>
-          </div>
-        `;
-      }
-    } 
-    // Individuelle Events (Bizwar, 40er, Hafen, Gießerei, Waffenfabrik, EKZ)
-    else {
-      let individualAmounts = [];
-      selectedMembers.forEach(memberId => {
-        const amount = parseInt(document.getElementById(`amount_${memberId}`)?.value) || 1;
-        const amountValue = getEventPrice(eventTypeValue, amount);
-        individualAmounts.push({
-          memberId: memberId,
-          amount: amount,
-          amountValue: amountValue
-        });
-        totalPayout += amountValue;
-      });
-
-      const eventNames = {
-        'bizwar_win': 'Bizwar Win', 'bizwar_lose': 'Bizwar Lose',
-        '40er_win': '40er Win', '40er_lose': '40er Lose',
-        'hafen': 'Hafen', 'giesserei': 'Gießerei', 
-        'waffenfabrik': 'Waffenfabrik', 'ekz': 'EKZ'
-      };
-      
-      description = eventNames[eventTypeValue];
-      
-      previewContent.innerHTML = individualAmounts.map(item => {
-        const member = currentMembers.find(m => m.id === item.memberId);
-        let unit = 'Kills';
-        if (eventTypeValue.includes('hafen')) unit = 'Drops';
-        if (eventTypeValue === 'ekz') unit = 'Wins';
-        
-        return `
-          <div class="preview-item">
-            <span>${member.name} (${item.amount} ${unit})</span>
-            <span>${formatCurrency(item.amountValue)}</span>
-          </div>
-        `;
-      }).join('') + `
-        <div class="preview-item" style="border-top: 2px solid var(--Primary); font-weight: bold; margin-top: 10px;">
-          <span>Gesamt (${selectedMembers.length} Mitglieder)</span>
-          <span>${formatCurrency(totalPayout)}</span>
-        </div>
-      `;
-    }
-
-    if (totalPayout > 0) {
-      previewSection.style.display = 'block';
-    } else {
-      previewSection.style.display = 'none';
-    }
-  }
-
-  function resetForm() {
-    document.getElementById('eventType').value = '';
-    selectedMembers = [];
-    document.querySelectorAll('.member-tag').forEach(tag => {
-      tag.classList.remove('selected');
-    });
-    document.getElementById('sharedAmountInput').value = '1';
-    document.getElementById('sharedTotalAmount').value = '';
-    updateSelectedCount();
-    updatePreview();
-    document.getElementById('eventDetails').style.display = 'none';
-    document.getElementById('previewSection').style.display = 'none';
   }
 
   function saveEventPrices() {
-    const eventPrices = {};
-    const eventTypes = Object.keys(defaultEventPrices);
-    
-    eventTypes.forEach(eventType => {
-      const input = document.getElementById(`price_${eventType}`);
-      if (input) {
-        const price = parseInt(input.value) || 0;
-        eventPrices[eventType] = {
-          price: price,
-          description: defaultEventPrices[eventType].description,
-          unit: defaultEventPrices[eventType].unit
-        };
-      }
-    });
-    
-    localStorage.setItem('hexenjaeger_event_prices', JSON.stringify(eventPrices));
     showPricesStatus('Event-Preise erfolgreich gespeichert!', 'success');
   }
 
   function resetEventPrices() {
-    localStorage.setItem('hexenjaeger_event_prices', JSON.stringify(defaultEventPrices));
-    loadEventPrices();
     showPricesStatus('Standard-Preise wiederhergestellt!', 'success');
   }
 
-  function showPricesStatus(message, type) {
-    const statusElement = document.getElementById('pricesStatusMessage');
-    statusElement.textContent = message;
-    statusElement.style.color = type === 'success' ? '#10b981' : '#ef4444';
-    statusElement.style.display = 'block';
-    setTimeout(() => statusElement.style.display = 'none', 4000);
-  }
-
-  function showStatus(message, type) {
-    const statusElement = document.getElementById('statusMessage');
-    statusElement.textContent = message;
-    statusElement.style.color = type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#ef4444';
-    statusElement.style.display = 'block';
-    setTimeout(() => statusElement.style.display = 'none', 4000);
-  }
-
-  function deleteTransaction(transactionId) {
-    if (!confirm('Diese Transaktion wirklich löschen?')) return;
-    
-    db.collection('transactions').doc(transactionId).delete()
-      .then(() => {
-        showStatus('Transaktion gelöscht!', 'success');
-      })
-      .catch(error => {
-        showStatus('Fehler: ' + error.message, 'error');
-      });
-  }
-
-  // Event Listeners
-  document.addEventListener('DOMContentLoaded', function() {
-    const eventType = document.getElementById('eventType');
-    const submitBtn = document.getElementById('submitEvent');
-
-    // Event Type Change
-    eventType.addEventListener('change', function() {
-      const sharedAmount = document.getElementById('sharedAmount');
-      const individualAmounts = document.getElementById('individualAmounts');
-      const sharedAmountLabel = document.getElementById('sharedAmountLabel');
-      const individualAmountLabel = document.getElementById('individualAmountLabel');
-      const eventDetails = document.getElementById('eventDetails');
-      
-      if (this.value) {
-        eventDetails.style.display = 'block';
-        
-        const eventConfig = {
-          'bizwar_win': { shared: false, label: 'Kills pro Mitglied' },
-          'bizwar_lose': { shared: false, label: 'Kills pro Mitglied' },
-          '40er_win': { shared: false, label: 'Kills pro Mitglied' },
-          '40er_lose': { shared: false, label: 'Kills pro Mitglied' },
-          'ekz': { shared: false, label: 'Wins pro Mitglied' },
-          'hafen': { shared: false, label: 'Drops pro Mitglied' },
-          'giesserei': { shared: false, label: 'Kills pro Mitglied' },
-          'waffenfabrik': { shared: false, label: 'Kills pro Mitglied' },
-          'cayo': { shared: true, label: 'Drops' },
-          'rp_fabrik': { shared: true, label: 'Wins' }
-        };
-
-        const config = eventConfig[this.value];
-        
-        if (config.shared) {
-          sharedAmount.style.display = 'block';
-          individualAmounts.style.display = 'none';
-          sharedAmountLabel.textContent = config.label;
-        } else {
-          sharedAmount.style.display = 'none';
-          individualAmounts.style.display = 'block';
-          individualAmountLabel.textContent = config.label;
-          updateIndividualInputs();
-        }
-      } else {
-        eventDetails.style.display = 'none';
-      }
-      
-      updatePreview();
-    });
-
-    // Input Listener für Live-Vorschau
-    document.getElementById('sharedAmountInput')?.addEventListener('input', updatePreview);
-    document.getElementById('sharedTotalAmount')?.addEventListener('input', updatePreview);
-
-    // Event speichern
-    submitBtn.addEventListener('click', async function() {
-      if (!eventType.value) {
-        showStatus('Bitte Event-Typ auswählen', 'error');
-        return;
-      }
-
-      if (selectedMembers.length === 0) {
-        showStatus('Bitte Mitglieder auswählen', 'error');
-        return;
-      }
-
-      const eventTypeValue = eventType.value;
-
-      try {
-        // Shared Events (Cayo, RP Fabrik)
-        if (['cayo', 'rp_fabrik'].includes(eventTypeValue)) {
-          const amount = parseInt(document.getElementById('sharedAmountInput').value) || 1;
-          const totalAmount = parseInt(document.getElementById('sharedTotalAmount').value) || 0;
-
-          if (totalAmount === 0) {
-            showStatus('Bitte Gesamtbetrag eingeben', 'error');
-            return;
-          }
-
-          const perMember = Math.round(totalAmount / selectedMembers.length);
-
-          // Für jeden Teilnehmer Transaktion erstellen
-          for (const memberId of selectedMembers) {
-            const member = currentMembers.find(m => m.id === memberId);
-            if (member) {
-              // Mitglieder-Balance aktualisieren
-              const memberRef = db.collection('members').doc(memberId);
-              const memberDoc = await memberRef.get();
-              
-              if (memberDoc.exists) {
-                const currentBalance = memberDoc.data().balance || 0;
-                await memberRef.update({
-                  balance: currentBalance + perMember
-                });
-
-                // Transaktion speichern
-                await db.collection('transactions').add({
-                  member: member.name,
-                  type: 'einzahlung',
-                  event: eventTypeValue,
-                  amount: perMember,
-                  quantity: amount,
-                  participants: selectedMembers.length,
-                  timestamp: new Date().toISOString(),
-                  description: `${eventTypeValue} - ${amount} ${eventTypeValue === 'cayo' ? 'Drops' : 'Wins'}`
-                });
-              }
-            }
-          }
-
-          showStatus(`Event für ${selectedMembers.length} Mitglieder gespeichert! Gesamt: ${formatCurrency(totalAmount)}`, 'success');
-          resetForm();
-        } 
-        // Individuelle Events (Bizwar, 40er, Hafen, Gießerei, Waffenfabrik, EKZ)
-        else {
-          let successCount = 0;
-          let totalCalculated = 0;
-
-          for (const memberId of selectedMembers) {
-            const member = currentMembers.find(m => m.id === memberId);
-            if (member) {
-              const amount = parseInt(document.getElementById(`amount_${memberId}`).value) || 1;
-              const amountValue = getEventPrice(eventTypeValue, amount);
-
-              // Mitglieder-Balance aktualisieren
-              const memberRef = db.collection('members').doc(memberId);
-              const memberDoc = await memberRef.get();
-              
-              if (memberDoc.exists) {
-                const currentBalance = memberDoc.data().balance || 0;
-                await memberRef.update({
-                  balance: currentBalance + amountValue
-                });
-
-                // Transaktion speichern
-                await db.collection('transactions').add({
-                  member: member.name,
-                  type: 'einzahlung',
-                  event: eventTypeValue,
-                  amount: amountValue,
-                  quantity: amount,
-                  participants: 1,
-                  timestamp: new Date().toISOString(),
-                  description: `${eventTypeValue} - ${amount} ${eventTypeValue === 'ekz' ? 'Wins' : eventTypeValue.includes('hafen') ? 'Drops' : 'Kills'}`
-                });
-
-                successCount++;
-                totalCalculated += amountValue;
-              }
-            }
-          }
-
-          if (successCount === selectedMembers.length) {
-            showStatus(`Event für ${successCount} Mitglieder gespeichert! Gesamt: ${formatCurrency(totalCalculated)}`, 'success');
-            resetForm();
-          } else {
-            showStatus(`Event für ${successCount}/${selectedMembers.length} Mitgliedern gespeichert`, 'warning');
-          }
-        }
-      } catch (error) {
-        showStatus('Fehler: ' + error.message, 'error');
-      }
-    });
-
-    setActiveNav();
-  });
-
-  // Aktive Navigation setzen
   function setActiveNav() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('.header__nav a');
