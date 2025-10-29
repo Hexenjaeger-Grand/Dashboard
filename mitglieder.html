@@ -597,7 +597,7 @@
     <button class="btn" style="width: 100%; margin-top: 16px;" id="btnLogin">LOGIN</button>
     
     <p style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Grey);">
-      Verwende <code>!login</code> im Discord um ein Passwort zu erhalten
+      Verwende <code>/auth</code> im Discord um ein Passwort zu erhalten
     </p>
     
     <p id="loginStatus" style="text-align: center; margin-top: 16px; font-size: 14px; color: var(--Yellow);"></p>
@@ -671,8 +671,8 @@
 </div>
 
 <script>
-  // Cloudflare Worker URL
-  const API_BASE = 'https://withered-pond-25ca.leonneumann1997.workers.dev';
+  // API Base URL - WIRD BEI DOMAIN-EINRICHTUNG ANGEPASST
+  const API_BASE = window.location.origin;
   
   // Login Status Management
   let currentUser = null;
