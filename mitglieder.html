@@ -806,18 +806,20 @@
   let currentSort = 'name';
   let currentSearchTerm = '';
 
-  // Mitglieder laden
-  function loadMembers() {
-    // Mock-Daten für jetzt
-    currentMembers = [
-      { id: "HJ001", name: "Genji", balance: 150000 },
-      { id: "HJ002", name: "Alex", balance: 75000 },
-      { id: "HJ003", name: "Max", balance: 50000 },
-      { id: "HJ004", name: "Tom", balance: 25000 },
-      { id: "HJ005", name: "Lisa", balance: 100000 }
-    ];
-    
-    renderMembers();
+  // Mitglieder von API laden
+  async function loadMembers() {
+    try {
+      const response = await fetch(`${API_BASE}/api/members`);
+      if (response.ok) {
+        currentMembers = await response.json();
+        renderMembers();
+      } else {
+        showNotification('Fehler beim Laden der Mitglieder', 'error');
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden:', error);
+      showNotification('Verbindungsfehler', 'error');
+    }
   }
 
   function renderMembers(members = null) {
@@ -912,11 +914,10 @@
   }
 
   function showNotification(message, type = 'success') {
-    // Einfache Notification
     alert(message);
   }
 
-  function checkIdAvailability() {
+  async function checkIdAvailability() {
     const memberIdInput = document.getElementById('memberId');
     const idAvailable = document.getElementById('idAvailable');
     const idTaken = document.getElementById('idTaken');
@@ -930,13 +931,18 @@
       return;
     }
 
-    // Prüfe ob ID bereits existiert
-    const idExists = currentMembers.some(member => member.id.toUpperCase() === id);
-
-    if (idExists) {
-      idTaken.style.display = 'inline-block';
-    } else {
-      idAvailable.style.display = 'inline-block';
+    try {
+      const response = await fetch(`${API_BASE}/api/members/check-id/${id}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.available) {
+          idAvailable.style.display = 'inline-block';
+        } else {
+          idTaken.style.display = 'inline-block';
+        }
+      }
+    } catch (error) {
+      console.error('Fehler bei ID-Prüfung:', error);
     }
   }
 
@@ -962,16 +968,12 @@
     if (!id) {
       idError.style.display = 'block';
       isValid = false;
-    } else if (currentMembers.some(member => member.id.toUpperCase() === id.toUpperCase())) {
-      idError.textContent = 'Diese ID ist bereits vergeben';
-      idError.style.display = 'block';
-      isValid = false;
     }
 
     return isValid;
   }
 
-  function saveMember() {
+  async function saveMember() {
     if (!validateForm()) {
       return;
     }
@@ -979,17 +981,28 @@
     const name = document.getElementById('memberName').value.trim();
     const id = document.getElementById('memberId').value.trim().toUpperCase();
     
-    // Hier später mit Bot Server verbinden
-    currentMembers.push({
-      id: id,
-      name: name,
-      balance: 0,
-      joinDate: new Date().toISOString()
-    });
-    
-    closeModal();
-    showNotification('Mitglied erfolgreich hinzugefügt!');
-    renderMembers();
+    try {
+      const response = await fetch(`${API_BASE}/api/members`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name,
+          id: id
+        })
+      });
+
+      if (response.ok) {
+        closeModal();
+        showNotification('Mitglied erfolgreich hinzugefügt!');
+        loadMembers(); // Liste neu laden
+      } else {
+        showNotification('Fehler beim Hinzufügen des Mitglieds', 'error');
+      }
+    } catch (error) {
+      showNotification('Verbindungsfehler', 'error');
+    }
   }
 
   function closeModal() {
@@ -1008,20 +1021,44 @@
     if (member) {
       const newName = prompt('Neuen Namen eingeben:', member.name);
       if (newName && newName.trim()) {
-        // Hier später mit Bot Server verbinden
-        member.name = newName.trim();
-        showNotification('Mitglied erfolgreich bearbeitet!');
-        renderMembers();
+        try {
+          const response = await fetch(`${API_BASE}/api/members/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: newName.trim() })
+          });
+
+          if (response.ok) {
+            showNotification('Mitglied erfolgreich bearbeitet!');
+            loadMembers(); // Liste neu laden
+          } else {
+            showNotification('Fehler beim Bearbeiten', 'error');
+          }
+        } catch (error) {
+          showNotification('Verbindungsfehler', 'error');
+        }
       }
     }
   };
 
   window.deleteMember = async (id) => {
     if (confirm('Mitglied wirklich löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.')) {
-      // Hier später mit Bot Server verbinden
-      currentMembers = currentMembers.filter(m => m.id !== id);
-      showNotification('Mitglied erfolgreich gelöscht!');
-      renderMembers();
+      try {
+        const response = await fetch(`${API_BASE}/api/members/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showNotification('Mitglied erfolgreich gelöscht!');
+          loadMembers(); // Liste neu laden
+        } else {
+          showNotification('Fehler beim Löschen', 'error');
+        }
+      } catch (error) {
+        showNotification('Verbindungsfehler', 'error');
+      }
     }
   };
 
