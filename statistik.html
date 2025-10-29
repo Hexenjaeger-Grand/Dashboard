@@ -400,51 +400,51 @@
       background: var(--Yellow);
     }
 
-.bar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-  width: 60px;
-  height: 100%;
-  justify-content: flex-end;
-  gap: 8px;
-}
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 60px;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 8px;
+    }
 
-.bar-value {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--Yellow);
-  text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
-}
+    .bar-value {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--Yellow);
+      text-shadow: 0 0 10px rgba(255, 222, 42, 0.3);
+    }
 
-.bar {
-  background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
-  border-radius: 6px 6px 0 0;
-  width: 40px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
-  min-height: 15px;
-}
+    .bar {
+      background: linear-gradient(180deg, var(--Primary) 0%, #6d4aff 100%);
+      border-radius: 6px 6px 0 0;
+      width: 40px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(124, 91, 241, 0.3);
+      min-height: 15px;
+    }
 
-.bar:hover {
-  background: linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%);
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(255, 222, 42, 0.4);
-}
+    .bar:hover {
+      background: linear-gradient(180deg, var(--Yellow) 0%, #e6c900 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(255, 222, 42, 0.4);
+    }
 
-.bar-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--White);
-  text-align: center;
-  max-width: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-  letter-spacing: 0.3px;
-}
+    .bar-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--White);
+      text-align: center;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      letter-spacing: 0.3px;
+    }
 
     .admin-only { 
       display: none; 
@@ -689,79 +689,59 @@
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Statistiken Variablen
-  let totalPayouts = 0;
-  let openPayouts = 0;
-  let activeMembers = 0;
-  let eventTotals = {};
-  let memberTotals = {};
-
-  // Alle Statistiken laden
-  function loadAllStats() {
-    // Mock-Daten für jetzt
-    totalPayouts = 1250000;
-    openPayouts = 275000;
-    activeMembers = 8;
-    
-    eventTotals = {
-      'bizwar_win': 450000,
-      '40er_win': 320000,
-      'hafen': 280000,
-      'ekz': 150000,
-      'giesserei': 50000
-    };
-    
-    memberTotals = {
-      'Genji': 450000,
-      'Alex': 320000,
-      'Max': 280000,
-      'Tom': 150000,
-      'Lisa': 50000
-    };
-    
-    updateStats();
-    updateCharts();
+  // Statistiken von API laden
+  async function loadAllStats() {
+    try {
+      const response = await fetch(`${API_BASE}/api/stats`);
+      if (response.ok) {
+        const stats = await response.json();
+        updateStats(stats);
+        updateCharts(stats);
+      } else {
+        console.error('Fehler beim Laden der Statistiken');
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden:', error);
+    }
   }
 
   // Statistiken aktualisieren
-  function updateStats() {
-    document.getElementById('openPayouts').textContent = openPayouts.toLocaleString('de-DE') + ' €';
-    document.getElementById('totalPayouts').textContent = totalPayouts.toLocaleString('de-DE') + ' €';
-    document.getElementById('activeMembers').textContent = activeMembers;
+  function updateStats(stats) {
+    document.getElementById('openPayouts').textContent = (stats.openPayouts || 0).toLocaleString('de-DE') + ' €';
+    document.getElementById('totalPayouts').textContent = (stats.totalPayouts || 0).toLocaleString('de-DE') + ' €';
+    document.getElementById('activeMembers').textContent = stats.activeMembers || 0;
   }
 
   // Charts aktualisieren
-  function updateCharts() {
+  function updateCharts(stats) {
     // Events Chart
     const eventsChart = document.getElementById('eventsChart');
     eventsChart.innerHTML = '';
     
-    const sortedEvents = Object.entries(eventTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8);
+    const eventStats = stats.eventStats || [];
     
-    if (sortedEvents.length === 0) {
+    if (eventStats.length === 0) {
       eventsChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Event-Daten verfügbar</div>';
     } else {
-      const maxEventValue = Math.max(...sortedEvents.map(e => e[1]));
+      const maxEventValue = Math.max(...eventStats.map(e => e.amount));
       
-      sortedEvents.forEach(([event, amount]) => {
+      eventStats.forEach(event => {
         const barContainer = document.createElement('div');
         barContainer.className = 'bar-container';
         
         const value = document.createElement('div');
         value.className = 'bar-value';
-        value.textContent = formatAmount(amount);
+        value.textContent = formatAmount(event.amount);
         
-        const height = maxEventValue > 0 ? (amount / maxEventValue) * 140 : 15;
+        const height = maxEventValue > 0 ? (event.amount / maxEventValue) * 140 : 15;
         const bar = document.createElement('div');
         bar.className = 'bar';
         bar.style.height = height + 'px';
-        bar.title = `${event}: ${amount.toLocaleString('de-DE')} €`;
+        bar.title = `${event.type}: ${event.amount.toLocaleString('de-DE')} €`;
         
         const label = document.createElement('div');
         label.className = 'bar-label';
-        label.textContent = event;
+        label.textContent = event.type;
         
         barContainer.appendChild(value);
         barContainer.appendChild(bar);
@@ -774,31 +754,30 @@
     const membersChart = document.getElementById('membersChart');
     membersChart.innerHTML = '';
     
-    const sortedMembers = Object.entries(memberTotals)
-      .sort((a, b) => b[1] - a[1]);
+    const memberStats = stats.memberStats || [];
     
-    if (sortedMembers.length === 0) {
+    if (memberStats.length === 0) {
       membersChart.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--Grey); font-size: 14px;">Keine Mitglieder-Daten verfügbar</div>';
     } else {
-      const maxMemberValue = Math.max(...sortedMembers.map(m => m[1]));
+      const maxMemberValue = Math.max(...memberStats.map(m => m.amount));
       
-      sortedMembers.forEach(([member, amount]) => {
+      memberStats.forEach(member => {
         const barContainer = document.createElement('div');
         barContainer.className = 'bar-container';
         
         const value = document.createElement('div');
         value.className = 'bar-value';
-        value.textContent = formatAmount(amount);
+        value.textContent = formatAmount(member.amount);
         
-        const height = maxMemberValue > 0 ? (amount / maxMemberValue) * 140 : 15;
+        const height = maxMemberValue > 0 ? (member.amount / maxMemberValue) * 140 : 15;
         const bar = document.createElement('div');
         bar.className = 'bar';
         bar.style.height = height + 'px';
-        bar.title = `${member}: ${amount.toLocaleString('de-DE')} €`;
+        bar.title = `${member.name}: ${member.amount.toLocaleString('de-DE')} €`;
         
         const label = document.createElement('div');
         label.className = 'bar-label';
-        label.textContent = member;
+        label.textContent = member.name;
         
         barContainer.appendChild(value);
         barContainer.appendChild(bar);
