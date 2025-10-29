@@ -614,27 +614,29 @@
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Mock Daten für Auszahlungen
-  let members = [];
-
-  function loadPayouts() {
-    // Temporäre Mock-Daten
-    members = [
-      { id: "HJ001", name: "Genji", balance: 150000, lastActivity: "2024-03-20" },
-      { id: "HJ002", name: "Alex", balance: 75000, lastActivity: "2024-03-19" },
-      { id: "HJ003", name: "Max", balance: 50000, lastActivity: "2024-03-18" }
-    ];
-    
-    updateTable();
-    
-    let totalOpen = 0;
-    members.forEach(member => totalOpen += member.balance || 0);
-    
-    document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
-    document.getElementById('membersWithOpen').textContent = members.length;
+  // Auszahlungen von API laden
+  async function loadPayouts() {
+    try {
+      const response = await fetch(`${API_BASE}/api/payouts`);
+      if (response.ok) {
+        const data = await response.json();
+        updateTable(data.members || []);
+        
+        let totalOpen = 0;
+        data.members.forEach(member => totalOpen += member.balance || 0);
+        
+        document.getElementById('totalOpenAmount').textContent = totalOpen.toLocaleString('de-DE') + ' €';
+        document.getElementById('membersWithOpen').textContent = data.members.length;
+      } else {
+        showNotification('Fehler beim Laden der Auszahlungen', 'error');
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden:', error);
+      showNotification('Verbindungsfehler', 'error');
+    }
   }
 
-  function updateTable() {
+  function updateTable(members) {
     const table = document.getElementById('payoutsTable');
     table.innerHTML = '';
     
@@ -657,36 +659,53 @@
     });
   }
 
-  function markAsPaid(memberId) {
+  async function markAsPaid(memberId) {
     if (!confirm('Diese Auszahlung als bezahlt markieren?')) return;
     
-    // Hier später mit Bot Server verbinden
-    console.log(`Auszahlung für ${memberId} als bezahlt markiert`);
-    showNotification('Auszahlung als bezahlt markiert', 'success');
+    try {
+      const response = await fetch(`${API_BASE}/api/payouts/${memberId}/mark-paid`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        showNotification('Auszahlung als bezahlt markiert', 'success');
+        loadPayouts(); // Tabelle neu laden
+      } else {
+        showNotification('Fehler beim Markieren als bezahlt', 'error');
+      }
+    } catch (error) {
+      showNotification('Verbindungsfehler', 'error');
+    }
   }
 
-  function markAllAsPaid() {
+  async function markAllAsPaid() {
     if (!confirm('ALLE offenen Auszahlungen als bezahlt markieren?')) return;
     
-    // Hier später mit Bot Server verbinden
-    console.log('Alle Auszahlungen als bezahlt markiert');
-    showNotification('Alle Auszahlungen als bezahlt markiert', 'success');
+    try {
+      const response = await fetch(`${API_BASE}/api/payouts/mark-all-paid`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        showNotification('Alle Auszahlungen als bezahlt markiert', 'success');
+        loadPayouts(); // Tabelle neu laden
+      } else {
+        showNotification('Fehler beim Markieren aller Auszahlungen', 'error');
+      }
+    } catch (error) {
+      showNotification('Verbindungsfehler', 'error');
+    }
   }
 
   function exportToCSV() {
-    let csv = 'Mitglied,Offener Betrag,Letzte Aktivität\n';
-    
-    members.forEach(member => {
-      csv += `"${member.name || member.id}",${member.balance || 0},"${member.lastActivity || 'Unbekannt'}"\n`;
-    });
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `auszahlungen_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // CSV Export über API
+    window.open(`${API_BASE}/api/payouts/export/csv`, '_blank');
   }
 
   function showNotification(message, type = 'success') {
