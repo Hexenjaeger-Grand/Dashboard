@@ -73,15 +73,6 @@
       border: 1px solid rgba(107, 114, 128, 0.3);
     }
 
-    .user-email {
-      font-size: 11px;
-      opacity: 0.9;
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
     /* Header mit Logo und Text */
     .header {
       background: var(--White);
@@ -400,11 +391,34 @@
       background: rgba(124,91,241,.1);
     }
 
-    /* Event Form Styles */
+    /* NEU: Suchleiste für Mitglieder */
+    .member-search {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .member-search input {
+      width: 100%;
+      padding: 12px 16px 12px 40px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      color: var(--White);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--Grey);
+    }
+
+    /* VERBESSERT: Mitglieder Grid mit gleichgroßen Karten */
     .members-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
       margin: 15px 0;
     }
 
@@ -412,19 +426,37 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 8px;
-      padding: 12px;
+      padding: 16px;
       cursor: pointer;
       transition: all 0.2s;
       text-align: center;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .member-tag:hover {
       background: rgba(124,91,241,.1);
+      transform: translateY(-2px);
     }
 
     .member-tag.selected {
       background: var(--Primary);
       border-color: var(--Primary);
+    }
+
+    .member-name {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .member-id {
+      font-size: 12px;
+      color: var(--Yellow);
+      font-weight: 600;
     }
 
     .quick-actions {
@@ -573,23 +605,23 @@
       opacity: 1; 
     }
 
-    /* Dropdown Styles für bessere Lesbarkeit */
-select {
-  background: rgba(0, 0, 0, 0.7) !important;
-  color: var(--White) !important;
-  border: 1px solid rgba(255,255,255,.2) !important;
-}
+    /* Dropdown Styles */
+    select {
+      background: rgba(0, 0, 0, 0.7) !important;
+      color: var(--White) !important;
+      border: 1px solid rgba(255,255,255,.2) !important;
+    }
 
-select option {
-  background: #1a1a2e !important;
-  color: var(--White) !important;
-  padding: 12px !important;
-}
+    select option {
+      background: #1a1a2e !important;
+      color: var(--White) !important;
+      padding: 12px !important;
+    }
 
-select:focus {
-  border-color: var(--Primary) !important;
-  outline: 2px solid var(--Primary) !important;
-}
+    select:focus {
+      border-color: var(--Primary) !important;
+      outline: 2px solid var(--Primary) !important;
+    }
 
     /* Responsive */
     @media (max-width: 1040px) {
@@ -695,9 +727,16 @@ select:focus {
         </select>
       </div>
 
-      <!-- Mitglieder Auswahl -->
+      <!-- Mitglieder Auswahl mit Suchfunktion -->
       <div class="form-group">
         <label>Mitglieder auswählen</label>
+        
+        <!-- Suchleiste -->
+        <div class="member-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="memberSearch" placeholder="Mitglieder suchen...">
+        </div>
+        
         <div class="quick-actions">
           <button type="button" class="quick-btn" onclick="selectAllMembers()">Alle auswählen</button>
           <button type="button" class="quick-btn" onclick="deselectAllMembers()">Alle abwählen</button>
@@ -917,28 +956,54 @@ select:focus {
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
   });
 
-  // Events Management (Mock für jetzt)
+  // Events Management
   let selectedMembers = [];
   let currentMembers = [];
+  let currentSearchTerm = '';
 
-  function loadMembers() {
-    // Mock-Daten
-    currentMembers = [
-      { id: "HJ001", name: "Genji" },
-      { id: "HJ002", name: "Alex" },
-      { id: "HJ003", name: "Max" },
-      { id: "HJ004", name: "Tom" },
-      { id: "HJ005", name: "Lisa" }
-    ];
-    
+  // Mitglieder von API laden
+  async function loadMembers() {
+    try {
+      const response = await fetch(`${API_BASE}/api/members`);
+      if (response.ok) {
+        currentMembers = await response.json();
+        renderMembers();
+      } else {
+        showStatus('Fehler beim Laden der Mitglieder', 'error');
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden:', error);
+      showStatus('Verbindungsfehler', 'error');
+    }
+  }
+
+  function renderMembers() {
     const membersGrid = document.getElementById('membersGrid');
     membersGrid.innerHTML = '';
     
-    currentMembers.forEach(member => {
+    let filteredMembers = currentMembers;
+    
+    // Suchfilter anwenden
+    if (currentSearchTerm) {
+      filteredMembers = currentMembers.filter(member => 
+        (member.name || '').toLowerCase().includes(currentSearchTerm) || 
+        (member.id || '').toLowerCase().includes(currentSearchTerm)
+      );
+    }
+    
+    if (filteredMembers.length === 0) {
+      membersGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--Grey);">Keine Mitglieder gefunden</div>';
+      return;
+    }
+    
+    filteredMembers.forEach(member => {
       const memberTag = document.createElement('div');
       memberTag.className = 'member-tag';
       memberTag.dataset.id = member.id;
-      memberTag.innerHTML = `<span>${member.name}</span>`;
+      memberTag.innerHTML = `
+        <div class="member-name">${member.name || 'Unbekannt'}</div>
+        <div class="member-id">${member.id || 'Keine ID'}</div>
+      `;
       
       memberTag.addEventListener('click', function() {
         const memberId = this.dataset.id;
@@ -955,6 +1020,15 @@ select:focus {
       });
       
       membersGrid.appendChild(memberTag);
+    });
+  }
+
+  // Suchfunktion für Mitglieder
+  function setupSearch() {
+    const searchInput = document.getElementById('memberSearch');
+    searchInput.addEventListener('input', function() {
+      currentSearchTerm = this.value.toLowerCase();
+      renderMembers();
     });
   }
 
@@ -990,6 +1064,46 @@ select:focus {
     document.getElementById('previewSection').style.display = 'none';
   }
 
+  async function submitEvent() {
+    const eventType = document.getElementById('eventType').value;
+    
+    if (!eventType) {
+      showStatus('Bitte Event-Typ auswählen', 'error');
+      return;
+    }
+
+    if (selectedMembers.length === 0) {
+      showStatus('Bitte Mitglieder auswählen', 'error');
+      return;
+    }
+
+    try {
+      const eventData = {
+        type: eventType,
+        memberIds: selectedMembers,
+        // Hier weitere Event-Daten hinzufügen
+      };
+
+      const response = await fetch(`${API_BASE}/api/events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData)
+      });
+
+      if (response.ok) {
+        showStatus(`Event für ${selectedMembers.length} Mitglieder gespeichert!`, 'success');
+        resetForm();
+        loadRecentEvents(); // Events neu laden
+      } else {
+        showStatus('Fehler beim Speichern des Events', 'error');
+      }
+    } catch (error) {
+      showStatus('Verbindungsfehler', 'error');
+    }
+  }
+
   function showStatus(message, type) {
     const statusElement = document.getElementById('statusMessage');
     statusElement.textContent = message;
@@ -998,66 +1112,25 @@ select:focus {
     setTimeout(() => statusElement.style.display = 'none', 4000);
   }
 
-  function showPricesStatus(message, type) {
-    const statusElement = document.getElementById('pricesStatusMessage');
-    statusElement.textContent = message;
-    statusElement.style.color = type === 'success' ? '#10b981' : '#ef4444';
-    statusElement.style.display = 'block';
-    setTimeout(() => statusElement.style.display = 'none', 4000);
+  // Event-Preise von API laden
+  async function loadEventPrices() {
+    try {
+      const response = await fetch(`${API_BASE}/api/event-prices`);
+      if (response.ok) {
+        const eventPrices = await response.json();
+        renderEventPrices(eventPrices);
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden der Event-Preise:', error);
+    }
   }
 
-  // Event Listeners
-  document.addEventListener('DOMContentLoaded', function() {
-    setActiveNav();
-    loadMembers();
-    
-    // Event Type Change
-    document.getElementById('eventType').addEventListener('change', function() {
-      if (this.value) {
-        document.getElementById('eventDetails').style.display = 'block';
-      } else {
-        document.getElementById('eventDetails').style.display = 'none';
-      }
-    });
-
-    // Event speichern
-    document.getElementById('submitEvent').addEventListener('click', function() {
-      const eventType = document.getElementById('eventType').value;
-      
-      if (!eventType) {
-        showStatus('Bitte Event-Typ auswählen', 'error');
-        return;
-      }
-
-      if (selectedMembers.length === 0) {
-        showStatus('Bitte Mitglieder auswählen', 'error');
-        return;
-      }
-
-      // Hier später mit Bot Server verbinden
-      showStatus(`Event für ${selectedMembers.length} Mitglieder gespeichert!`, 'success');
-      resetForm();
-    });
-
-    // Event-Preise laden
-    loadEventPrices();
-    
-    if (!checkExistingSession()) {
-      document.getElementById('loginModal').classList.add('active');
+  function renderEventPrices(eventPrices) {
+    const grid = document.getElementById('eventPricesGrid');
+    if (!eventPrices || Object.keys(eventPrices).length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--Grey);">Keine Event-Preise konfiguriert</div>';
+      return;
     }
-  });
-
-  function loadEventPrices() {
-    const eventPrices = {
-      'bizwar_win': { price: 50000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
-      'bizwar_lose': { price: 25000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
-      '40er_win': { price: 40000, description: 'Pro Kill (Win)', unit: 'pro Kill' },
-      '40er_lose': { price: 20000, description: 'Pro Kill (Lose)', unit: 'pro Kill' },
-      'giesserei': { price: 30000, description: 'Pro Kill', unit: 'pro Kill' },
-      'waffenfabrik': { price: 35000, description: 'Pro Kill', unit: 'pro Kill' },
-      'hafen': { price: 100000, description: 'Pro Drop', unit: 'pro Drop' },
-      'ekz': { price: 150000, description: 'Pro Win', unit: 'pro Win' }
-    };
 
     const eventNames = {
       'bizwar_win': 'Bizwar Win',
@@ -1070,7 +1143,6 @@ select:focus {
       'ekz': 'EKZ'
     };
 
-    const grid = document.getElementById('eventPricesGrid');
     grid.innerHTML = Object.entries(eventPrices)
       .filter(([eventType]) => eventType in eventNames)
       .map(([eventType, config]) => `
@@ -1087,13 +1159,116 @@ select:focus {
       `).join('');
   }
 
-  function saveEventPrices() {
-    showPricesStatus('Event-Preise erfolgreich gespeichert!', 'success');
+  async function saveEventPrices() {
+    try {
+      const prices = {};
+      document.querySelectorAll('[id^="price_"]').forEach(input => {
+        const eventType = input.id.replace('price_', '');
+        prices[eventType] = parseInt(input.value) || 0;
+      });
+
+      const response = await fetch(`${API_BASE}/api/event-prices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prices })
+      });
+
+      if (response.ok) {
+        showPricesStatus('Event-Preise erfolgreich gespeichert!', 'success');
+      } else {
+        showPricesStatus('Fehler beim Speichern der Preise', 'error');
+      }
+    } catch (error) {
+      showPricesStatus('Verbindungsfehler', 'error');
+    }
   }
 
-  function resetEventPrices() {
-    showPricesStatus('Standard-Preise wiederhergestellt!', 'success');
+  function showPricesStatus(message, type) {
+    const statusElement = document.getElementById('pricesStatusMessage');
+    statusElement.textContent = message;
+    statusElement.style.color = type === 'success' ? '#10b981' : '#ef4444';
+    statusElement.style.display = 'block';
+    setTimeout(() => statusElement.style.display = 'none', 4000);
   }
+
+  // Letzte Events laden
+  async function loadRecentEvents() {
+    try {
+      const response = await fetch(`${API_BASE}/api/events/recent`);
+      if (response.ok) {
+        const events = await response.json();
+        renderRecentEvents(events);
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden der Events:', error);
+    }
+  }
+
+  function renderRecentEvents(events) {
+    const table = document.getElementById('eventsTable');
+    if (!events || events.length === 0) {
+      table.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color: var(--Grey);">Keine Events vorhanden</td></tr>';
+      return;
+    }
+
+    table.innerHTML = events.map(event => `
+      <tr>
+        <td>${event.type || 'Unbekannt'}</td>
+        <td>${event.memberName || event.memberId}</td>
+        <td>${(event.amount || 0).toLocaleString('de-DE')} €</td>
+        <td>${event.date || 'Unbekannt'}</td>
+        <td class="admin-only">
+          <button class="btn" onclick="deleteEvent('${event.id}')">Löschen</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function deleteEvent(eventId) {
+    if (!confirm('Event wirklich löschen?')) return;
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/events/${eventId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        showStatus('Event erfolgreich gelöscht', 'success');
+        loadRecentEvents();
+      } else {
+        showStatus('Fehler beim Löschen des Events', 'error');
+      }
+    } catch (error) {
+      showStatus('Verbindungsfehler', 'error');
+    }
+  }
+
+  // Event Listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
+    loadMembers();
+    loadEventPrices();
+    loadRecentEvents();
+    setupSearch();
+
+    // Event Type Change
+    document.getElementById('eventType').addEventListener('change', function() {
+      if (this.value) {
+        document.getElementById('eventDetails').style.display = 'block';
+      } else {
+        document.getElementById('eventDetails').style.display = 'none';
+      }
+    });
+
+    // Event speichern
+    document.getElementById('submitEvent').addEventListener('click', submitEvent);
+
+    if (!checkExistingSession()) {
+      document.getElementById('loginModal').classList.add('active');
+    }
+  });
 
   function setActiveNav() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
@@ -1110,6 +1285,26 @@ select:focus {
   }
 
   window.addEventListener('popstate', setActiveNav);
+
+  // Globale Funktionen
+  window.selectAllMembers = selectAllMembers;
+  window.deselectAllMembers = deselectAllMembers;
+  window.resetForm = resetForm;
+  window.saveEventPrices = saveEventPrices;
+  window.resetEventPrices = async function() {
+    try {
+      const response = await fetch(`${API_BASE}/api/event-prices/reset`, {
+        method: 'POST'
+      });
+      if (response.ok) {
+        showPricesStatus('Standard-Preise wiederhergestellt!', 'success');
+        loadEventPrices();
+      }
+    } catch (error) {
+      showPricesStatus('Fehler beim Zurücksetzen', 'error');
+    }
+  };
+  window.deleteEvent = deleteEvent;
 </script>
 </body>
 </html>
